@@ -121,9 +121,45 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
-exports.Prisma.PostScalarFieldEnum = {
+exports.Prisma.ModelScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  image: 'image',
+  area: 'area',
+  floors: 'floors',
+  price: 'price',
+  bedrooms: 'bedrooms',
+  description: 'description',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.FloorPlanScalarFieldEnum = {
+  id: 'id',
+  modelId: 'modelId',
+  floorPlanImage: 'floorPlanImage',
+  rooms: 'rooms',
+  totalArea: 'totalArea',
+  builtArea: 'builtArea',
+  label: 'label'
+};
+
+exports.Prisma.PortfolioScalarFieldEnum = {
+  id: 'id',
+  image: 'image',
+  title: 'title',
+  location: 'location',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.DiarioObraScalarFieldEnum = {
+  id: 'id',
+  status: 'status',
+  titulo: 'titulo',
+  fase: 'fase',
+  imagem_principal: 'imagem_principal',
+  galeria: 'galeria',
+  depoimento: 'depoimento',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -133,14 +169,37 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
+exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
+};
+
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull
+};
+
 exports.Prisma.QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
 };
 
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
+};
+
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
+};
+
 
 exports.Prisma.ModelName = {
-  Post: 'Post'
+  Model: 'Model',
+  FloorPlan: 'FloorPlan',
+  Portfolio: 'Portfolio',
+  DiarioObra: 'DiarioObra'
 };
 
 /**

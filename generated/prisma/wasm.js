@@ -93,9 +93,45 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
-exports.Prisma.PostScalarFieldEnum = {
+exports.Prisma.ModelScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  image: 'image',
+  area: 'area',
+  floors: 'floors',
+  price: 'price',
+  bedrooms: 'bedrooms',
+  description: 'description',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.FloorPlanScalarFieldEnum = {
+  id: 'id',
+  modelId: 'modelId',
+  floorPlanImage: 'floorPlanImage',
+  rooms: 'rooms',
+  totalArea: 'totalArea',
+  builtArea: 'builtArea',
+  label: 'label'
+};
+
+exports.Prisma.PortfolioScalarFieldEnum = {
+  id: 'id',
+  image: 'image',
+  title: 'title',
+  location: 'location',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.DiarioObraScalarFieldEnum = {
+  id: 'id',
+  status: 'status',
+  titulo: 'titulo',
+  fase: 'fase',
+  imagem_principal: 'imagem_principal',
+  galeria: 'galeria',
+  depoimento: 'depoimento',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -105,14 +141,37 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
+exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
+};
+
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull
+};
+
 exports.Prisma.QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
 };
 
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
+};
+
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
+};
+
 
 exports.Prisma.ModelName = {
-  Post: 'Post'
+  Model: 'Model',
+  FloorPlan: 'FloorPlan',
+  Portfolio: 'Portfolio',
+  DiarioObra: 'DiarioObra'
 };
 /**
  * Create the Client
@@ -153,7 +212,6 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
-  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
@@ -162,13 +220,13 @@ const config = {
       }
     }
   },
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel Post {\n  id        Int      @id @default(autoincrement())\n  name      String\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  @@index([name])\n}\n",
-  "inlineSchemaHash": "4dfee2d805d63053d5ae63a6ff65a5c68e353713bdd4147909d9158ea83d8e0f",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel Model {\n  id          String     @id\n  name        String\n  image       String\n  area        String\n  floors      String\n  price       String\n  bedrooms    Int\n  description String\n  floorPlan   FloorPlan?\n  createdAt   DateTime   @default(now())\n  updatedAt   DateTime   @updatedAt\n}\n\nmodel FloorPlan {\n  id             String  @id @default(cuid())\n  modelId        String  @unique\n  model          Model   @relation(fields: [modelId], references: [id])\n  floorPlanImage String\n  rooms          Json // Lista de {name, size}\n  totalArea      String\n  builtArea      String\n  label          String?\n}\n\nmodel Portfolio {\n  id        Int      @id @default(autoincrement())\n  image     String\n  title     String\n  location  String\n  createdAt DateTime @default(now())\n}\n\nmodel DiarioObra {\n  id               String   @id\n  status           String // 'Andamento' | 'Entregue'\n  titulo           String\n  fase             String\n  imagem_principal String\n  galeria          String[]\n  depoimento       Json? // {texto, autor}\n  createdAt        DateTime @default(now())\n  updatedAt        DateTime @updatedAt\n}\n",
+  "inlineSchemaHash": "e6f0a340384350489428ac9f679d48654183b7baaa90cc27ad0c0bcbc2cec816",
   "copyEngine": true
 }
 config.dirname = '/'
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"Post\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"Model\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"image\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"area\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"floors\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"price\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"bedrooms\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"floorPlan\",\"kind\":\"object\",\"type\":\"FloorPlan\",\"relationName\":\"FloorPlanToModel\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"FloorPlan\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"modelId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"model\",\"kind\":\"object\",\"type\":\"Model\",\"relationName\":\"FloorPlanToModel\"},{\"name\":\"floorPlanImage\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"rooms\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"totalArea\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"builtArea\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"label\",\"kind\":\"scalar\",\"type\":\"String\"}],\"dbName\":null},\"Portfolio\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"image\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"location\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"DiarioObra\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"titulo\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"fase\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"imagem_principal\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"galeria\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"depoimento\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.engineWasm = {
   getRuntime: async () => require('./query_engine_bg.js'),

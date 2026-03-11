@@ -11,11 +11,47 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+model Model {
+    id          String     @id
+    name        String
+    image       String
+    area        String
+    floors      String
+    price       String
+    bedrooms    Int
+    description String
+    floorPlan   FloorPlan?
+    createdAt   DateTime   @default(now())
+    updatedAt   DateTime   @updatedAt
+}
 
-    @@index([name])
+model FloorPlan {
+    id             String  @id @default(cuid())
+    modelId        String  @unique
+    model          Model   @relation(fields: [modelId], references: [id])
+    floorPlanImage String
+    rooms          Json // Lista de {name, size}
+    totalArea      String
+    builtArea      String
+    label          String?
+}
+
+model Portfolio {
+    id        Int      @id @default(autoincrement())
+    image     String
+    title     String
+    location  String
+    createdAt DateTime @default(now())
+}
+
+model DiarioObra {
+    id               String   @id
+    status           String // 'Andamento' | 'Entregue'
+    titulo           String
+    fase             String
+    imagem_principal String
+    galeria          String[]
+    depoimento       Json? // {texto, autor}
+    createdAt        DateTime @default(now())
+    updatedAt        DateTime @updatedAt
 }
