@@ -30,8 +30,8 @@ export const UseCasesSection = () => {
   return (
     <section id="objetivos" className="bg-muted/30 py-20 md:py-32">
       <div className="container mx-auto px-4">
-        <ScrollReveal className="mb-16 max-w-3xl">
-          <span className="mb-6 inline-block rounded-full bg-primary/10 px-4 py-2 text-sm font-semibold text-primary">
+        <ScrollReveal className="mb-16 max-w-3xl mx-auto text-center">
+          <span className="mb-6 inline-block rounded-full bg-primary/10 px-4 py-2 text-sm font-semibold text-primary text-center">
             Aplicações e Versatilidade
           </span>
           <h2 className="section-title mb-6 text-4xl font-bold leading-tight md:text-5xl text-foreground">
