@@ -101,6 +101,7 @@ export const ModelsSection = () => {
                       alt={model.name}
                       fill
                       className="object-cover transition-transform duration-500 group-hover:scale-110"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                     <div className="absolute bottom-3 left-3 right-3 md:bottom-4 md:left-4 md:right-4">

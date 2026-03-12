@@ -100,9 +100,9 @@ export const PortfolioSection = () => {
                     <Image
                       src={item.image}
                       alt={item.title || "Projeto Wood Bahia"}
-                      fill
-                      sizes="(max-width: 768px) 50vw, 33vw"
-                      className="object-cover transition-transform duration-700 group-hover:scale-110"
+                       fill
+                       sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                       className="object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center text-muted-foreground">
