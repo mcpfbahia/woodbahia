@@ -267,19 +267,14 @@ export default function FloorPlanPage() {
                     <div className="bg-muted/50 rounded-2xl border border-muted overflow-hidden aspect-[4/3] flex items-center justify-center relative backdrop-blur-sm cursor-grab active:cursor-grabbing">
                       <motion.div
                         drag
-                        dragConstraints={{ left: -1000, right: 1000, top: -1000, bottom: 1000 }}
-                        dragElastic={0.05}
+                        dragConstraints={{ left: -2000, right: 2000, top: -2000, bottom: 2000 }}
+                        dragElastic={0}
                         dragMomentum={false}
                         animate={{
                           scale: zoom,
                           rotate: rotation,
                           x: position.x,
                           y: position.y
-                        }}
-                        onDragEnd={(_, info) => {
-                          // Mantém a posição final após o drag para que o animate não "puxe" de volta
-                          // Nota: O Framer Motion drag manipula o transform diretamente. 
-                          // Para resetar via botão, usamos o estado 'position'.
                         }}
                         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                         className="relative w-full h-full flex items-center justify-center"
@@ -288,7 +283,8 @@ export default function FloorPlanPage() {
                       <img
                         src={floorPlan[activeTab]?.image || '/placeholder.svg'}
                         alt={`${floorPlan[activeTab]?.label || 'Planta baixa'} - ${model.name}`}
-                        className="max-w-full max-h-full object-contain"
+                        className="max-w-full max-h-full object-contain pointer-events-none"
+                        draggable="false"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src = 'https://placehold.co/800x600?text=Planta+em+Breve';
                         }}
