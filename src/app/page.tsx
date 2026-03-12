@@ -1,7 +1,7 @@
 import { Header } from "~/components/layout/Header";
 import { HeroSection } from "~/components/sections/HeroSection";
 import { AboutSection } from "~/components/sections/AboutSection";
-import { TargetAudienceSection } from "~/components/sections/TargetAudienceSection";
+import { UseCasesSection } from "~/components/sections/UseCasesSection";
 import { FeaturesSection } from "~/components/sections/FeaturesSection";
 import { ModelsSection } from "~/components/sections/ModelsSection";
 import { RegionalCoverageSection } from "~/components/sections/RegionalCoverageSection";
@@ -24,7 +24,7 @@ export default function Home() {
         <AboutSection />
         <ModelsSection />
         <RegionalCoverageSection />
-        <TargetAudienceSection />
+        <UseCasesSection />
         <FeaturesSection />
         <SimulatorSection />
         <PortfolioSection />
