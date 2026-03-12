@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     Calculator, Lock, CheckCircle2, AlertTriangle,
     RefreshCw, MessageCircle, ChevronRight,
-    Package, Layers, Home, Hammer, Sparkles, ArrowLeft
+    Package, Layers, Home, Hammer, Sparkles, ArrowLeft, FileText, Send
 } from 'lucide-react';
 import Link from 'next/link';
 import { Header } from '~/components/layout/Header';
@@ -304,7 +304,7 @@ function Step3({ area, pacoteId, selecionados, nome, whatsapp, onRefazer }: Step
         (selecionados.length ? `➕ Adicionais: ${ADICIONAIS.filter((a) => selecionados.includes(a.id)).map((a) => a.nome).join(', ')}\n` : '') +
         `💰 Valor estimado: ${formatBRL(total)}\n\n` +
         `Meu WhatsApp: ${whatsapp}\n\n` +
-        `Gostaria de falar com um consultor.`
+        `*Gostaria de uma proposta real e detalhada baseada nesta simulação.*`
     );
 
     const waUrl = `https://wa.me/5571992936290?text=${mensagem}`;
@@ -367,23 +367,37 @@ function Step3({ area, pacoteId, selecionados, nome, whatsapp, onRefazer }: Step
                 </div>
             )}
 
-            {/* Alerta */}
-            <div className="flex gap-3 items-start bg-amber-50 border border-amber-200 rounded-2xl p-5 shadow-sm">
-                <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                <p className="text-amber-800 text-xs md:text-sm leading-relaxed">
-                    <strong>Informação Importante:</strong> Esta é uma estimativa aproximada baseada nos valores atuais de mercado. O valor final pode variar conforme as características do terreno, logística e acabamentos específicos. Uma proposta formal será enviada após conversa com nossa equipe técnica.
-                </p>
+            {/* Alerta de Simulação */}
+            <div className="flex gap-4 items-center bg-amber-50 border-2 border-amber-200 rounded-2xl p-6 shadow-sm">
+                <AlertTriangle className="w-6 h-6 text-amber-600 flex-shrink-0" />
+                <div>
+                    <p className="text-amber-900 font-bold text-sm mb-1">Observação importante:</p>
+                    <p className="text-amber-800 text-sm leading-relaxed">
+                        Esta página é uma simulação para fins de estimativa. Para saber o valor real e as condições atuais, solicite uma proposta oficial.
+                    </p>
+                </div>
             </div>
 
-            {/* Botão WhatsApp */}
+            {/* Botão Proposta Real (Destaque) */}
             <a
                 href={waUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full flex items-center justify-center gap-3 py-5 px-8 rounded-2xl bg-green-500 text-white font-bold text-xl shadow-xl shadow-green-500/30 hover:bg-green-600 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300"
+                className="w-full flex items-center justify-center gap-3 py-6 px-8 rounded-2xl bg-primary text-white font-black text-xl shadow-xl shadow-primary/30 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 ring-4 ring-primary/10"
             >
-                <MessageCircle className="w-6 h-6" />
-                Falar com Consultor Agora
+                <FileText className="w-7 h-7" />
+                SOLICITAR PROPOSTA REAL
+            </a>
+
+            {/* Botão WhatsApp Secundário */}
+            <a
+                href={waUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full flex items-center justify-center gap-2 py-4 px-8 rounded-2xl bg-green-500/10 text-green-700 border-2 border-green-500/20 font-bold text-lg hover:bg-green-500/20 transition-all"
+            >
+                <MessageCircle className="w-5 h-5" />
+                Conversar com Especialista
             </a>
 
             {/* Refazer */}
