@@ -16,8 +16,8 @@ const advantages = [
   },
   {
     icon: ShieldCheck,
-    title: "Manutenção Simples e Durável",
-    description: "Utilizamos madeira tratada de alta qualidade, resistente a pragas, umidade e intempéries, garantindo durabilidade e manutenção previsível para casas de madeira em praia, campo ou áreas rurais.",
+    title: "Manutenção Simples e Alta Durabilidade",
+    description: "Utilizamos madeira Pinus tratada em autoclave, um processo industrial que protege a estrutura contra cupins, fungos e umidade. Isso garante maior durabilidade para chalés de madeira e casas pré-fabricadas em regiões de praia, campo ou áreas rurais.",
   },
   {
     icon: Wallet,
