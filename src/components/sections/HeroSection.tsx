@@ -58,7 +58,7 @@ export const HeroSection = () => {
 
           {/* Heading */}
           <motion.h1
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: typeof window !== "undefined" && window.innerWidth < 768 ? 5 : 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1 }}
             className="mb-2 font-serif text-4xl font-bold leading-[1.1] text-white sm:text-5xl md:text-6xl lg:text-7xl"
@@ -70,7 +70,7 @@ export const HeroSection = () => {
           </motion.h1>
 
           <motion.h2
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: typeof window !== "undefined" && window.innerWidth < 768 ? 5 : 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.15 }}
             className="mb-6 font-serif text-2xl font-medium text-white/90 sm:text-3xl md:text-4xl"
@@ -80,7 +80,7 @@ export const HeroSection = () => {
 
           {/* Subheadline */}
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: typeof window !== "undefined" && window.innerWidth < 768 ? 5 : 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
             className="mb-8 max-w-2xl text-lg leading-relaxed font-medium text-white/90 md:text-xl"

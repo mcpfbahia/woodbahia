@@ -47,6 +47,14 @@ export const ScrollReveal = ({
   duration = 0.6,
 }: ScrollRevealProps) => {
   const { ref, visible } = useVisible(delay * 1000);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   const transforms: Record<string, string> = {
     up: "translateY(50px)",
@@ -61,7 +69,7 @@ export const ScrollReveal = ({
       className={className}
       style={{
         opacity: visible ? 1 : 0,
-        transform: visible ? "none" : transforms[direction],
+        transform: visible || isMobile ? "none" : transforms[direction],
         transition: `opacity ${duration}s ease-out, transform ${duration}s ease-out`,
         transitionDelay: visible ? `${delay}s` : "0s",
       }}
@@ -91,6 +99,14 @@ export const StaggerItem = ({
   index?: number;
 }) => {
   const { ref, visible } = useVisible(index * 100);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   return (
     <div
@@ -98,7 +114,7 @@ export const StaggerItem = ({
       className={className}
       style={{
         opacity: visible ? 1 : 0,
-        transform: visible ? "none" : "translateY(40px)",
+        transform: visible || isMobile ? "none" : "translateY(40px)",
         transition: "opacity 0.6s ease-out, transform 0.6s ease-out",
       }}
     >
