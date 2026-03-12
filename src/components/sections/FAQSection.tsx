@@ -105,11 +105,10 @@ export const FAQSection = () => {
               Tire suas dúvidas
             </span>
             <h2 className="section-title text-2xl font-bold sm:text-3xl md:text-4xl lg:text-5xl">
-              Perguntas Frequentes
+              Perguntas Frequentes sobre Chalés de Madeira e Casas Pré-Fabricadas
             </h2>
             <p className="mx-auto mt-4 max-w-2xl px-2 text-sm text-muted-foreground md:text-base lg:text-lg">
-              Respostas para as principais dúvidas sobre nossos chalés e processo
-              de construção
+              Respostas para as principais dúvidas sobre nossos <strong className="text-foreground">chalés de madeira</strong> e <strong className="text-foreground">casas pré-fabricadas</strong>, incluindo prazos de construção, materiais utilizados e formas de pagamento.
             </p>
           </div>
 
@@ -130,10 +129,10 @@ export const FAQSection = () => {
             <ScrollReveal delay={0.2}>
               <div className="mt-8 rounded-xl border border-border bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5 p-4 text-center md:mt-12 md:rounded-2xl md:p-6 lg:p-8">
                 <p className="mb-3 text-sm text-muted-foreground md:mb-4 md:text-base">
-                  Não encontrou sua pergunta?
+                  Fale com um especialista e tire todas as dúvidas sobre chalés de madeira, casas pré-fabricadas e projetos personalizados.
                 </p>
                 <a
-                  href="https://wa.me/5571992936290?text=Olá! Tenho uma dúvida sobre os chalés."
+                  href="https://wa.me/5571992936290?text=Olá! Gostaria de tirar dúvidas sobre os chalés de madeira e casas pré-fabricadas."
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-cta inline-flex text-sm md:text-base"

@@ -194,50 +194,53 @@ export const steps = [
 
 export const faqItems = [
   {
-    question: "Qual o prazo de entrega e montagem?",
+    question: "01 — Qual o prazo de entrega e montagem?",
     answer:
-      "O prazo varia de 45 a 90 dias após a chegada do kit no terreno, dependendo do modelo escolhido e das condições do local. A fabricação leva em média 30 a 45 dias após a aprovação do projeto e pagamento do sinal.",
+      "O prazo médio para construção de um chalé de madeira ou casa pré-fabricada varia de 45 a 90 dias após a chegada do kit no terreno, dependendo do modelo escolhido e das condições do local. A fabricação do kit de madeira leva em média 30 a 45 dias após a aprovação do projeto e pagamento do sinal.",
   },
   {
-    question: "A madeira Pinus tratada é resistente?",
+    question: "02 — A madeira Pinus tratada é resistente?",
     answer:
-      "Sim! O Pinus tratado em autoclave passa por um processo industrial que garante proteção contra cupins, fungos e intempéries por mais de 50 anos. É a mesma tecnologia usada em países europeus e nos Estados Unidos.",
+      "Sim. Utilizamos madeira Pinus tratada em autoclave, um processo industrial que protege a madeira contra cupins, fungos e umidade. Esse tratamento aumenta significativamente a durabilidade da estrutura, tornando os chalés de madeira e casas pré-fabricadas resistentes e seguros para uso em regiões de praia, campo ou cidade.",
   },
   {
-    question: "Vocês entregam em todo o Brasil?",
-    answer: "Entregamos e montamos em toda Bahia e Sergipe.",
-  },
-  {
-    question: "O que preciso ter pronto no terreno?",
+    question: "03 — Vocês entregam em todo o Brasil?",
     answer:
-      "O terreno deve estar limpo, nivelado e com o radier (base de concreto) ou sapatas prontas conforme projeto. Também é necessário ter pontos de água e energia disponíveis no local.",
+      "Sim, os kits de chalés de madeira e casas pré-fabricadas podem ser enviados para todo o Brasil. Já a opção casa pronta (chave na mão) possui área de atuação regional, com atendimento nos estados da Bahia e Sergipe.",
   },
   {
-    question: "Posso personalizar o projeto?",
+    question: "04 — O que preciso ter pronto no terreno?",
     answer:
-      "Sim! Oferecemos projetos personalizados desenvolvidos por nossos arquitetos. Você pode adaptar medidas, adicionar cômodos, varanda, mezanino e outros elementos. O custo é calculado conforme a complexidade do projeto.",
+      "Para iniciar a montagem do chalé de madeira, o terreno deve estar preparado conforme o tipo de fundação do projeto. Se o modelo utilizar fundação em radier, ela deve estar pronta no terreno antes da montagem. Nos modelos que utilizam sapatas com eucalipto tratado, essa estrutura já faz parte do projeto e está incluída na construção. Também é importante garantir acesso ao local para descarga do material.",
   },
   {
-    question: "Como funciona o pagamento?",
+    question: "05 — Posso personalizar o projeto?",
     answer:
-      "Trabalhamos com entrada de 50% na aprovação do projeto e 50% na entrega do kit. Aceitamos transferência bancária, PIX e parcelamento em até 12x no cartão de crédito (consulte taxas).",
+      "Sim. Desenvolvemos projetos personalizados de chalés de madeira e casas pré-fabricadas, adaptando o tamanho do imóvel, número de ambientes, posição de portas e janelas e o tipo de acabamento. Isso permite criar um chalé ideal para Airbnb, casa de campo ou casa de praia.",
   },
   {
-    question: "A casa vem com instalação elétrica e hidráulica?",
+    question: "06 — Como funciona o pagamento?",
     answer:
-      "Instalação elétrica apenas passagem de eletrodutos e instalação hidráulica básica apenas os pontos principais de banheiro e cozinha. Consulte instalação elétrica e hidráulica completa.",
+      "Trabalhamos com diferentes formas de pagamento: parcelamento em até 6x sem juros, parcelamento em até 18x no cartão com juros ou 5% de desconto para pagamento à vista. Também oferecemos pagamento progressivo durante a obra: 30% de sinal na assinatura do contrato, 20% na entrega do kit no local da obra e o valor restante pago de forma proporcional até a conclusão da construção.",
   },
   {
-    question: "Qual a garantia dos produtos?",
+    question: "07 — A casa vem com instalação elétrica e hidráulica?",
     answer:
-      "Oferecemos 5 anos de garantia na estrutura de madeira contra defeitos de fabricação, desde que seguidas as orientações de manutenção. A madeira tratada tem vida útil superior a 25 anos.",
+      "A instalação elétrica é entregue com passagem de eletrodutos embutidos na estrutura, permitindo a instalação posterior dos fios e equipamentos. A parte hidráulica inclui pontos básicos de água e esgoto para banheiro e cozinha. Itens como caixa d'água e biodigestor não estão incluídos no projeto padrão.",
   },
   {
-    question: "Vocês entregam casa pronta chave na mão?",
-    answer: "Sim!",
+    question: "08 — Qual a garantia dos produtos?",
+    answer:
+      "Nossos chalés utilizam madeira Pinus tratada em autoclave, o que permite oferecer garantia estrutural de até 15 anos contra pragas e deterioração da madeira, desde que sejam realizados os cuidados básicos de manutenção.",
   },
   {
-    question: "Posso comprar apenas o kit de madeira para eu mesmo fazer a montagem?",
-    answer: "Sim!",
+    question: "09 — Vocês entregam casa pronta chave na mão?",
+    answer:
+      "Sim. Oferecemos a opção de construção completa “chave na mão”, onde entregamos o chalé pronto para uso dentro da área de atuação da empresa.",
+  },
+  {
+    question: "10 — Posso comprar apenas o kit de madeira para montar?",
+    answer:
+      "Sim. Também é possível adquirir apenas o kit de madeira, que acompanha todas as peças estruturais e manual de montagem, permitindo que o cliente realize a construção com equipe própria.",
   },
 ];
