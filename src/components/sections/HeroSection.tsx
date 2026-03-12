@@ -59,8 +59,8 @@ export const HeroSection = () => {
           <motion.h1
             initial={{ opacity: 0, y: typeof window !== "undefined" && window.innerWidth < 768 ? 5 : 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.1 }}
-            className="mb-4 font-serif text-3xl font-bold leading-tight text-white sm:text-4xl md:text-5xl lg:text-7xl"
+            transition={{ duration: 0.8, delay: 0.15 }}
+            className="mb-4 font-serif text-2xl font-bold leading-tight text-white sm:text-3xl md:text-4xl lg:text-6xl"
           >
             Casas Pré-Fabricadas e{" "}
             <span className="bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 bg-clip-text text-transparent italic">
@@ -72,9 +72,9 @@ export const HeroSection = () => {
             initial={{ opacity: 0, y: typeof window !== "undefined" && window.innerWidth < 768 ? 5 : 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.15 }}
-            className="mb-8 font-serif text-2xl font-medium text-white/90 sm:text-3xl md:text-4xl"
+            className="mb-8 font-serif text-xl font-medium text-white/90 sm:text-2xl md:text-3xl"
           >
-            Construa seu chalé de madeira para Airbnb, campo ou praia com estrutura em Pinus tratado em autoclave e excelente custo-benefício.
+            Construa seu chalé de madeira ou casa pré-fabricada com madeira Pinus tratada em autoclave, ideal para investimento, campo ou praia.
           </motion.h2>
 
           {/* Subheadline */}
