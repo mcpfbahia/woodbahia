@@ -12,7 +12,9 @@ import {
   ZoomIn, 
   ZoomOut, 
   RotateCw, 
-  Loader2 
+  Loader2,
+  RefreshCw,
+  Move
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { doc, getDoc } from "firebase/firestore";
@@ -35,6 +37,7 @@ export default function FloorPlanPage() {
   const [zoom, setZoom] = useState(1);
   const [rotation, setRotation] = useState(0);
   const [activeTab, setActiveTab] = useState<'terreo' | 'superior'>('terreo');
+  const [position, setPosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     setMounted(true);
@@ -105,6 +108,7 @@ export default function FloorPlanPage() {
   useEffect(() => {
     setZoom(1);
     setRotation(0);
+    setPosition({ x: 0, y: 0 });
   }, [activeTab]);
 
   if (!mounted) return null;
@@ -135,6 +139,11 @@ export default function FloorPlanPage() {
   const handleZoomIn = () => setZoom((prev) => Math.min(prev + 0.25, 2));
   const handleZoomOut = () => setZoom((prev) => Math.max(prev - 0.25, 0.5));
   const handleRotate = () => setRotation((prev) => (prev + 90) % 360);
+  const handleReset = () => {
+    setZoom(1);
+    setRotation(0);
+    setPosition({ x: 0, y: 0 });
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -240,18 +249,41 @@ export default function FloorPlanPage() {
                       >
                         <RotateCw className="w-5 h-5 text-primary" />
                       </button>
+                      <button
+                        onClick={handleReset}
+                        className="w-10 h-10 rounded-full bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors"
+                        title="Resetar visualização"
+                      >
+                        <RefreshCw className="w-5 h-5 text-primary" />
+                      </button>
                     </div>
                   </div>
 
-                  <div className="bg-muted/50 rounded-2xl border border-muted overflow-hidden aspect-[4/3] flex items-center justify-center relative">
-                    <motion.div
-                      animate={{
-                        scale: zoom,
-                        rotate: rotation
-                      }}
-                      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                      className="relative w-full h-full flex items-center justify-center"
-                    >
+                  <div className="mb-4 flex items-center gap-2 text-xs text-muted-foreground bg-primary/5 p-2 rounded-lg w-fit">
+                    <Move className="w-3 h-3" />
+                    <span>Dica: Clique e arraste para mover a planta ampliada</span>
+                  </div>
+
+                    <div className="bg-muted/50 rounded-2xl border border-muted overflow-hidden aspect-[4/3] flex items-center justify-center relative backdrop-blur-sm cursor-grab active:cursor-grabbing">
+                      <motion.div
+                        drag
+                        dragConstraints={{ left: -1000, right: 1000, top: -1000, bottom: 1000 }}
+                        dragElastic={0.05}
+                        dragMomentum={false}
+                        animate={{
+                          scale: zoom,
+                          rotate: rotation,
+                          x: position.x,
+                          y: position.y
+                        }}
+                        onDragEnd={(_, info) => {
+                          // Mantém a posição final após o drag para que o animate não "puxe" de volta
+                          // Nota: O Framer Motion drag manipula o transform diretamente. 
+                          // Para resetar via botão, usamos o estado 'position'.
+                        }}
+                        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                        className="relative w-full h-full flex items-center justify-center"
+                      >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={floorPlan[activeTab]?.image || '/placeholder.svg'}
