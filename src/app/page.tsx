@@ -2,7 +2,7 @@ import { Header } from "~/components/layout/Header";
 import { HeroSection } from "~/components/sections/HeroSection";
 import { AboutSection } from "~/components/sections/AboutSection";
 import { UseCasesSection } from "~/components/sections/UseCasesSection";
-import { FeaturesSection } from "~/components/sections/FeaturesSection";
+import { TechnicalAdvantagesSection } from "~/components/sections/TechnicalAdvantagesSection";
 import { ModelsSection } from "~/components/sections/ModelsSection";
 import { RegionalCoverageSection } from "~/components/sections/RegionalCoverageSection";
 import { TimelineSection } from "~/components/sections/TimelineSection";
@@ -25,7 +25,7 @@ export default function Home() {
         <ModelsSection />
         <RegionalCoverageSection />
         <UseCasesSection />
-        <FeaturesSection />
+        <TechnicalAdvantagesSection />
         <SimulatorSection />
         <PortfolioSection />
         <TestimonialsSection />
