@@ -50,9 +50,8 @@ export const HeroSection = () => {
             transition={{ duration: 0.6 }}
             className="mb-6"
           >
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white/90 backdrop-blur-md">
-              <span className="h-2 w-2 animate-pulse rounded-full bg-green-400" />
-              Construção Sustentável & Inteligente
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-black uppercase tracking-widest text-white backdrop-blur-md">
+              Wood Bahia
             </span>
           </motion.div>
 
@@ -61,11 +60,11 @@ export const HeroSection = () => {
             initial={{ opacity: 0, y: typeof window !== "undefined" && window.innerWidth < 768 ? 5 : 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1 }}
-            className="mb-2 font-serif text-4xl font-bold leading-[1.1] text-white sm:text-5xl md:text-6xl lg:text-7xl"
+            className="mb-4 font-serif text-4xl font-bold leading-[1.1] text-white sm:text-5xl md:text-6xl lg:text-7xl"
           >
-            Wood Bahia
-            <span className="block bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 bg-clip-text text-transparent">
-              Casas Pré Fabricadas
+            Casas Pré-Fabricadas e{" "}
+            <span className="block bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 bg-clip-text text-transparent italic">
+              Chalés de Madeira na Bahia
             </span>
           </motion.h1>
 
@@ -73,9 +72,9 @@ export const HeroSection = () => {
             initial={{ opacity: 0, y: typeof window !== "undefined" && window.innerWidth < 768 ? 5 : 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.15 }}
-            className="mb-6 font-serif text-2xl font-medium text-white/90 sm:text-3xl md:text-4xl"
+            className="mb-8 font-serif text-2xl font-medium text-white/90 sm:text-3xl md:text-4xl"
           >
-            Casas & Chalés de Madeira
+            Chalés A-Frame e Casas Pré-Fabricadas para moradia, lazer ou investimento em Airbnb
           </motion.h2>
 
           {/* Subheadline */}
@@ -83,12 +82,11 @@ export const HeroSection = () => {
             initial={{ opacity: 0, y: typeof window !== "undefined" && window.innerWidth < 768 ? 5 : 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="mb-8 max-w-2xl text-lg leading-relaxed font-medium text-white/90 md:text-xl"
+            className="mb-10 max-w-3xl text-lg leading-relaxed font-medium text-white/80 md:text-xl"
           >
-            Projetos "chave na mão" para o seu refúgio ou investimento, do
-            Litoral Baiano ao interior. Do projeto arquitetônico ao fornecimento
-            completo da estrutura, construímos o seu sonho de forma rápida,
-            simples e orientada.
+            Projetos chave na mão, do projeto arquitetônico ao fornecimento completo da estrutura.
+            Construímos chalés e casas de madeira de forma rápida, econômica e planejada, 
+            atendendo todo o litoral da Bahia, Chapada Diamantina e interior.
           </motion.p>
 
           {/* CTAs */}
