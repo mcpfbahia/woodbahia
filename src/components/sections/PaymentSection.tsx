@@ -45,6 +45,9 @@ export const PaymentSection = () => {
                     <p className="text-xl sm:text-3xl font-bold text-slate-900 leading-tight whitespace-nowrap">
                       Até <span className="text-primary font-black text-2xl sm:text-4xl">18x</span> no cartão
                     </p>
+                    <p className="text-slate-500 text-[10px] sm:text-xs mt-2 font-medium leading-tight">
+                      Simule o valor das parcelas e descubra quanto pagará pelo seu kit.
+                    </p>
                   </div>
                   <a 
                     href="/simulador/parcelamento"
