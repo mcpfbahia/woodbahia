@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { collection, getDocs, doc, deleteDoc, updateDoc, addDoc } from "firebase/firestore";
+import { collection, getDocs, doc, deleteDoc, updateDoc, addDoc, setDoc, getDoc } from "firebase/firestore";
 import { db } from "~/lib/firebase";
 import { Loader2, Plus, Edit2, Trash2, X, Save, Image as ImageIcon, FileText, Settings, Minus } from "lucide-react";
 import Image from "next/image";
@@ -9,6 +9,7 @@ import { ImageUpload } from "~/components/admin/ImageUpload";
 
 interface ModelItem {
   id?: string;
+  slug?: string;
   name: string;
   area: string;
   builtArea?: string;
@@ -32,6 +33,7 @@ interface ModelItem {
 }
 
 const initialFormState: ModelItem = {
+  slug: "",
   name: "",
   area: "",
   builtArea: "",
@@ -90,7 +92,7 @@ export default function AdminModelosPage() {
 
   const handleOpenModal = (item?: ModelItem) => {
     if (item) {
-      setFormData(item);
+      setFormData({ ...item, slug: item.id });
       setIsEditing(true);
     } else {
       setFormData(initialFormState);
@@ -120,8 +122,18 @@ export default function AdminModelosPage() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Gerar slug se estiver vazio
+    let finalSlug = formData.slug?.trim() || 
+                    formData.name.toLowerCase()
+                      .normalize("NFD")
+                      .replace(/[\u0300-\u036f]/g, "")
+                      .replace(/[^a-z0-z0-9]/g, "-")
+                      .replace(/-+/g, "-")
+                      .replace(/^-|-$/g, "");
+
     if (!formData.name || !formData.price || !formData.image) {
-      alert("Nome, Preço e Imagem Principal são obrigatórios. Volte na aba correspondente e preencha.");
+      alert("Nome, Preço e Imagem Principal são obrigatórios.");
       return;
     }
 
@@ -131,11 +143,38 @@ export default function AdminModelosPage() {
       
       const dataToSave = { ...formData };
       delete dataToSave.id;
+      delete dataToSave.slug;
 
       if (isEditing && formData.id) {
-        await updateDoc(doc(db, "models", formData.id), dataToSave);
+        // Se o slug mudou, precisamos mover o documento
+        if (formData.id !== finalSlug) {
+          const oldDocRef = doc(db, "models", formData.id);
+          const newDocRef = doc(db, "models", finalSlug);
+          
+          // Verificar se o novo slug já existe
+          const checkNew = await getDoc(newDocRef);
+          if (checkNew.exists()) {
+            if (!confirm("Já existe um modelo com este link (slug). Deseja SOBRESCREVER?")) {
+               setSaving(false);
+               return;
+            }
+          }
+
+          await setDoc(newDocRef, dataToSave);
+          await deleteDoc(oldDocRef);
+        } else {
+          await updateDoc(doc(db, "models", formData.id), dataToSave);
+        }
       } else {
-        await addDoc(collection(db, "models"), dataToSave);
+        // Novo Modelo com ID (slug) customizado
+        const newDocRef = doc(db, "models", finalSlug);
+        const checkNew = await getDoc(newDocRef);
+        if (checkNew.exists()) {
+          alert("Erro: Já existe um modelo com este link (slug). Escolha outro.");
+          setSaving(false);
+          return;
+        }
+        await setDoc(newDocRef, dataToSave);
       }
       
       handleCloseModal();
@@ -293,9 +332,16 @@ export default function AdminModelosPage() {
                 {/* ABA 1: BÁSICO */}
                 {activeTab === "basico" && (
                   <div className="grid gap-6 md:grid-cols-2">
-                    <div className="col-span-full">
-                      <label className="mb-1 block text-sm font-semibold text-slate-700">Nome do Modelo *</label>
-                      <input type="text" required value={formData.name} onChange={e => setFormData(p => ({ ...p, name: e.target.value }))} className="w-full rounded-lg border border-slate-200 p-3" placeholder="Ex: Chalé Suíço" />
+                    <div className="col-span-full grid md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="mb-1 block text-sm font-semibold text-slate-700">Nome do Modelo *</label>
+                        <input type="text" required value={formData.name} onChange={e => setFormData(p => ({ ...p, name: e.target.value }))} className="w-full rounded-lg border border-slate-200 p-3" placeholder="Ex: Chalé Suíço" />
+                      </div>
+                      <div>
+                        <label className="mb-1 block text-sm font-semibold text-slate-700">Link do Modelo (Slug SEO)</label>
+                        <input type="text" value={formData.slug} onChange={e => setFormData(p => ({ ...p, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') }))} className="w-full rounded-lg border border-slate-200 p-3 font-mono text-sm" placeholder="Ex: chale-itacimirim" />
+                        <p className="text-[10px] text-slate-500 mt-1">Gera a URL: woodbahia.site/modelo/<strong>{formData.slug || "id-automatico"}</strong></p>
+                      </div>
                     </div>
                     
                     <div>
