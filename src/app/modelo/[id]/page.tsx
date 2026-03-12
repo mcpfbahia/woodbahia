@@ -343,7 +343,7 @@ export default function ModelDetailPage() {
                     href={`https://wa.me/5571992936290?text=Olá! Tenho interesse no ${model.name}.`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="btn-cta inline-flex items-center justify-center gap-2 bg-primary px-8 py-4 font-bold text-white rounded-xl shadow-lg hover:opacity-90 transition-all"
+                    className="btn-cta bg-primary !shadow-lg"
                   >
                     <Phone className="h-5 w-5" />
                     Quero este modelo
@@ -352,7 +352,7 @@ export default function ModelDetailPage() {
                   {/* Botão para Planta Baixa */}
                   <Link
                     href={`/modelo/${id}/planta`}
-                    className="inline-flex items-center justify-center gap-2 border-2 border-primary/20 bg-transparent px-8 py-4 font-bold text-primary rounded-xl hover:bg-primary/5 transition-all text-center"
+                    className="inline-flex items-center justify-center gap-2 border-2 border-primary/20 bg-transparent px-8 py-4 font-bold text-primary rounded-xl hover:bg-primary/5 hover:-translate-y-1 transition-all text-center"
                   >
                     <Layers className="h-5 w-5" />
                     Ver Planta Baixa

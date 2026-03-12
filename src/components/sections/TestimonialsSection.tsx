@@ -70,14 +70,14 @@ export const TestimonialsSection = () => {
 
       <div className="container relative z-10 mx-auto px-4">
         <ScrollReveal className="mb-12 text-center md:mb-16">
-          <span className="mb-6 inline-block rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
+          <span className="mb-6 inline-block rounded-full bg-secondary/10 px-4 py-2 text-sm font-medium text-secondary">
             Depoimentos Reais
           </span>
-          <h2 className="section-title text-3xl font-bold md:text-5xl">
-            O que nossos clientes
-            <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+          <h2 className="section-title text-3xl font-bold md:text-5xl text-[#4A2B1D] mb-6 tracking-tight">
+            O que nossos
+            <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent italic">
               {" "}
-              dizem
+              clientes dizem
             </span>
           </h2>
           <p className="mx-auto max-w-2xl text-base text-muted-foreground md:text-lg lg:text-xl mt-4">

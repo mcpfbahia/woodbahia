@@ -1,146 +1,145 @@
-import { CreditCard, Home, MessageCircle, CheckCircle2 } from "lucide-react";
-import { ScrollReveal, StaggerContainer, StaggerItem } from "~/components/common/ScrollReveal";
+"use client";
+
+import React from 'react';
+import { CreditCard, Home, CheckCircle2, MessageCircle } from 'lucide-react';
+import { ScrollReveal, StaggerContainer, StaggerItem } from '~/components/common/ScrollReveal';
 
 export const PaymentSection = () => {
   return (
-    <section id="pagamento" className="py-20 md:py-32 bg-slate-50 overflow-hidden relative">
-      <div className="container mx-auto px-4 max-w-6xl relative z-10">
-        <ScrollReveal>
-          <StaggerContainer className="text-center mb-16">
-            <StaggerItem>
-              <h2 className="text-4xl md:text-5xl font-serif font-bold text-primary mb-6">Formas de Pagamento</h2>
-            </StaggerItem>
-            <StaggerItem>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Facilitamos o pagamento para tornar seu projeto de casa pré-fabricada mais acessível e seguro.
-              </p>
-            </StaggerItem>
-          </StaggerContainer>
-
-          <StaggerContainer className="grid md:grid-cols-2 gap-8 mb-16">
-            {/* Card 1 */}
-            <StaggerItem>
-              <div className="bg-white rounded-[2rem] p-8 md:p-10 shadow-xl shadow-slate-200/50 border border-slate-100 h-full flex flex-col relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
-                <div className="absolute -top-10 -right-10 p-8 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity duration-500 group-hover:rotate-12">
-                  <CreditCard className="w-64 h-64" />
-                </div>
-                <div className="relative z-10 flex-1">
-                  <div className="w-16 h-16 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mb-8 shadow-sm">
-                    <CreditCard className="w-8 h-8" />
-                  </div>
-                  <h3 className="text-2xl md:text-3xl font-bold text-slate-800 mb-8">Cartão de Crédito</h3>
-                  <ul className="space-y-5 mb-8">
-                    <li className="flex items-start gap-4">
-                      <CheckCircle2 className="w-6 h-6 text-primary flex-shrink-0" />
-                      <span className="text-slate-600 font-medium">Parcelamento fácil e sem burocracia</span>
-                    </li>
-                    <li className="flex items-start gap-4">
-                      <CheckCircle2 className="w-6 h-6 text-primary flex-shrink-0" />
-                      <span className="text-slate-600 font-medium">Juros baixos aplicados conforme operadora do cartão</span>
-                    </li>
-                  </ul>
-                </div>
-                <div className="relative z-10 mt-auto bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/10 rounded-2xl p-6 flex flex-col gap-4">
-                  <div>
-                    <p className="text-xl sm:text-3xl font-bold text-slate-900 leading-tight whitespace-nowrap">
-                      Até <span className="text-primary font-black text-2xl sm:text-4xl">18x</span> no cartão
-                    </p>
-                    <p className="text-slate-500 text-[10px] sm:text-xs mt-2 font-medium leading-tight">
-                      Simule o valor das parcelas e descubra quanto pagará pelo seu kit.
-                    </p>
-                  </div>
-                  <a 
-                    href="/simulador/parcelamento"
-                    className="w-full inline-flex items-center justify-center bg-primary text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-primary/30 hover:bg-primary/90 hover:-translate-y-0.5 transition-all text-sm uppercase tracking-wide"
-                  >
-                    Simule sua Compra
-                  </a>
-                  <div className="absolute top-0 right-0 p-3">
-                     <span className="flex h-3 w-3 relative">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary/40 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
-                      </span>
-                  </div>
-                </div>
-              </div>
-            </StaggerItem>
-
-            {/* Card 2 */}
-            <StaggerItem>
-              <div className="bg-white rounded-[2rem] p-8 md:p-10 shadow-xl shadow-slate-200/50 border border-slate-100 h-full flex flex-col relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
-                 <div className="absolute -top-10 -right-10 p-8 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity duration-500 group-hover:-rotate-12">
-                  <Home className="w-64 h-64" />
-                </div>
-                <div className="relative z-10 flex-1">
-                  <div className="w-16 h-16 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mb-8 shadow-sm">
-                    <Home className="w-8 h-8" />
-                  </div>
-                  <h3 className="text-2xl md:text-3xl font-bold text-slate-800 mb-8">Pagamento Progressivo da Obra</h3>
-                  
-                  <div className="relative pl-6 before:absolute before:inset-0 before:left-[11px] before:top-2 before:bottom-6 before:w-0.5 before:bg-gradient-to-b before:from-primary/30 before:via-primary/20 before:to-transparent space-y-6">
-                    {/* Timeline progressiva */}
-                    <div className="relative flex items-start group/step">
-                      <div className="absolute -left-6 top-1 flex items-center justify-center w-5 h-5 rounded-full border-[4px] border-white bg-primary text-white z-10 flex-shrink-0 shadow-sm" />
-                      <div>
-                          <p className="font-black text-primary text-2xl leading-none mb-1 group-hover/step:translate-x-1 transition-transform">30%</p>
-                          <p className="font-medium text-slate-600 text-sm">Sinal na assinatura do contrato</p>
-                      </div>
-                    </div>
-                    
-                    <div className="relative flex items-start group/step">
-                      <div className="absolute -left-6 top-1 flex items-center justify-center w-5 h-5 rounded-full border-[4px] border-white bg-primary text-white z-10 flex-shrink-0 shadow-sm" />
-                      <div>
-                          <p className="font-black text-primary text-2xl leading-none mb-1 group-hover/step:translate-x-1 transition-transform">20%</p>
-                          <p className="font-medium text-slate-600 text-sm">Na entrega do kit no local da obra</p>
-                      </div>
-                    </div>
-
-                    <div className="relative flex items-start group/step">
-                      <div className="absolute -left-6 top-1.5 flex items-center justify-center w-5 h-5 rounded-full border-[4px] border-white bg-slate-300 text-white z-10 flex-shrink-0" />
-                      <div>
-                          <p className="font-bold text-slate-700 text-base leading-tight">Parcelas proporcionais</p>
-                          <p className="text-slate-500 text-xs mt-1">Conforme o andamento da construção</p>
-                      </div>
-                    </div>
-
-                    <div className="relative flex items-start group/step">
-                      <div className="absolute -left-6 top-1.5 flex items-center justify-center w-5 h-5 rounded-full border-[4px] border-white bg-green-500 text-white z-10 flex-shrink-0 shadow-sm" />
-                      <div>
-                          <p className="font-bold text-green-700 text-base leading-tight tracking-tight uppercase">Pagamento Final</p>
-                          <p className="text-slate-600 text-xs mt-1 font-medium">Concluído na entrega da obra</p>
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-            </StaggerItem>
-          </StaggerContainer>
-
-          <StaggerContainer className="text-center max-w-3xl mx-auto flex flex-col items-center">
-            <StaggerItem>
-              <div className="inline-block bg-white rounded-2xl p-6 mb-10 shadow-lg shadow-slate-200/50 border border-slate-100 relative">
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest shadow-md">
-                  Transparência
-                </div>
-                <p className="text-slate-700 font-medium text-lg md:text-xl italic leading-relaxed pt-2">
-                  "Nosso modelo de pagamento acompanha o avanço da obra, garantindo segurança e transparência para ambas as partes."
-                </p>
-              </div>
-            </StaggerItem>
-            <StaggerItem>
-              <a
-                href="https://wa.me/5571992936290"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-green-500 px-10 py-5 text-lg md:text-xl font-bold text-white transition-all shadow-xl shadow-green-500/30 hover:-translate-y-1 hover:shadow-2xl hover:bg-green-600"
-              >
-                <MessageCircle className="h-6 w-6" />
-                Falar no WhatsApp
-              </a>
-            </StaggerItem>
-          </StaggerContainer>
+    <section id="pagamento" className="w-full bg-[#FAF8F5] py-20 lg:py-32 relative overflow-hidden">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+        
+        {/* Cabeçalho Padronizado */}
+        <ScrollReveal className="text-center mb-16 md:mb-20">
+          <span className="mb-6 inline-block rounded-full bg-secondary/10 px-4 py-2 text-sm font-medium text-secondary">
+            Formas de Pagamento
+          </span>
+          <h2 className="text-3xl font-bold md:text-5xl text-[#4A2B1D] mb-6 tracking-tight">
+            Facilidades no <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent italic">Pagamento</span>
+          </h2>
+          <p className="mx-auto max-w-2xl text-base text-muted-foreground md:text-lg lg:text-xl mt-4">
+            Facilitamos o pagamento para tornar seu projeto de casa pré-fabricada mais acessível e seguro.
+          </p>
         </ScrollReveal>
+
+        {/* Grid dos Cards de Pagamento */}
+        <StaggerContainer className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full max-w-6xl mb-16">
+          
+          {/* Card 1: Cartão de Crédito */}
+          <StaggerItem index={0}>
+            <div className="h-full relative bg-white p-8 md:p-10 rounded-[2rem] shadow-sm border border-stone-100 transition-all duration-500 hover:shadow-xl hover:-translate-y-1 overflow-hidden group">
+              
+              {/* Ícone de Marca d'água no fundo com Movimento */}
+              <CreditCard className="absolute -top-12 -right-12 w-80 h-80 text-[#4A2B1D]/5 rotate-12 transition-all duration-1000 ease-out group-hover:scale-110 group-hover:-translate-x-8 group-hover:-translate-y-8 group-hover:rotate-[20deg] pointer-events-none" />
+
+              <div className="relative z-10">
+                <div className="w-14 h-14 rounded-2xl bg-[#F9F6F0] border border-[#EFE8DF] flex items-center justify-center mb-8">
+                  <CreditCard className="w-6 h-6 text-[#A46A45]" />
+                </div>
+
+                <h3 className="text-2xl md:text-3xl font-extrabold text-[#111827] mb-8">
+                  Cartão de Crédito
+                </h3>
+
+                <ul className="space-y-4 mb-8">
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-6 h-6 text-[#B06D46] shrink-0" />
+                    <span className="text-[#57463A] font-medium">Parcelamento fácil e sem burocracia</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-6 h-6 text-[#B06D46] shrink-0" />
+                    <span className="text-[#57463A] font-medium">Juros baixos aplicados conforme operadora do cartão</span>
+                  </li>
+                </ul>
+
+                {/* Box de Destaque */}
+                <div className="bg-[#F9F6F0] rounded-2xl p-6 border border-[#EFE8DF]">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-2xl font-black text-[#111827]">
+                      Até <span className="text-[#B06D46]">18x</span> no cartão
+                    </h4>
+                    <div className="w-3 h-3 rounded-full bg-[#B06D46] animate-pulse"></div>
+                  </div>
+                  <p className="text-sm text-[#735F53]">
+                    Simule o valor das parcelas e descubra quanto pagará pelo seu kit.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </StaggerItem>
+
+          {/* Card 2: Pagamento Progressivo */}
+          <StaggerItem index={1}>
+            <div className="h-full relative bg-white p-8 md:p-10 rounded-[2rem] shadow-sm border border-stone-100 transition-all duration-500 hover:shadow-xl hover:-translate-y-1 overflow-hidden group">
+              
+              {/* Ícone de Marca d'água no fundo com Movimento */}
+              <Home className="absolute -top-12 -right-12 w-80 h-80 text-[#4A2B1D]/5 -rotate-6 transition-all duration-1000 ease-out group-hover:scale-110 group-hover:-translate-x-8 group-hover:-translate-y-8 group-hover:rotate-[0deg] pointer-events-none" />
+
+              <div className="relative z-10">
+                <div className="w-14 h-14 rounded-2xl bg-[#F9F6F0] border border-[#EFE8DF] flex items-center justify-center mb-8">
+                  <Home className="w-6 h-6 text-[#A46A45]" />
+                </div>
+
+                <h3 className="text-2xl md:text-3xl font-extrabold text-[#111827] mb-8 pr-12">
+                  Pagamento Progressivo da Obra
+                </h3>
+
+                {/* Timeline de Pagamento Progressivo */}
+                <div className="relative pl-6 border-l-2 border-[#EFE8DF] space-y-8">
+                  
+                  {/* Passo 1 */}
+                  <div className="relative group/step">
+                    <div className="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-[#B06D46] border-4 border-white transition-transform group-hover/step:scale-125"></div>
+                    <h4 className="text-xl font-black text-[#B06D46] mb-1">30%</h4>
+                    <p className="text-[#57463A] font-medium text-sm">Sinal na assinatura do contrato</p>
+                  </div>
+
+                  {/* Passo 2 */}
+                  <div className="relative group/step">
+                    <div className="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-[#B06D46] border-4 border-white transition-transform group-hover/step:scale-125"></div>
+                    <h4 className="text-xl font-black text-[#B06D46] mb-1">20%</h4>
+                    <p className="text-[#57463A] font-medium text-sm">Na entrega do kit no local da obra</p>
+                  </div>
+
+                  {/* Passo 3 */}
+                  <div className="relative group/step">
+                    <div className="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-[#EFE8DF] border-4 border-white transition-transform group-hover/step:scale-125"></div>
+                    <h4 className="text-lg font-bold text-[#735F53] mb-1">Parcelas proporcionais</h4>
+                    <p className="text-[#8A6B5B] text-sm">Conforme o andamento da construção</p>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </StaggerItem>
+
+        </StaggerContainer>
+
+        {/* Citação / Transparência */}
+        <ScrollReveal className="relative w-full max-w-4xl bg-white p-8 md:p-10 rounded-3xl shadow-md border border-stone-100 text-center mb-12 group">
+          {/* Etiqueta Flutuante */}
+          <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#8A3A1B] text-white text-xs font-bold px-4 py-1.5 rounded-full tracking-widest uppercase shadow-sm group-hover:scale-110 transition-transform">
+            Transparência
+          </div>
+          
+          <p className="text-xl md:text-2xl italic font-medium text-[#4A2B1D] leading-relaxed">
+            "Nosso modelo de pagamento acompanha o avanço da obra, garantindo segurança e transparência para ambas as partes."
+          </p>
+        </ScrollReveal>
+
+        {/* Botão WhatsApp */}
+        <ScrollReveal>
+          <a 
+            href="https://wa.me/5571992936290" 
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-cta !bg-[#25D366] hover:!bg-[#1DA851] !shadow-green-500/30"
+          >
+            <MessageCircle className="w-7 h-7" />
+            <span>Falar no WhatsApp</span>
+          </a>
+        </ScrollReveal>
+
       </div>
     </section>
   );

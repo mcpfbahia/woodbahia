@@ -39,15 +39,18 @@ export const TargetAudienceSection = () => {
     <section className="bg-muted/30 py-20 md:py-32">
       <div className="container mx-auto px-4">
         <ScrollReveal className="mb-16 text-center">
-          <span className="mb-6 inline-block rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
+          <span className="mb-6 inline-block rounded-full bg-secondary/10 px-4 py-2 text-sm font-medium text-secondary">
             Para quem é
           </span>
-          <h2 className="section-title text-3xl font-bold md:text-5xl">
+          <h2 className="section-title text-3xl font-bold md:text-5xl text-[#4A2B1D] mb-6 tracking-tight">
             Projetos{" "}
-            <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent italic">
               ideais para:
             </span>
           </h2>
+          <p className="mx-auto max-w-2xl text-base text-muted-foreground md:text-lg lg:text-xl mt-4">
+            Soluções inteligentes para diferentes perfis de investimento e estilos de vida.
+          </p>
         </ScrollReveal>
 
         <StaggerContainer className="grid gap-6 md:gap-8 md:grid-cols-2 lg:grid-cols-4">

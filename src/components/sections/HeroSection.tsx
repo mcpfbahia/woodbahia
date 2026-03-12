@@ -1,7 +1,7 @@
 
 "use client";
 
-import { ArrowRight, Clock, Award, Users } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
@@ -42,7 +42,7 @@ export const HeroSection = () => {
       </div>
 
       <div className="container relative z-10 mx-auto px-4 pb-16 pt-24">
-        <div className="max-w-3xl">
+        <div className="max-w-4xl">
           {/* Badge */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -60,95 +60,76 @@ export const HeroSection = () => {
             initial={{ opacity: 0, y: typeof window !== "undefined" && window.innerWidth < 768 ? 5 : 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.15 }}
-            className="mb-4 font-serif text-2xl font-bold leading-tight text-white sm:text-3xl md:text-4xl lg:text-6xl"
+            className="mb-4 font-serif text-3xl font-bold leading-tight text-white sm:text-4xl md:text-5xl lg:text-6xl"
           >
-            Casas Pré-Fabricadas e{" "}
+            Chalés de Madeira e Casas <br className="hidden lg:block" />
             <span className="bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 bg-clip-text text-transparent italic">
-              Chalés de Madeira na Bahia
+              Pré-Fabricadas na Bahia
             </span>
           </motion.h1>
 
-          <motion.h2
-            initial={{ opacity: 0, y: typeof window !== "undefined" && window.innerWidth < 768 ? 5 : 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.15 }}
-            className="mb-8 font-serif text-xl font-medium text-white/90 sm:text-2xl md:text-3xl"
-          >
-            Construa seu chalé de madeira ou casa pré-fabricada com madeira Pinus tratada em autoclave, ideal para investimento, campo ou praia.
-          </motion.h2>
-
-          {/* Subheadline */}
           <motion.p
             initial={{ opacity: 0, y: typeof window !== "undefined" && window.innerWidth < 768 ? 5 : 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="mb-10 max-w-3xl text-lg leading-relaxed font-medium text-white/80 md:text-xl"
+            transition={{ duration: 0.8, delay: 0.15 }}
+            className="mb-10 font-sans text-lg font-medium text-white/90 md:text-xl lg:max-w-2xl"
           >
-            Projetos chave na mão, do projeto arquitetônico ao fornecimento completo da estrutura.
-            Construímos chalés e casas de madeira de forma rápida, econômica e planejada, 
-            atendendo todo o litoral da Bahia, Chapada Diamantina e interior.
+            Construa seu chalé de madeira ou casa pré-fabricada com Pinus tratado em autoclave, ideal para investimento, campo ou praia.
           </motion.p>
+
+
 
           {/* CTAs */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="mb-12 flex flex-col gap-4 sm:flex-row"
+            className="mb-8 flex flex-col gap-4 sm:flex-row"
           >
             <MagneticButton className="w-full sm:w-auto">
-              <a
+              <Link
                 href="/simulador"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-secondary to-primary px-8 py-4 text-lg font-bold text-white shadow-primary/20 shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-primary/40 hover:shadow-xl sm:w-auto"
+                className="btn-cta w-full sm:w-auto"
               >
-                Simule o preço do seu chalé de madeira
+                Simular preço do chalé
                 <ArrowRight className="h-5 w-5" />
-              </a>
+              </Link>
             </MagneticButton>
             <MagneticButton className="w-full sm:w-auto">
-              <a
+              <Link
                 href="/#modelos"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 px-8 py-4 text-lg font-semibold text-white backdrop-blur-md transition-all duration-300 hover:bg-white/20 sm:w-auto"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 px-8 py-4 text-lg font-bold text-white backdrop-blur-md transition-all duration-300 hover:bg-white/20 hover:-translate-y-1 sm:w-auto"
               >
-                Veja nossos modelos de chalé de madeira para Airbnb
-              </a>
+                Ver modelos de chalés
+              </Link>
             </MagneticButton>
           </motion.div>
 
-          {/* Stats */}
+          {/* Social Proof */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="flex flex-wrap justify-center gap-4 sm:justify-start md:gap-8"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.5 }}
+            className="flex items-center gap-3 text-white/60"
           >
-            {/* 4. Stats no Rodapé do Hero */}
-            <div className="mt-20 border-t border-white/10 pt-10">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
-                {[
-                  { label: "Followers Instagram", value: "+45k" },
-                  { label: "Projetos Entregues", value: "+100" },
-                  { label: "Chalé Pronto em até 45 dias", value: "Até 45 Dias" }
-                ].map((stat, i) => (
-                  <motion.div 
-                    key={i}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.5 + (i * 0.1) }}
-                  >
-                    <div>
-                      <p className="text-3xl font-black text-white mb-1">
-                        {stat.value}
-                      </p>
-                      <p className="text-white/60 text-sm font-medium uppercase tracking-widest whitespace-nowrap">
-                        {stat.label}
-                      </p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+            <div className="flex -space-x-2">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="h-8 w-8 rounded-full border-2 border-black bg-white/10 overflow-hidden relative">
+                   <Image 
+                    src={`https://i.pravatar.cc/100?u=woodbahia${i}`} 
+                    alt="User" 
+                    fill 
+                    className="object-cover opacity-80"
+                  />
+                </div>
+              ))}
             </div>
+            <p className="text-sm font-medium tracking-wide">
+              Mais de <span className="text-amber-400 font-bold">45 mil pessoas</span> acompanham nossos projetos no Instagram
+            </p>
           </motion.div>
+
+          {/* Final constraints */}
         </div>
       </div>
     </section>

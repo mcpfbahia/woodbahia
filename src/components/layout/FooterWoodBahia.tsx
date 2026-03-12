@@ -71,14 +71,16 @@ export const FooterWoodBahia = () => {
               </div>
             </div>
             <h3 className="mb-3 font-serif text-xl font-bold md:text-2xl lg:text-3xl">
-              Mais de <span className="font-extrabold text-white">45 mil pessoas</span> acompanham a Wood Bahia no Instagram.
+              Mais de <span className="font-extrabold text-white">45 mil pessoas</span> acompanham <br className="hidden lg:block" />
+              a Wood Bahia no Instagram.
             </h3>
             <a
               href="https://www.instagram.com/woodbahiacasasprefabricadas/"
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-primary-foreground px-8 py-3 font-bold text-primary transition-all hover:scale-105 hover:bg-white"
+              className="btn-cta"
             >
+              <Instagram className="h-6 w-6" />
               Seguir @woodbahia
             </a>
           </ScrollReveal>
@@ -111,7 +113,7 @@ export const FooterWoodBahia = () => {
             </p>
             <div className="rounded-2xl bg-white/5 p-5 border border-white/10">
               <span className="block text-xs font-bold uppercase tracking-widest text-primary-foreground/40 mb-2">Área de Atuação</span>
-              <p className="text-sm font-medium">Atendimento para construção completa na Bahia e interior de Sergipe.</p>
+              <p className="text-sm font-medium leading-relaxed">Atendimento para construção de casas e chalés pré-fabricados na Bahia e Sergipe.</p>
             </div>
           </div>
 
@@ -182,9 +184,12 @@ export const FooterWoodBahia = () => {
                   <h4 className="mb-4 text-sm font-black uppercase tracking-widest text-white">Facilidade de Pagamento</h4>
                   <div className="flex items-center gap-3 rounded-2xl bg-white/5 border border-white/10 p-4">
                     <CreditCard className="h-6 w-6 text-primary-foreground/60" />
-                    <div>
-                      <span className="block text-[10px] font-bold uppercase tracking-widest text-white/40">Parcelamento</span>
-                      <p className="font-black text-white">Cartão de crédito até 18x</p>
+                    <div className="leading-tight">
+                      <span className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1">Parcelamento</span>
+                      <p className="font-black text-white">
+                        Cartão de Crédito <br/>
+                        até 18X
+                      </p>
                     </div>
                   </div>
                 </div>

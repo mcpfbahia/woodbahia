@@ -144,9 +144,9 @@ export const ModelsSection = () => {
                       </div>
                       <Link
                         href={`/modelo/${model.id}`}
-                        className="group/btn inline-flex items-center gap-2 text-sm font-medium text-primary transition-colors hover:text-primary/80"
+                        className="group/btn inline-flex items-center gap-2 rounded-xl bg-secondary/10 px-4 py-2.5 text-sm font-bold text-secondary transition-all hover:bg-secondary hover:text-white"
                       >
-                        Conheça este chalé de madeira
+                        Conhecer Modelo
                         <ArrowRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
                       </Link>
                     </div>
@@ -176,7 +176,7 @@ export const ModelsSection = () => {
                     href="https://wa.me/5571992936290?text=Olá! Gostaria de mais informações sobre projetos personalizados."
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex h-12 items-center justify-center rounded-xl bg-primary px-6 font-semibold text-primary-foreground shadow-lg transition-all hover:-translate-y-1 hover:bg-primary/90"
+                    className="btn-cta w-full"
                   >
                     Solicitar Orçamento
                   </a>
@@ -195,8 +195,7 @@ export const ModelsSection = () => {
           <Link
             href="/modelos"
             className={cn(
-              buttonVariants({ size: "lg" }),
-              "rounded-xl px-8 py-4 text-lg font-semibold shadow-lg"
+              "btn-cta w-full sm:w-auto"
             )}
           >
             Ver Todos os Modelos

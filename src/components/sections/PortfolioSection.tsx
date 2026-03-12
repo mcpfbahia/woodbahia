@@ -1,25 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { Instagram, Loader2, Image as ImageIcon } from "lucide-react";
+import React, { useEffect, useState, useRef } from 'react';
+import { ArrowLeft, ArrowRight, Instagram, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
+import Link from 'next/link';
+import Image from 'next/image';
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "~/lib/firebase";
 import { initialPortfolio } from "~/lib/data";
-import {
-  ScrollReveal,
-  StaggerContainer,
-  StaggerItem,
-} from "../common/ScrollReveal";
-import { Button, buttonVariants } from "../ui/button";
-import { cn } from "~/lib/utils";
-
 
 export const PortfolioSection = () => {
   const [mounted, setMounted] = useState(false);
   const [portfolioItems, setPortfolioItems] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -52,127 +45,124 @@ export const PortfolioSection = () => {
     fetchPortfolio();
   }, []);
 
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = direction === 'left' ? -400 : 400;
+      scrollContainerRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
 
   if (!mounted) {
     return (
-      <section id="portfolio" className="bg-background py-16 md:py-20 lg:py-32">
-        <div className="container mx-auto px-4">
-          <div className="mx-auto max-w-5xl h-96 flex items-center justify-center">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          </div>
-        </div>
+      <section id="portfolio" className="w-full bg-[#FAF8F5] py-20 lg:py-28 overflow-hidden min-h-[400px] flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </section>
     );
   }
 
   return (
-    <section id="portfolio" className="bg-background py-16 md:py-20 lg:py-32">
-      <div className="container mx-auto px-4">
-        <ScrollReveal>
-          <div className="mb-12 text-center md:mb-16">
-            <span className="mb-4 inline-block rounded-full bg-primary/10 px-4 py-1.5 text-xs font-medium text-primary md:text-sm">
-              Nossos Projetos
-            </span>
-            <h2 className="section-title text-2xl font-bold sm:text-3xl md:text-4xl lg:text-5xl">
-              Portfólio
-            </h2>
-            <p className="mx-auto mt-4 max-w-2xl px-2 text-sm text-muted-foreground md:text-lg">
-              Conheça alguns dos nossos projetos realizados. Acompanhe nosso
-              Instagram para ver mais obras e novidades.
-            </p>
-          </div>
-        </ScrollReveal>
+    <section id="portfolio" className="w-full bg-[#FAF8F5] py-20 lg:py-28 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+        
+        {/* Cabeçalho Padronizado */}
+        <div className="text-center mb-16">
+          <span className="mb-6 inline-block rounded-full bg-secondary/10 px-4 py-2 text-sm font-medium text-secondary">
+            Projetos Entregues
+          </span>
+          <h2 className="section-title text-3xl font-bold md:text-5xl text-[#4A2B1D] mb-6">
+            Nosso <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent italic">Portifolio</span>
+          </h2>
+          <p className="mx-auto max-w-2xl text-base text-muted-foreground md:text-lg lg:text-xl mt-4">
+            Conheça alguns dos nossos projetos realizados e encante-se com o padrão de qualidade Wood Bahia.
+          </p>
+          
+          <a href="https://www.instagram.com/woodbahiacasasprefabricadas/" target="_blank" rel="noopener noreferrer" 
+             className="inline-flex items-center gap-2 text-[#B06D46] hover:text-[#8A3A1B] font-medium transition-colors">
+            <Instagram className="w-5 h-5" />
+            <span>Acompanhe nosso Instagram para ver mais obras e novidades.</span>
+          </a>
+        </div>
 
-        {isLoading ? (
-          <div className="flex h-40 items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
-        ) : (
-          <StaggerContainer className="mx-auto mb-12 grid max-w-5xl grid-cols-2 gap-3 sm:gap-4 md:mb-16 md:grid-cols-3 md:gap-6">
-            {portfolioItems?.slice(0, 6).map((item: any, idx: number) => (
-              <StaggerItem 
-                key={item.id} 
-                index={idx}
-                className={idx >= 4 ? "hidden md:block" : ""}
-              >
-                <div className="group relative aspect-square cursor-pointer overflow-hidden rounded-xl bg-muted md:rounded-2xl">
-                  {item.image ? (
-                    <Image
-                      src={item.image}
-                      alt={item.title || "Projeto Wood Bahia"}
-                       fill
-                       sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                       className="object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-                  ) : (
-                    <div className="flex h-full items-center justify-center text-muted-foreground">
-                      <ImageIcon className="h-8 w-8 opacity-50" />
-                    </div>
-                  )}
+        {/* Carrossel com Navegação */}
+        <div className="relative w-full group/carousel">
+          {/* Botões de Navegação (Desktop) */}
+          <button 
+            onClick={() => scroll('left')}
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-30 hidden lg:flex h-14 w-14 items-center justify-center rounded-full bg-white shadow-xl text-primary transition-all hover:scale-110 hover:bg-primary hover:text-white border border-border/50 opacity-0 group-hover/carousel:opacity-100"
+            aria-label="Anterior"
+          >
+            <ChevronLeft className="w-8 h-8" />
+          </button>
 
-                  {/* Hover Overlay */}
-                  <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/90 via-black/50 to-black/20 p-4 opacity-0 transition-all duration-300 group-hover:opacity-100 md:p-6">
-                    <div className="translate-y-4 transition-transform duration-300 group-hover:translate-y-0">
-                      <h4 className="font-serif text-lg font-bold text-white md:text-xl">
-                        {item.title}
-                      </h4>
-                      <p className="mb-2 flex items-center gap-1 text-xs font-medium text-primary md:text-sm">
-                        <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary" />
-                        {item.location}
-                      </p>
-                      {item.description && (
-                        <p className="line-clamp-2 border-t border-white/20 pt-2 text-[10px] leading-relaxed text-white/80 md:line-clamp-3 md:text-xs">
-                          {item.description}
-                        </p>
-                      )}
-                    </div>
+          <button 
+            onClick={() => scroll('right')}
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-30 hidden lg:flex h-14 w-14 items-center justify-center rounded-full bg-white shadow-xl text-primary transition-all hover:scale-110 hover:bg-primary hover:text-white border border-border/50 opacity-0 group-hover/carousel:opacity-100"
+            aria-label="Próximo"
+          >
+            <ChevronRight className="w-8 h-8" />
+          </button>
+
+          {/* Carrossel Nativo (CSS Scroll Snap) */}
+          {isLoading ? (
+            <div className="flex h-40 items-center justify-center">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : (
+            <div 
+              ref={scrollContainerRef}
+              className="w-full flex gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory hide-scrollbar pb-8 px-4 -mx-4 sm:px-0 sm:mx-0"
+            >
+              {portfolioItems.map((projeto) => (
+                <div 
+                  key={projeto.id} 
+                  className="relative w-[280px] sm:w-[320px] md:w-[400px] h-[350px] md:h-[450px] shrink-0 snap-center rounded-[2rem] overflow-hidden group shadow-md"
+                >
+                  <Image 
+                    src={projeto.image || projeto.img || "/placeholder.svg"} 
+                    alt={projeto.title || projeto.alt || "Projeto Wood Bahia"}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                  {/* Degradê escuro embaixo para dar um ar premium */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                    <h4 className="font-serif text-lg font-bold text-white md:text-xl">
+                      {projeto.title}
+                    </h4>
+                    <p className="text-xs font-medium text-white/80">
+                      {projeto.location}
+                    </p>
                   </div>
-
-                  {item.instagramUrl && (
-                    <a
-                      href={item.instagramUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="absolute right-2 top-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[#f09433]/90 via-[#e6683c]/90 to-[#bc1888]/90 opacity-0 shadow-lg backdrop-blur-md transition-all duration-300 hover:scale-110 group-hover:opacity-100 md:right-3 md:top-3 md:h-10 md:w-10"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <Instagram className="h-4 w-4 text-white md:h-5 md:w-5" />
-                    </a>
-                  )}
                 </div>
-              </StaggerItem>
-            ))}
-          </StaggerContainer>
-        )}
+              ))}
+            </div>
+          )}
 
-        <ScrollReveal delay={0.3}>
-          <div className="flex flex-col items-center gap-6">
-            <Link
-              href="/portfolio"
-              className={cn(
-                buttonVariants({ variant: "default" }),
-                "btn-cta h-auto gap-2 rounded-xl px-8 py-4 text-sm font-semibold shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl md:gap-3 md:py-6 md:text-base"
-              )}
+          {/* Indicadores Visuais (Mobile) */}
+          <div className="flex justify-center gap-2 mt-4 lg:hidden">
+             <button 
+              onClick={() => scroll('left')}
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-[#EFE8DF] text-primary"
             >
-              <ImageIcon className="h-5 w-5" />
-              Ver Galeria Completa
-            </Link>
-
-
-
-
-            <a
-              href="https://www.instagram.com/woodbahiacasasprefabricadas/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-primary"
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            <button 
+              onClick={() => scroll('right')}
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-[#EFE8DF] text-primary"
             >
-              <Instagram className="h-4 w-4" />
-              <span>Ou siga no Instagram @woodbahiacasasprefabricadas</span>
-            </a>
+              <ChevronRight className="w-6 h-6" />
+            </button>
           </div>
-        </ScrollReveal>
+        </div>
+
+        {/* Botão de Call to Action para a Página de Galeria (SEO) */}
+        <div className="mt-8 md:mt-12">
+          <Link href="/portfolio" className="group flex items-center gap-3 bg-white border-2 border-[#EFE8DF] hover:border-[#B06D46] text-[#4A2B1D] font-bold text-lg py-4 px-8 rounded-2xl transition-all duration-300 hover:shadow-lg">
+            <span>Ver Galeria Completa</span>
+            <ArrowRight className="w-5 h-5 text-[#B06D46] transition-transform duration-300 group-hover:translate-x-1" />
+          </Link>
+        </div>
+
       </div>
     </section>
   );
-};
+}

@@ -128,7 +128,7 @@ export default function ModelsGalleryPage() {
                         </div>
                         <Link
                           href={`/modelo/${model.id}`}
-                          className="group/btn hover:bg-secondary inline-flex items-center gap-2 rounded-lg bg-secondary/10 px-4 py-2 text-sm font-medium text-secondary transition-all hover:text-white"
+                          className="group/btn hover:bg-secondary inline-flex items-center gap-2 rounded-xl bg-secondary/10 px-4 py-2 text-sm font-medium text-secondary transition-all hover:text-white"
                         >
                           Detalhes
                           <ArrowRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-1" />

@@ -34,14 +34,15 @@ export const RegionalCoverageSection = () => {
   return (
     <section className="bg-background py-20 md:py-32 overflow-hidden">
       <div className="container mx-auto px-4">
-        <ScrollReveal className="max-w-4xl mx-auto text-center mb-16">
-          <span className="inline-block px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
+        <ScrollReveal className="mb-16 text-center">
+          <span className="mb-6 inline-block rounded-full bg-secondary/10 px-4 py-2 text-sm font-medium text-secondary">
             Onde Construímos
           </span>
-          <h2 className="section-title text-4xl md:text-5xl font-bold mb-6">
-            Atendemos toda a <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent italic">Bahia</span>
+          <h2 className="section-title text-3xl font-bold md:text-5xl text-[#4A2B1D] mb-6">
+            Atendemos toda a <br />
+            <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent italic">Bahia e região</span>
           </h2>
-          <p className="text-lg text-muted-foreground">
+          <p className="mx-auto max-w-2xl text-base text-muted-foreground md:text-lg lg:text-xl mt-4">
             Levamos o sonho da casa própria em madeira para diversas regiões do estado, com logística própria e equipe especializada.
           </p>
         </ScrollReveal>
