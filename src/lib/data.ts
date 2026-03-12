@@ -40,16 +40,6 @@ export const initialModels = [
     description: "Design A-Frame com fachada em vidro e vista panorâmica para o litoral.",
   },
   {
-    id: "chale-arraial-dajuda",
-    name: "Chalé Arraial d'Ajuda",
-    image: "/images/models/model-5.jpg",
-    area: "25m²",
-    floors: "1 Pavimento",
-    price: "R$ 30.000",
-    bedrooms: 1,
-    description: "Compacto e funcional, excelente para investimento em aluguel.",
-  },
-  {
     id: "chale-porto-seguro",
     name: "Chalé Porto Seguro",
     image: "/images/models/model-6.jpg",
@@ -68,16 +58,6 @@ export const initialModels = [
     price: "R$ 75.000",
     bedrooms: 2,
     description: "Elegante e funcional, com varanda integrada à natureza.",
-  },
-  {
-    id: "chale-boipeba",
-    name: "Chalé Boipeba",
-    image: "/images/models/model-8.jpg",
-    area: "100m²",
-    floors: "2 Pavimentos",
-    price: "R$ 140.000",
-    bedrooms: 3,
-    description: "Imponente chalé com fachada em vidro e vista panorâmica.",
   },
   {
     id: "chale-itacimirim",

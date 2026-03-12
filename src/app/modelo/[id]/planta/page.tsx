@@ -28,7 +28,15 @@ import { modelFloorPlans } from "~/lib/floorPlanData";
 
 export default function FloorPlanPage() {
   const { id } = useParams() as { id: string };
-  const firebaseId = id === 'chale-praia-do-forte-2' ? 'chale-itacare' : id;
+  const getFirebaseId = (slug: string) => {
+    const mappings: Record<string, string> = {
+      'chale-praia-do-forte-2': 'chale-itacare',
+      'chale-boipeba': 'chale-itacimirim',
+      'chale-arraial-dajuda': 'chale-itacimirim'
+    };
+    return mappings[slug] || slug;
+  };
+  const firebaseId = getFirebaseId(id);
   const [model, setModel] = useState<any>(null);
   const [floorPlan, setFloorPlan] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -73,9 +81,29 @@ export default function FloorPlanPage() {
             builtArea: builtArea || '',
           });
         } else {
-          const staticModel = initialModels.find(m => m.id === id);
+          // Tentar buscar nos dados estáticos (incluindo mapeamento de fallback)
+          const staticId = firebaseId; // Já mapeado acima
+          const staticModel = initialModels.find(m => m.id === staticId);
+          
           if (staticModel) {
-            setModel(staticModel);
+            setModel({ ...staticModel, id: id }); // Preserva o ID original da URL
+            const staticPlan = modelFloorPlans[staticId];
+            if (staticPlan) {
+              setFloorPlan({
+                terreo: { image: staticPlan.floorPlanImage || (staticId === 'chale-itacimirim' ? '/planta-terrea-itacimirim.jpg' : '/placeholder.svg'), label: staticPlan.label || 'Planta Térrea' },
+                superior: null,
+                rooms: staticPlan.rooms || [],
+                totalArea: staticPlan.totalArea || '',
+                builtArea: staticPlan.builtArea || ''
+              });
+              return;
+            }
+          }
+          
+          // Fallback final
+          const staticModelOriginalId = initialModels.find(m => m.id === id);
+          if (staticModelOriginalId) {
+            setModel(staticModelOriginalId);
             const staticPlan = modelFloorPlans[id];
             if (staticPlan) {
               setFloorPlan({

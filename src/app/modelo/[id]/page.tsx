@@ -75,16 +75,20 @@ export default function ModelDetailPage() {
           } else {
             // Fallback para IDs específicos baseados no projeto antigo
             const fallbackIds: Record<string, string> = {
-              "chale-itacimirim": "chale-boipeba",
-              "chale-guarajuba": "chale-arraial-dajuda",
+              "chale-boipeba": "chale-itacimirim",
+              "chale-arraial-dajuda": "chale-itacimirim",
               "chale-praia-do-forte-2": "chale-itacare",
             };
 
             if (fallbackIds[id]) {
-              const fbRef = doc(db, "models", fallbackIds[id]!);
-              const fbSnap = await getDoc(fbRef);
+              const mappedId = fallbackIds[id]!;
+              const fbFallbackRef = doc(db, "models", mappedId);
+              const fbSnap = await getDoc(fbFallbackRef);
               if (fbSnap.exists()) {
                 setModel({ id, ...fbSnap.data() });
+              } else {
+                const staticFallback = initialModels.find(m => m.id === mappedId);
+                if (staticFallback) setModel({ ...staticFallback, id });
               }
             }
           }
