@@ -74,7 +74,7 @@ export const TestimonialsSection = () => {
             Depoimentos Reais
           </span>
           <h2 className="section-title text-3xl font-bold md:text-5xl text-[#4A2B1D] mb-6 tracking-tight">
-            O que nossos
+            O que nossos <br className="md:hidden" />
             <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent italic">
               {" "}
               clientes dizem

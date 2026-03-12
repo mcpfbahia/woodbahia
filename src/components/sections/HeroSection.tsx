@@ -60,7 +60,7 @@ export const HeroSection = () => {
             initial={{ opacity: 0, y: typeof window !== "undefined" && window.innerWidth < 768 ? 5 : 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.15 }}
-            className="mb-4 font-serif text-3xl font-bold leading-tight text-white sm:text-4xl md:text-5xl lg:text-6xl"
+            className="mb-4 font-serif text-[1.75rem] font-bold leading-[1.2] text-white tracking-tight sm:text-4xl md:text-5xl lg:text-6xl"
           >
             Chalés de Madeira e Casas <br className="hidden lg:block" />
             <span className="bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 bg-clip-text text-transparent italic">

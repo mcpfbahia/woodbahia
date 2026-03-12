@@ -86,13 +86,13 @@ export const AboutSection = () => {
               {/* Overlay suave para garantir o contraste dos selos */}
               <div className="absolute inset-0 bg-gradient-to-t from-[#111827]/30 to-transparent"></div>
 
-              {/* CONTAINER DOS SELOS: Empilhados verticalmente no Mobile, discretos */}
-              <div className="absolute top-8 left-8 flex flex-col gap-4 z-20">
+              {/* CONTAINER DOS SELOS: Empilhados verticalmente, menores no Mobile */}
+              <div className="absolute top-4 left-4 lg:top-8 lg:left-8 flex flex-col gap-2.5 lg:gap-4 z-20">
                 {selosData.map((selo, index) => (
                   <div 
                     key={index} 
                     className={`
-                      bg-white/50 backdrop-blur-md shadow-xl rounded-2xl p-4 flex items-center gap-3 transition-transform duration-500 
+                      bg-white/50 backdrop-blur-md shadow-xl rounded-xl lg:rounded-2xl p-2.5 lg:p-4 flex items-center gap-2 lg:gap-3 transition-transform duration-500 
                       hover:-translate-y-1 hover:shadow-2xl hover:bg-white/80
                       // Animação de entrada cascata (simulada)
                       opacity-0 animate-fade-in-right border border-white/20
@@ -100,14 +100,14 @@ export const AboutSection = () => {
                     style={{ animationDelay: `${index * 150}ms` }} 
                   >
                     {/* Ícone Terracota */}
-                    <selo.icon className="w-6 h-6 text-[#A46A45] shrink-0" />
+                    <selo.icon className="w-4 h-4 lg:w-6 lg:h-6 text-[#A46A45] shrink-0" />
                     
                     {/* Texto Terracota Escuro */}
                     <div>
-                      <span className="block text-xl font-black text-[#8A3A1B] leading-tight">
+                      <span className="block text-base lg:text-xl font-black text-[#8A3A1B] leading-tight">
                         {selo.titulo}
                       </span>
-                      <span className="block text-xs font-bold text-[#8A3A1B] leading-tight tracking-wide">
+                      <span className="block text-[10px] lg:text-xs font-bold text-[#8A3A1B] leading-tight tracking-wide">
                         {selo.subtitulo}
                       </span>
                     </div>
