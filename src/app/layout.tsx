@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     default: "Wood Bahia | Casas Pré-Fabricadas e Chalés de Madeira na Bahia e Sergipe",
     template: "%s | Wood Bahia"
   },
-  description: "Líder regional em construção sustentável de chalés e casas de madeira em Pinus tratado. Atendemos Salvador, Litoral Norte, Chapada Diamantina e toda a Bahia e Sergipe. 15 anos de garantia.",
+  description: "Líder regional em construção sustentável de chalés e casas de madeira em Pinus tratado. Atendemos Salvador, Litoral Norte, Sudoeste Baiano, Sergipe e Chapada Diamantina. 15 anos de garantia.",
   keywords: [
     "casas pré-fabricadas bahia", 
     "chalés de madeira bahia", 
@@ -23,6 +23,7 @@ export const metadata: Metadata = {
     "construção sustentável bahia", 
     "investimento imobiliário bahia", 
     "litoral norte bahia", 
+    "sudoeste baiano",
     "casa de madeira sergipe",
     "praia do forte", 
     "guarajuba", 
@@ -142,13 +143,17 @@ const schemaJSON = {
       "url": "https://www.woodbahia.site/",
       "areaServed": [
         "Salvador", "Lauro de Freitas", "Camaçari", "Feira de Santana", 
-        "Vitória da Conquista", "Itabuna", "Ilhéus", "Juazeiro", "Barreiras", 
+        "Vitória da Conquista",
+  "Sudoeste Baiano",
+ "Itabuna", "Ilhéus", "Juazeiro", "Barreiras", 
         "Jequié", "Alagoinhas", "Teixeira de Freitas", "Porto Seguro", 
         "Simões Filho", "Paulo Afonso", "Eunápolis", "Santo Antônio de Jesus", 
         "Valença", "Candeias", "Guanambi", "Jacobina", "Serrinha", 
         "Luis Eduardo Magalhães", "Itapetinga", "Irecê", "Casa Nova", 
         "Bom Jesus da Lapa", "Brumado", "Conceição do Coité", "Itamaraju",
-        "Itacaré", "Trancoso", "Arraial d'Ajuda", "Praia do Forte", "Guarajuba",
+        "Itacaré", "Trancoso", "Arraial d'Ajuda",  "Sergipe",
+  "Praia do Forte",
+ "Guarajuba",
         "Imbassaí", "Litoral Norte da Bahia", "Chapada Diamantina", "Lençóis",
         "Aracaju, SE", "Estância, SE", "Lagarto, SE", "Itabaiana, SE"
       ],
