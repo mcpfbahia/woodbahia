@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { Header } from '~/components/layout/Header';
-import { Footer } from '~/components/layout/Footer';
+import { FooterWoodBahia } from '~/components/layout/FooterWoodBahia';
 import { WhatsAppButton } from '~/components/common/WhatsAppButton';
 import { saveLead } from '~/lib/leads';
 
@@ -576,7 +576,7 @@ export default function InvestmentSimulationPage() {
                     </div>
                 </div>
             </main>
-            <Footer />
+            <FooterWoodBahia />
             <WhatsAppButton />
         </div>
     );

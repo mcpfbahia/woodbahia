@@ -9,8 +9,8 @@ import { initialModels } from "~/lib/data";
 import { StaggerContainer, StaggerItem } from "~/components/common/ScrollReveal";
 import Image from "next/image";
 import { Header } from "~/components/layout/Header";
-import { Footer } from "~/components/layout/Footer";
 import { WhatsAppButton } from "~/components/common/WhatsAppButton";
+import { FooterWoodBahia } from "~/components/layout/FooterWoodBahia";
 
 export default function ModelsGalleryPage() {
   const [models, setModels] = useState<any[]>([]);
@@ -143,7 +143,7 @@ export default function ModelsGalleryPage() {
         </div>
       </main>
 
-      <Footer />
+      <FooterWoodBahia />
       <WhatsAppButton />
     </div>
   );

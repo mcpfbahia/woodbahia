@@ -30,7 +30,7 @@ export const HeroSection = () => {
         <div className="md:hidden">
           <Image
             src="/fundo-hero-section-mobile.webp"
-            alt="Chalé de madeira sustentável Wood Bahia"
+            alt="chalé de madeira moderno para Airbnb construído com madeira pinus tratada"
             fill
             className="object-cover"
             priority
@@ -74,7 +74,7 @@ export const HeroSection = () => {
             transition={{ duration: 0.8, delay: 0.15 }}
             className="mb-8 font-serif text-2xl font-medium text-white/90 sm:text-3xl md:text-4xl"
           >
-            Chalés A-Frame e Casas Pré-Fabricadas para moradia, lazer ou investimento em Airbnb
+            Construa seu chalé de madeira para Airbnb, campo ou praia com estrutura em Pinus tratado em autoclave e excelente custo-benefício.
           </motion.h2>
 
           {/* Subheadline */}
@@ -101,7 +101,7 @@ export const HeroSection = () => {
                 href="/simulador"
                 className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-secondary to-primary px-8 py-4 text-lg font-bold text-white shadow-primary/20 shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-primary/40 hover:shadow-xl sm:w-auto"
               >
-                Simular investimento
+                Simule o preço do seu chalé de madeira
                 <ArrowRight className="h-5 w-5" />
               </a>
             </MagneticButton>
@@ -110,7 +110,7 @@ export const HeroSection = () => {
                 href="/#modelos"
                 className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 px-8 py-4 text-lg font-semibold text-white backdrop-blur-md transition-all duration-300 hover:bg-white/20 sm:w-auto"
               >
-                Ver modelos
+                Veja nossos modelos de chalé de madeira para Airbnb
               </a>
             </MagneticButton>
           </motion.div>

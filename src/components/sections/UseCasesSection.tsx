@@ -1,6 +1,7 @@
 "use client";
 
-import { TrendingUp, Coins, TreePine, Waves } from "lucide-react";
+import { TrendingUp, Coins, TreePine, Waves, Calculator, ChevronRight } from "lucide-react";
+import Link from "next/link";
 import { ScrollReveal, StaggerContainer, StaggerItem } from "../common/ScrollReveal";
 
 const segments = [
@@ -58,9 +59,16 @@ export const UseCasesSection = () => {
                 <p className="leading-relaxed text-muted-foreground font-medium">
                   {segment.description}
                 </p>
-                <div className="mt-6 flex items-center text-primary text-sm font-bold opacity-0 transition-opacity group-hover:opacity-100">
-                  Ver detalhes do projeto
-                </div>
+                <Link
+                  href="/simulador"
+                  className="mt-6 flex items-center justify-between group-hover:text-primary transition-colors font-bold text-sm"
+                >
+                  <span className="flex items-center gap-2">
+                    <Calculator className="h-4 w-4" />
+                    Simule o preço do seu chalé de madeira
+                  </span>
+                  <ChevronRight className="h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
+                </Link>
               </article>
             </StaggerItem>
           ))}

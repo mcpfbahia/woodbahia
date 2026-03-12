@@ -74,7 +74,7 @@ export const AboutSection = () => {
                   <div className="col-span-12 row-start-1 h-[400px] md:h-[500px] relative overflow-hidden rounded-[2.5rem] shadow-2xl">
                     <Image
                       src="/images/models/model-4.jpg" // Chalé A-Frame de exemplo
-                      alt="Construção de Chalé Premium Wood Bahia"
+                      alt="casa pré-fabricada de madeira para praia na Bahia construída pela Wood Bahia"
                       fill
                       className="object-cover transition-transform duration-700 hover:scale-110"
                     />

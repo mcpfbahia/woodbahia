@@ -20,7 +20,7 @@ import { motion } from "framer-motion";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "~/lib/firebase";
 import { Header } from "~/components/layout/Header";
-import { Footer } from "~/components/layout/Footer";
+import { FooterWoodBahia } from "~/components/layout/FooterWoodBahia";
 import { WhatsAppButton } from "~/components/common/WhatsAppButton";
 import { ScrollReveal } from "~/components/common/ScrollReveal";
 import { initialModels } from "~/lib/data";
@@ -393,7 +393,7 @@ export default function FloorPlanPage() {
         </section>
       </main>
 
-      <Footer />
+      <FooterWoodBahia />
       <WhatsAppButton />
     </div>
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import { Header } from "~/components/layout/Header";
-import { Footer } from "~/components/layout/Footer";
+import { FooterWoodBahia } from "~/components/layout/FooterWoodBahia";
 import { WhatsAppButton } from "~/components/common/WhatsAppButton";
 import { ScrollReveal } from "~/components/common/ScrollReveal";
 import { Gavel, Info, ShieldCheck, Scale, Image as ImageIcon, ShoppingBag, AlertTriangle, ExternalLink } from "lucide-react";
@@ -149,7 +149,7 @@ export default function TermsOfUsePage() {
         </div>
       </main>
 
-      <Footer />
+      <FooterWoodBahia />
       <WhatsAppButton />
     </div>
   );

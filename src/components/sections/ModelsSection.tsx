@@ -98,7 +98,7 @@ export const ModelsSection = () => {
                   >
                     <Image
                       src={model.image || "/placeholder.svg"}
-                      alt={model.name}
+                      alt={`${model.name} - chalé de madeira ideal para investimento em Airbnb na Bahia`}
                       fill
                       className="object-cover transition-transform duration-500 group-hover:scale-110"
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -146,7 +146,7 @@ export const ModelsSection = () => {
                         href={`/modelo/${model.id}`}
                         className="group/btn inline-flex items-center gap-2 text-sm font-medium text-primary transition-colors hover:text-primary/80"
                       >
-                        Ver detalhes
+                        Conheça este chalé de madeira
                         <ArrowRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
                       </Link>
                     </div>

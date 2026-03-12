@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Header } from "~/components/layout/Header";
-import { Footer } from "~/components/layout/Footer";
+import { FooterWoodBahia } from "~/components/layout/FooterWoodBahia";
 import { WhatsAppButton } from "~/components/common/WhatsAppButton";
 import { ScrollReveal, StaggerContainer, StaggerItem } from "~/components/common/ScrollReveal";
 
@@ -302,7 +302,7 @@ export default function InstallmentSimulatorPage() {
         </div>
       </main>
 
-      <Footer />
+      <FooterWoodBahia />
       <WhatsAppButton />
     </div>
   );

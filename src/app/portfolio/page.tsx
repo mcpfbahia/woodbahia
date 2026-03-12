@@ -14,7 +14,7 @@ import { initialPortfolio } from "~/lib/data";
 import { StaggerContainer, StaggerItem } from "~/components/common/ScrollReveal";
 import Image from "next/image";
 import { Header } from "~/components/layout/Header";
-import { Footer } from "~/components/layout/Footer";
+import { FooterWoodBahia } from "~/components/layout/FooterWoodBahia";
 import { WhatsAppButton } from "~/components/common/WhatsAppButton";
 
 export default function PortfolioPage() {
@@ -148,7 +148,7 @@ export default function PortfolioPage() {
         </div>
       </main>
 
-      <Footer />
+      <FooterWoodBahia />
       <WhatsAppButton />
     </div>
   );

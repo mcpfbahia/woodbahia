@@ -1,7 +1,7 @@
 "use client";
 
 import { Header } from "~/components/layout/Header";
-import { Footer } from "~/components/layout/Footer";
+import { FooterWoodBahia } from "~/components/layout/FooterWoodBahia";
 import { WhatsAppButton } from "~/components/common/WhatsAppButton";
 import { ScrollReveal } from "~/components/common/ScrollReveal";
 import { Shield, Lock, Eye, FileText, UserCheck, Mail } from "lucide-react";
@@ -157,7 +157,7 @@ export default function PrivacyPolicyPage() {
         </div>
       </main>
 
-      <Footer />
+      <FooterWoodBahia />
       <WhatsAppButton />
     </div>
   );

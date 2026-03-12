@@ -10,7 +10,7 @@ import { TestimonialsSection } from "~/components/sections/TestimonialsSection";
 import { PortfolioSection } from "~/components/sections/PortfolioSection";
 import { FAQSection } from "~/components/sections/FAQSection";
 import { ContactSection } from "~/components/sections/ContactSection";
-import { Footer } from "~/components/layout/Footer";
+import { FooterWoodBahia } from "~/components/layout/FooterWoodBahia";
 import { WhatsAppButton } from "~/components/common/WhatsAppButton";
 import { PaymentSection } from "~/components/sections/PaymentSection";
 import { SimulatorSection } from "~/components/sections/SimulatorSection";
@@ -34,7 +34,7 @@ export default function Home() {
         <FAQSection />
         <ContactSection />
       </main>
-      <Footer />
+      <FooterWoodBahia />
       <WhatsAppButton />
     </div>
   );

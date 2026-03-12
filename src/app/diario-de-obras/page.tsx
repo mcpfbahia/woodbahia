@@ -6,7 +6,7 @@ import { Quote, MessageCircle, Loader2 } from "lucide-react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "~/lib/firebase";
 import { Header } from "~/components/layout/Header";
-import { Footer } from "~/components/layout/Footer";
+import { FooterWoodBahia } from "~/components/layout/FooterWoodBahia";
 import { WhatsAppButton } from "~/components/common/WhatsAppButton";
 import Image from "next/image";
 
@@ -230,7 +230,7 @@ export default function DiarioObrasPage() {
         </div>
       </main>
 
-      <Footer />
+      <FooterWoodBahia />
       <WhatsAppButton />
     </div>
   );

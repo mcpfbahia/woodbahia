@@ -27,11 +27,11 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "~/lib/firebase";
 import { initialModels } from "~/lib/data";
 import { Header } from "~/components/layout/Header";
-import { Footer } from "~/components/layout/Footer";
 import { WhatsAppButton } from "~/components/common/WhatsAppButton";
 import { ScrollReveal } from "~/components/common/ScrollReveal";
 import { Dialog, DialogContent, DialogTitle } from "~/components/ui/dialog";
 import Image from "next/image";
+import { FooterWoodBahia } from "~/components/layout/FooterWoodBahia";
 
 export default function ModelDetailPage() {
   const { id } = useParams() as { id: string };
@@ -464,7 +464,7 @@ export default function ModelDetailPage() {
         </section>
       </main>
 
-      <Footer />
+      <FooterWoodBahia />
       <WhatsAppButton />
 
       {/* Lightbox Dialog */}

@@ -8,10 +8,10 @@ import { TRPCReactProvider } from "~/trpc/react";
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.woodbahia.site"),
   title: {
-    default: "Wood Bahia | Casas Pré-Fabricadas e Chalés de Madeira na Bahia e Sergipe",
+    default: "Chalés de Madeira e Casas Pré-Fabricadas na Bahia | Wood Bahia",
     template: "%s | Wood Bahia"
   },
-  description: "Líder regional em construção sustentável de chalés e casas de madeira em Pinus tratado. Atendemos Salvador, Litoral Norte, Sudoeste Baiano, Sergipe e Chapada Diamantina. 15 anos de garantia.",
+  description: "Construa seu chalé de madeira com estrutura em madeira Pinus tratada em autoclave. Projetos para Airbnb, casas de campo e casas de praia na Bahia e Sergipe.",
   keywords: [
     "casas pré-fabricadas bahia", 
     "chalés de madeira bahia", 
@@ -122,10 +122,10 @@ const schemaJSON = {
     {
       "@type": "LocalBusiness",
       "parentOrganization": { "@id": "https://www.woodbahia.site/#organization" },
-      "name": "Wood Bahia - Showroom Lauro de Freitas",
+      "name": "Wood Bahia Casas Pré-Fabricadas",
       "image": "https://www.woodbahia.site/og-image.jpeg",
       "priceRange": "$$$",
-      "telephone": "+55-71-99293-6290",
+      "telephone": "+55 71 99293-6290",
       "email": "woodbahia@gmail.com",
       "address": {
         "@type": "PostalAddress",
@@ -142,20 +142,9 @@ const schemaJSON = {
       },
       "url": "https://www.woodbahia.site/",
       "areaServed": [
+        "Bahia", "Sergipe",
         "Salvador", "Lauro de Freitas", "Camaçari", "Feira de Santana", 
-        "Vitória da Conquista",
-  "Sudoeste Baiano",
- "Itabuna", "Ilhéus", "Juazeiro", "Barreiras", 
-        "Jequié", "Alagoinhas", "Teixeira de Freitas", "Porto Seguro", 
-        "Simões Filho", "Paulo Afonso", "Eunápolis", "Santo Antônio de Jesus", 
-        "Valença", "Candeias", "Guanambi", "Jacobina", "Serrinha", 
-        "Luis Eduardo Magalhães", "Itapetinga", "Irecê", "Casa Nova", 
-        "Bom Jesus da Lapa", "Brumado", "Conceição do Coité", "Itamaraju",
-        "Itacaré", "Trancoso", "Arraial d'Ajuda",  "Sergipe",
-  "Praia do Forte",
- "Guarajuba",
-        "Imbassaí", "Litoral Norte da Bahia", "Chapada Diamantina", "Lençóis",
-        "Aracaju, SE", "Estância, SE", "Lagarto, SE", "Itabaiana, SE"
+        "Vitória da Conquista", "Itacolomi", "Praia do Forte", "Guarajuba"
       ],
       "openingHoursSpecification": [
         {
@@ -171,7 +160,8 @@ const schemaJSON = {
           "closes": "12:00"
         }
       ],
-      "description": "Showroom especializado em casas pré-fabricadas e chalés de madeira sustentável. Referência em toda a Bahia e Sergipe."
+      "description": "Especialistas em chalés de madeira e casas pré-fabricadas para Airbnb, campo e praia.",
+      "hasCategory": "Construction company specialized in wooden chalets and prefabricated houses"
     }
   ]
 };
