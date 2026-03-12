@@ -21,78 +21,63 @@ export const AboutSection = () => {
               <div>
                 <span className="mb-6 inline-block rounded-full bg-secondary/10 px-4 py-2 text-sm font-medium text-secondary">
                   Sobre Nós
-                </span>
-                <h2 className="section-title text-3xl font-bold md:text-5xl">
-                  Experiência e Foco em
-                  <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                    {" "}
-                    Projetos de Madeira
+                </span>                <h2 className="section-title text-3xl font-bold md:text-5xl">
+                  Experiência em Casas e{" "}
+                  <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent italic">
+                    Chalés de Madeira na Bahia
                   </span>
                 </h2>
                 <p className="mb-6 font-serif text-xl font-medium text-foreground">
-                  Tradição e foco em casas e chalés de madeira
+                  Especialistas em Chalés A-Frame e Casas Pré-Fabricadas de Madeira
                 </p>
                 <p className="mb-6 text-lg leading-relaxed text-muted-foreground">
-                  A <strong className="text-foreground">Wood Bahia</strong> é
-                  especializada em casas e chalés de madeira em Pinus tratado,
-                  com forte atuação no{" "}
-                  <strong className="text-foreground">
-                    Litoral Norte da Bahia
-                  </strong>
-                  , Salvador, Sudoeste baiano e Sergipe. Nossas soluções são
-                  pensadas para investimento, lazer e valorização imobiliária.
+                  A <strong className="text-foreground">Wood Bahia</strong> é especialista em <strong className="text-foreground">chalés de madeira</strong> e <strong className="text-foreground">casas pré-fabricadas de madeira</strong> feitas com pinus tratado. Nossas soluções são ideais para <strong className="text-foreground">investimento em Airbnb</strong>, casas de campo, casas de praia e chalés turísticos, unindo valorização imobiliária e bem-estar.
+                </p>
+                <p className="mb-6 text-lg leading-relaxed text-muted-foreground">
+                  Atendemos o <strong className="text-foreground">Litoral Norte da Bahia</strong>, Salvador, <strong className="text-foreground">Chapada Diamantina</strong>, Interior da Bahia e Sergipe, levando qualidade e logística eficiente para todo o estado.
+                </p>
+                <p className="mb-6 text-lg leading-relaxed text-muted-foreground">
+                  Nossas construções oferecem rapidez de execução, conforto térmico absoluto, estética rústica-moderna e a durabilidade superior da madeira tratada, transformando terrenos em refúgios sustentáveis rapidamente.
                 </p>
                 <p className="mb-8 text-lg leading-relaxed text-muted-foreground">
-                  Unimos rapidez de execução, durabilidade e estética
-                  rústica-moderna, entregando estruturas completas em locais
-                  como{" "}
-                  <strong className="text-foreground">
-                    Praia do Forte, Guarajuba, Imbassaí, Sauípe, Baixios e
-                    Subaúma
-                  </strong>
-                  , onde o conforto térmico da madeira é um diferencial
-                  absoluto.
+                  Orgulhamo-nos de projetos entregues em <strong className="text-foreground">Praia do Forte, Guarajuba, Imbassaí, Costa do Sauípe, Baixios e Subaúma</strong>, onde a <strong className="text-foreground">cabana de madeira</strong> de alto padrão é um diferencial de mercado.
                 </p>
 
                 <StaggerContainer className="flex flex-col gap-4">
                   <StaggerItem index={0}>
                     <div className="flex items-center gap-3">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-pink-500/10">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-pink-500/10 transition-colors group-hover:bg-pink-500/20">
                         <Instagram className="h-6 w-6 text-pink-500" />
                       </div>
                       <div>
-                        <span className="block text-xl font-bold text-foreground">
-                          +45k
-                        </span>
-                        <span className="text-sm text-muted-foreground">
-                          Seguidores no Instagram
-                        </span>
+                        <span className="block text-xl font-bold text-foreground">+45k seguidores no Instagram</span>
                       </div>
                     </div>
                   </StaggerItem>
                   <StaggerItem index={1}>
                     <div className="flex items-center gap-3">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 transition-colors group-hover:bg-primary/20">
                         <TreePine className="h-6 w-6 text-primary" />
                       </div>
                       <div>
-                        <span className="block text-lg font-bold text-foreground">
-                          Especialistas em Madeira
-                        </span>
-                        <span className="text-sm text-muted-foreground">
-                          Madeira certificada
-                        </span>
+                        <span className="block text-lg font-bold text-foreground">Especialistas em construção em madeira</span>
                       </div>
                     </div>
                   </StaggerItem>
                   <StaggerItem index={2}>
                     <div className="flex items-center gap-3">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-secondary/10">
-                        <Heart className="h-6 w-6 text-secondary" />
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-secondary/10 transition-colors group-hover:bg-secondary/20">
+                        <Shield className="h-6 w-6 text-secondary" />
                       </div>
-                      <span className="font-medium text-foreground">
-                        Atendimento humano e orientado
-                      </span>
+                      <span className="font-bold text-foreground">Madeira tratada e certificada</span>
+                    </div>
+                  </StaggerItem>
+                  <StaggerItem index={3}>
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 transition-colors group-hover:bg-amber-500/20">
+                        <Heart className="h-6 w-6 text-amber-500" />
+                      </div>
+                      <span className="font-bold text-foreground">Atendimento humano e consultivo</span>
                     </div>
                   </StaggerItem>
                 </StaggerContainer>
