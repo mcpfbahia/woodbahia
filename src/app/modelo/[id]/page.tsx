@@ -32,6 +32,7 @@ import { ScrollReveal } from "~/components/common/ScrollReveal";
 import { Dialog, DialogContent, DialogTitle } from "~/components/ui/dialog";
 import Image from "next/image";
 import { FooterWoodBahia } from "~/components/layout/FooterWoodBahia";
+import { TransparencySection } from "~/components/sections/TransparencySection";
 
 export default function ModelDetailPage() {
   const { id } = useParams() as { id: string };
@@ -282,7 +283,7 @@ export default function ModelDetailPage() {
                   Modelo Exclusivo
                 </span>
 
-                <h1 className="font-serif mb-4 text-4xl font-bold text-primary md:text-5xl">
+                <h1 className="font-serif mb-4 text-4xl font-bold text-[#4A2B1D] md:text-5xl">
                   {model.name}
                 </h1>
 
@@ -311,7 +312,7 @@ export default function ModelDetailPage() {
                     <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-primary">
                       Kit Completamente Montado
                     </p>
-                    <p className="text-gradient font-serif text-4xl font-bold md:text-5xl">
+                    <p className="text-[#4A2B1D] font-serif text-4xl font-bold md:text-5xl">
                       {model.price}
                     </p>
                     <p className="mt-2 text-sm text-muted-foreground">
@@ -368,7 +369,7 @@ export default function ModelDetailPage() {
           <div className="container mx-auto px-4">
             <div className="grid gap-12 lg:grid-cols-2">
               <ScrollReveal>
-                <h2 className="section-title text-3xl font-bold mb-6">Sobre o Projeto</h2>
+                <h2 className="text-3xl font-bold mb-6 text-[#4A2B1D]">Sobre o Projeto</h2>
                 <p className="mb-8 text-lg leading-relaxed text-muted-foreground">
                   {details.fullDescription}
                 </p>
@@ -426,6 +427,9 @@ export default function ModelDetailPage() {
             </div>
           </div>
         </section>
+
+        {/* Transparência Total */}
+        <TransparencySection />
 
         {/* Prova Social Instagram */}
         <section className="py-10 md:py-12">
