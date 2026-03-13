@@ -1,7 +1,8 @@
 "use client";
 
 import React from 'react';
-import { CreditCard, Home, CheckCircle2, MessageCircle } from 'lucide-react';
+import { CreditCard, Home, CheckCircle2, MessageCircle, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
 import { ScrollReveal, StaggerContainer, StaggerItem } from '~/components/common/ScrollReveal';
 
 export const PaymentSection = () => {
@@ -60,9 +61,16 @@ export const PaymentSection = () => {
                     </h4>
                     <div className="w-3 h-3 rounded-full bg-[#B06D46] animate-pulse"></div>
                   </div>
-                  <p className="text-sm text-[#735F53]">
+                  <p className="text-sm text-[#735F53] mb-4">
                     Simule o valor das parcelas e descubra quanto pagará pelo seu kit.
                   </p>
+                  <Link 
+                    href="/simulador/parcelamento"
+                    className="inline-flex items-center justify-center gap-2 w-full py-3 px-4 bg-[#B06D46] hover:bg-[#8A5638] text-white font-bold rounded-xl transition-all duration-300 shadow-sm hover:shadow-md active:scale-[0.98]"
+                  >
+                    <span>Simular parcelas no cartão</span>
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                  </Link>
                 </div>
               </div>
             </div>

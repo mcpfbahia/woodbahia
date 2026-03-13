@@ -5,11 +5,11 @@ import { Phone, Instagram, MapPin, Clock, CreditCard, ExternalLink } from "lucid
 import { ScrollReveal } from "../common/ScrollReveal";
 
 const footerLinks = [
-  { name: "Simulador de Chalé", href: "/simulador/parcelamento" },
+  { name: "Simular Investimento", href: "/simulador" },
+  { name: "Simulador de Cartão", href: "/simulador/parcelamento" },
   { name: "Modelos", href: "/modelos" },
   { name: "Portfólio", href: "/portfolio" },
   { name: "Como Funciona", href: "/#como-funciona" },
-  { name: "Showroom", href: "#showroom" },
   { name: "Contato", href: "/#contato" },
 ];
 
@@ -182,15 +182,24 @@ export const FooterWoodBahia = () => {
 
                 <div>
                   <h4 className="mb-4 text-sm font-black uppercase tracking-widest text-white">Facilidade de Pagamento</h4>
-                  <div className="flex items-center gap-3 rounded-2xl bg-white/5 border border-white/10 p-4">
-                    <CreditCard className="h-6 w-6 text-primary-foreground/60" />
-                    <div className="leading-tight">
-                      <span className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1">Parcelamento</span>
-                      <p className="font-black text-white">
-                        Cartão de Crédito <br/>
-                        até 18X
-                      </p>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 rounded-2xl bg-white/5 border border-white/10 p-4">
+                      <CreditCard className="h-6 w-6 text-primary-foreground/60" />
+                      <div className="leading-tight">
+                        <span className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1">Parcelamento</span>
+                        <p className="font-black text-white">
+                          Cartão de Crédito <br/>
+                          até 18X
+                        </p>
+                      </div>
                     </div>
+                    <a 
+                      href="/simulador/parcelamento"
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/20 px-4 py-2.5 text-xs font-bold transition-all hover:bg-white hover:text-primary group"
+                    >
+                      <CreditCard className="h-3.5 w-3.5" />
+                      Simular parcelas no cartão
+                    </a>
                   </div>
                 </div>
               </div>

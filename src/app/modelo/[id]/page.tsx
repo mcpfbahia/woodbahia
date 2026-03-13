@@ -20,6 +20,7 @@ import {
   Instagram,
   ZoomIn,
   Loader2,
+  CreditCard,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import useEmblaCarousel from "embla-carousel-react";
@@ -339,24 +340,41 @@ export default function ModelDetailPage() {
                   )}
                 </div>
 
-                <div className="flex flex-col gap-4 sm:flex-row">
-                  <a
-                    href={`https://wa.me/5571992936290?text=Olá! Tenho interesse no ${model.name}.`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-cta bg-primary !shadow-lg"
-                  >
-                    <Phone className="h-5 w-5" />
-                    Quero este modelo
-                  </a>
-                  
-                  {/* Botão para Planta Baixa */}
+                <div className="flex flex-col gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <a
+                      href={`https://wa.me/5571992936290?text=Olá! Tenho interesse no ${model.name}.`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-cta bg-primary !shadow-lg px-6 py-4 text-base flex items-center justify-center gap-2 rounded-xl font-bold"
+                    >
+                      <Phone className="h-5 w-5" />
+                      Pedir Proposta
+                    </a>
+                    
+                    <Link
+                      href={`/modelo/${id}/planta`}
+                      className="inline-flex items-center justify-center gap-2 border-2 border-primary/20 bg-transparent px-6 py-4 font-bold text-primary rounded-xl hover:bg-primary/5 hover:-translate-y-1 transition-all text-center text-base"
+                    >
+                      <Layers className="h-5 w-5" />
+                      Planta Baixa
+                    </Link>
+                  </div>
+
                   <Link
-                    href={`/modelo/${id}/planta`}
-                    className="inline-flex items-center justify-center gap-2 border-2 border-primary/20 bg-transparent px-8 py-4 font-bold text-primary rounded-xl hover:bg-primary/5 hover:-translate-y-1 transition-all text-center"
+                    href="/simulador/parcelamento"
+                    className="group inline-flex items-center justify-between gap-4 border border-[#B06D46]/20 bg-[#B06D46]/5 px-5 py-3 rounded-xl hover:bg-[#B06D46]/10 transition-all w-full sm:w-auto self-start"
                   >
-                    <Layers className="h-5 w-5" />
-                    Ver Planta Baixa
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-[#B06D46]/10 rounded-lg text-[#B06D46]">
+                        <CreditCard className="h-4 w-4" />
+                      </div>
+                      <div className="text-left">
+                        <p className="text-sm font-bold text-[#B06D46] leading-none">Simular Parcela</p>
+                        <p className="text-[10px] text-[#B06D46]/70 font-medium uppercase mt-1 tracking-wider">cartão credito até 18X</p>
+                      </div>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-[#B06D46]/40 group-hover:text-[#B06D46] transition-colors" />
                   </Link>
                 </div>
               </motion.div>
