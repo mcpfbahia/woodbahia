@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ScrollReveal, StaggerContainer, StaggerItem } from '../common/ScrollReveal';
+import { saveLead } from '~/lib/leads';
 
 const objectives = [
   {
@@ -105,15 +106,36 @@ export const ContactSection = () => {
     setIsSaving(true);
 
     try {
+      const objectiveTitle = objectives.find((o) => o.id === formData.objective)?.titulo;
+      const landLabel = landOptions.find((l) => l.id === formData.hasLand)?.label;
+      const timelineLabel = timelineOptions.find((t) => t.id === formData.timeline)?.label;
+      const budgetLabel = budgetOptions.find((b) => b.id === formData.budget)?.label;
+
+      const messageContent = 
+        `Objetivo: ${objectiveTitle}\n` +
+        `Possui terreno: ${landLabel}\n` +
+        `Localização: ${formData.location || "Não informado"}\n` +
+        `Prazo: ${timelineLabel}\n` +
+        `Investimento: ${budgetLabel}`;
+
+      // Salva no banco de dados primeiro
+      await saveLead({
+        name: formData.name,
+        phone: formData.whatsapp,
+        source: 'contato',
+        message: messageContent,
+        detalhes: formData
+      });
+
       const message = encodeURIComponent(
         `🏡 *Nova Solicitação - Wood Bahia*\n\n` +
         `*Nome:* ${formData.name}\n` +
         `*WhatsApp:* ${formData.whatsapp}\n` +
-        `*Objetivo:* ${objectives.find((o) => o.id === formData.objective)?.titulo}\n\n` +
-        `*Possui terreno:* ${landOptions.find((l) => l.id === formData.hasLand)?.label}\n` +
+        `*Objetivo:* ${objectiveTitle}\n\n` +
+        `*Possui terreno:* ${landLabel}\n` +
         `*Localização:* ${formData.location || "Não informado"}\n` +
-        `*Prazo:* ${timelineOptions.find((t) => t.id === formData.timeline)?.label}\n` +
-        `*Investimento:* ${budgetOptions.find((b) => b.id === formData.budget)?.label}`
+        `*Prazo:* ${timelineLabel}\n` +
+        `*Investimento:* ${budgetLabel}`
       );
 
       const whatsappNumber = "5571992936290";

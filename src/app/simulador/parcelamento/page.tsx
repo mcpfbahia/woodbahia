@@ -4,13 +4,15 @@ import { useState, useMemo, useEffect } from "react";
 import { 
   ArrowLeft, CreditCard, Info, Calculator, 
   CheckCircle2, Banknote, ShieldCheck, 
-  ShoppingBag, Trash2
+  ShoppingBag, Trash2, Loader2, User, Phone as PhoneIcon, Check, ChevronRight
 } from "lucide-react";
 import Link from "next/link";
 import { Header } from "~/components/layout/Header";
 import { FooterWoodBahia } from "~/components/layout/FooterWoodBahia";
 import { WhatsAppButton } from "~/components/common/WhatsAppButton";
 import { ScrollReveal, StaggerContainer, StaggerItem } from "~/components/common/ScrollReveal";
+import { motion, AnimatePresence } from "framer-motion";
+import { saveLead } from "~/lib/leads";
 
 const TAXAS = {
   1: 3.29,           // 1x (MDR)
@@ -45,6 +47,11 @@ export default function InstallmentSimulatorPage() {
   const [entrada, setEntrada] = useState<number>(0);
   const [parcelasSelecionadas, setParcelasSelecionadas] = useState<number>(18);
   const [mounted, setMounted] = useState(false);
+  const [nome, setNome] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+  const [showLeadForm, setShowLeadForm] = useState(false);
+  const [isSavingLead, setIsSavingLead] = useState(false);
+  const [leadSaved, setLeadSaved] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -75,7 +82,41 @@ export default function InstallmentSimulatorPage() {
     return s || { valorDaParcela: 0, totalNoCartao: 0, taxa: 0, jurosTotal: 0, parcelas: parcelasSelecionadas };
   }, [tabelaSimulacao, parcelasSelecionadas]);
 
-  const generateWhatsAppParams = () => {
+  const handleLeadSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!nome || !whatsapp) return;
+
+    setIsSavingLead(true);
+    try {
+      const message = `Simulação Cartão: ${parcelasSelecionadas}x de ${formatCurrency(simulacaoAtual.valorDaParcela)} | Projeto: ${formatCurrency(valorProjeto)} | Entrada: ${formatCurrency(entrada)}`;
+      
+      await saveLead({
+        name: nome,
+        phone: whatsapp,
+        source: 'simulador-parcelamento',
+        message: message,
+        detalhes: {
+          valorProjeto,
+          entrada,
+          parcelas: parcelasSelecionadas,
+          valorParcela: simulacaoAtual.valorDaParcela,
+          totalCartao: simulacaoAtual.totalNoCartao
+        }
+      });
+      
+      setLeadSaved(true);
+      setShowLeadForm(false);
+      
+      // Abre o WhatsApp após salvar
+      window.open(generateWhatsAppLink(), "_blank");
+    } catch (error) {
+      console.error("Erro ao salvar lead:", error);
+    } finally {
+      setIsSavingLead(false);
+    }
+  };
+
+  const generateWhatsAppLink = () => {
     const telefone = "5571992936290";
     const texto = `Olá! Fiz uma simulação de financiamento no site da Wood Bahia e gostaria de receber uma proposta detalhada.
 *Projeto:* ${formatCurrency(valorProjeto)}
@@ -222,23 +263,19 @@ export default function InstallmentSimulatorPage() {
 
           <ScrollReveal delay={0.1}>
             <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-6 justify-center mb-24">
-              <a 
-                href={generateWhatsAppParams()}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button 
+                onClick={() => leadSaved ? window.open(generateWhatsAppLink(), "_blank") : setShowLeadForm(true)}
                 className="w-full md:w-auto bg-green-500 text-white flex items-center justify-center gap-3 px-8 py-5 rounded-2xl font-bold text-lg hover:-translate-y-1 hover:bg-green-600 transition-all shadow-xl shadow-green-500/30"
               >
                 <Banknote className="w-6 h-6" />
                 Receber proposta detalhada
-              </a>
-              <a 
-                href={generateWhatsAppParams()}
-                target="_blank"
-                rel="noopener noreferrer"
+              </button>
+              <button 
+                onClick={() => leadSaved ? window.open(generateWhatsAppLink(), "_blank") : setShowLeadForm(true)}
                 className="w-full md:w-auto bg-secondary text-white flex items-center justify-center gap-3 px-8 py-5 rounded-2xl font-bold text-lg hover:-translate-y-1 hover:bg-secondary/90 transition-all shadow-xl shadow-secondary/20"
               >
                 Solicitar Orçamento no WhatsApp
-              </a>
+              </button>
             </div>
           </ScrollReveal>
 
@@ -304,6 +341,82 @@ export default function InstallmentSimulatorPage() {
 
       <FooterWoodBahia />
       <WhatsAppButton />
+
+      {/* Modal de Identificação */}
+      <AnimatePresence>
+        {showLeadForm && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowLeadForm(false)}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-md bg-white rounded-[2.5rem] p-8 md:p-10 shadow-2xl border border-slate-100"
+            >
+              <div className="text-center mb-8">
+                <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <User className="w-8 h-8 text-primary" />
+                </div>
+                <h3 className="text-2xl font-serif font-bold text-primary mb-2">Quase lá!</h3>
+                <p className="text-slate-500">Identifique-se para receber sua simulação completa no WhatsApp.</p>
+              </div>
+
+              <form onSubmit={handleLeadSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700 uppercase tracking-wider ml-1">Seu Nome</label>
+                  <div className="relative">
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                    <input 
+                      type="text"
+                      required
+                      value={nome}
+                      onChange={(e) => setNome(e.target.value)}
+                      placeholder="Como podemos te chamar?"
+                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:border-primary transition-all"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700 uppercase tracking-wider ml-1">Seu WhatsApp</label>
+                  <div className="relative">
+                    <PhoneIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                    <input 
+                      type="tel"
+                      required
+                      value={whatsapp}
+                      onChange={(e) => setWhatsapp(e.target.value)}
+                      placeholder="(00) 00000-0000"
+                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:border-primary transition-all"
+                    />
+                  </div>
+                </div>
+
+                <button 
+                  type="submit"
+                  disabled={isSavingLead}
+                  className="w-full bg-primary text-white py-5 rounded-2xl font-bold text-lg flex items-center justify-center gap-3 hover:bg-primary/90 transition-all shadow-xl shadow-primary/20 disabled:opacity-70 mt-6"
+                >
+                  {isSavingLead ? (
+                    <Loader2 className="w-6 h-6 animate-spin" />
+                  ) : (
+                    <>
+                      <span>Ver Proposta Agora</span>
+                      <ChevronRight className="w-5 h-5" />
+                    </>
+                  )}
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

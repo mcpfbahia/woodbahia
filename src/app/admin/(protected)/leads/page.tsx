@@ -27,7 +27,16 @@ export default function AdminLeadsPage() {
       if (!db) throw new Error("Firebase DB not initialized");
       const q = query(collection(db, "leads"), orderBy("createdAt", "desc"));
       const querySnapshot = await getDocs(q);
-      const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Lead));
+      const data = querySnapshot.docs.map(doc => {
+        const d = doc.data();
+        return { 
+          id: doc.id, 
+          ...d,
+          name: d.name || d.nome,
+          phone: d.phone || d.whatsapp,
+          source: d.source || d.origem
+        } as Lead;
+      });
       setLeads(data);
     } catch (error) {
       console.error("Error fetching leads:", error);

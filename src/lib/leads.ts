@@ -2,10 +2,13 @@ import { db } from './firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 export interface LeadData {
-    nome: string;
-    whatsapp: string;
-    origem: 'simulador' | 'contato' | 'simulador-parcelamento';
-    detalhes: any;
+    name: string;
+    phone: string;
+    email?: string;
+    source: 'simulador' | 'contato' | 'simulador-parcelamento' | string;
+    message?: string;
+    status?: "Novo" | "Em Atendimento" | "Finalizado";
+    detalhes?: any;
     createdAt?: any;
 }
 
@@ -19,6 +22,7 @@ export const saveLead = async (data: LeadData) => {
         const leadsRef = collection(db, 'leads');
         const docRef = await addDoc(leadsRef, {
             ...data,
+            status: data.status || "Novo",
             createdAt: serverTimestamp(),
         });
         return docRef.id;

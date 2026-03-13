@@ -460,10 +460,13 @@ export default function InvestmentSimulationPage() {
             const valorM2 = pacote.preco + adicionalPorM2;
             const total = area * valorM2;
 
+            const message = `Área: ${area}m² | Pacote: ${pacote.nome} | Adicionais: ${ADICIONAIS.filter((a) => selecionados.includes(a.id)).map(a => a.nome).join(', ')} | Total: ${total}`;
+
             await saveLead({
-                nome,
-                whatsapp,
-                origem: 'simulador',
+                name: nome,
+                phone: whatsapp,
+                source: 'simulador',
+                message,
                 detalhes: {
                     area,
                     pacote: pacote.nome,
