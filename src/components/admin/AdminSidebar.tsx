@@ -9,7 +9,8 @@ import {
   Hammer, 
   Users,
   LogOut,
-  ChevronLeft
+  ChevronLeft,
+  FileText
 } from "lucide-react";
 import Image from "next/image";
 
@@ -21,6 +22,7 @@ export function AdminSidebar({ currentPath }: { currentPath: string }) {
     { name: "Modelos", path: "/admin/modelos", icon: Home },
     { name: "Portfólio", path: "/admin/portfolio", icon: ImageIcon },
     { name: "Diário de Obras", path: "/admin/diario-de-obras", icon: Hammer },
+    { name: "Propostas", path: "/admin/propostas", icon: FileText },
     { name: "Leads (Contatos)", path: "/admin/leads", icon: Users },
   ];
 

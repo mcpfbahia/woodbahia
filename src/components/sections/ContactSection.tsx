@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ScrollReveal, StaggerContainer, StaggerItem } from '../common/ScrollReveal';
+import { toast } from 'sonner';
 import { saveLead } from '~/lib/leads';
 
 const objectives = [
@@ -70,6 +71,8 @@ interface FormData {
 export const ContactSection = () => {
   const [mounted, setMounted] = useState(false);
   const [step, setStep] = useState(1);
+  const successRef = React.useRef<HTMLElement>(null);
+  
   const [formData, setFormData] = useState<FormData>({
     name: "",
     whatsapp: "",
@@ -86,6 +89,12 @@ export const ContactSection = () => {
     setMounted(true);
   }, []);
 
+  useEffect(() => {
+    if (isSubmitted && successRef.current) {
+      successRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [isSubmitted]);
+
   const formatPhone = (value: string) => {
     const numbers = value.replace(/\D/g, "");
     if (numbers.length <= 2) return numbers;
@@ -96,13 +105,37 @@ export const ContactSection = () => {
 
   const handleStep1Submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.name && formData.whatsapp && formData.objective) {
-      setStep(2);
+    if (!formData.name) {
+      toast.error("Por favor, preencha o seu nome.");
+      return;
     }
+    if (!formData.whatsapp || formData.whatsapp.length < 14) {
+      toast.error("Por favor, insira um WhatsApp válido.");
+      return;
+    }
+    if (!formData.objective) {
+      toast.error("Por favor, selecione o seu objetivo com o chalé.");
+      return;
+    }
+    setStep(2);
   };
 
   const handleFinalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!formData.hasLand) {
+      toast.error("Por favor, informe se já possui terreno.");
+      return;
+    }
+    if (!formData.timeline) {
+      toast.error("Por favor, selecione o prazo para construir.");
+      return;
+    }
+    if (!formData.budget) {
+      toast.error("Por favor, informe a faixa de investimento prevista.");
+      return;
+    }
+
     setIsSaving(true);
 
     try {
@@ -153,7 +186,7 @@ export const ContactSection = () => {
 
   if (isSubmitted) {
     return (
-      <section id="contato" className="w-full bg-[#FAF8F5] py-20 lg:py-28 flex flex-col items-center px-4">
+      <section ref={successRef} id="contato" className="w-full bg-[#FAF8F5] py-20 lg:py-28 flex flex-col items-center px-4">
         <div className="mx-auto max-w-lg text-center">
           <motion.div
             initial={{ scale: 0 }}

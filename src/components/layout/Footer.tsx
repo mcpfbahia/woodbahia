@@ -9,6 +9,7 @@ const footerLinks = [
   { name: "Simulador de Compra Cartão Crédito", href: "/simulador/parcelamento" },
   { name: "Modelos", href: "/modelos" },
   { name: "Portfólio", href: "/portfolio" },
+  { name: "Diário de Obras", href: "/diario-de-obras" },
   { name: "Como Funciona", href: "/#como-funciona" },
   { name: "Showroom", href: "#showroom" },
   { name: "Contato", href: "/#contato" },
@@ -193,7 +194,7 @@ export const Footer = () => {
                 <CreditCard className="h-5 w-5 text-primary-foreground/60" />
                 <div>
                   <span className="block text-[10px] uppercase tracking-wider text-primary-foreground/40">Cartão de Crédito</span>
-                  <span className="font-bold text-white text-sm">Até 18x no cartão</span>
+                  <span className="font-bold text-white text-sm">Até 3x sem juros ou 18x com juros</span>
                 </div>
               </div>
               

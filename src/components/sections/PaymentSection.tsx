@@ -45,6 +45,10 @@ export const PaymentSection = () => {
                 <ul className="space-y-4 mb-8">
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="w-6 h-6 text-[#B06D46] shrink-0" />
+                    <span className="text-[#57463A] font-medium">Pagamento no cartão de crédito em até 3X sem juros</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-6 h-6 text-[#B06D46] shrink-0" />
                     <span className="text-[#57463A] font-medium">Parcelamento fácil e sem burocracia</span>
                   </li>
                   <li className="flex items-start gap-3">
@@ -66,9 +70,9 @@ export const PaymentSection = () => {
                   </p>
                   <Link 
                     href="/simulador/parcelamento"
-                    className="inline-flex items-center justify-center gap-2 w-full py-3 px-4 bg-[#B06D46] hover:bg-[#8A5638] text-white font-bold rounded-xl transition-all duration-300 shadow-sm hover:shadow-md active:scale-[0.98]"
+                    className="inline-flex items-center justify-center gap-2 w-full py-3 px-4 bg-[#B06D46] hover:bg-[#8A5638] text-white font-bold rounded-xl transition-all duration-300 shadow-sm hover:shadow-md active:scale-[0.98] whitespace-nowrap"
                   >
-                    <span>Simular parcelas no cartão</span>
+                    <span className="text-sm sm:text-base">Simular parcelas no cartão</span>
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                   </Link>
                 </div>

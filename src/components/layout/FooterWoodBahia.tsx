@@ -9,6 +9,7 @@ const footerLinks = [
   { name: "Simulador de Cartão", href: "/simulador/parcelamento" },
   { name: "Modelos", href: "/modelos" },
   { name: "Portfólio", href: "/portfolio" },
+  { name: "Diário de Obras", href: "/diario-de-obras" },
   { name: "Como Funciona", href: "/#como-funciona" },
   { name: "Contato", href: "/#contato" },
 ];
@@ -186,12 +187,12 @@ export const FooterWoodBahia = () => {
                     <div className="flex items-center gap-3 rounded-2xl bg-white/5 border border-white/10 p-4">
                       <CreditCard className="h-6 w-6 text-primary-foreground/60" />
                       <div className="leading-tight">
-                        <span className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1">Parcelamento</span>
-                        <p className="font-black text-white">
-                          Cartão de Crédito <br/>
-                          até 18X
-                        </p>
-                      </div>
+                      <span className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1">Parcelamento</span>
+                      <p className="font-black text-white text-sm">
+                        Até 3x sem juros <br/>
+                        ou 18x com juros
+                      </p>
+                    </div>
                     </div>
                     <a 
                       href="/simulador/parcelamento"

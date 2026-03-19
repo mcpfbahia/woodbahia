@@ -144,7 +144,7 @@ export const ModelsSection = () => {
                       </div>
                       <Link
                         href={`/modelo/${model.id}`}
-                        className="group/btn inline-flex items-center gap-2 rounded-xl bg-secondary/10 px-4 py-2.5 text-sm font-bold text-secondary transition-all hover:bg-secondary hover:text-white"
+                        className="group/btn inline-flex items-center gap-2 whitespace-nowrap rounded-xl bg-secondary/10 px-4 py-2.5 text-sm font-bold text-secondary transition-all hover:bg-secondary hover:text-white"
                       >
                         Conhecer Modelo
                         <ArrowRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-1" />

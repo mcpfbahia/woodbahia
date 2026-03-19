@@ -177,6 +177,70 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
+  /* Proposal Generator Specific Styles */
+  .wood-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(245, 240, 235, 0.9));
+    border: 1px solid rgba(140, 66, 31, 0.15);
+    box-shadow: 0 10px 30px rgba(140, 66, 31, 0.08);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .wood-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(to right, #8C421F, #D2691E, #8C421F);
+    opacity: 0.8;
+  }
+
+  .engraved-text {
+    font-family: var(--font-serif);
+    color: #4A3728;
+    text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.5);
+    letter-spacing: -0.02em;
+    font-weight: 800;
+  }
+
+  .recessed-input {
+    background: rgba(140, 66, 31, 0.05) !important;
+    border: 1px solid rgba(140, 66, 31, 0.1) !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+  }
+
+  .recessed-input:focus {
+    background: rgba(140, 66, 31, 0.08) !important;
+    border-color: rgba(140, 66, 31, 0.3) !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02), 0 0 0 2px rgba(140, 66, 31, 0.1);
+  }
+
+  .wood-button {
+    background: linear-gradient(135deg, #5D4037, #3E2723);
+    box-shadow: 0 4px 15px rgba(62, 39, 35, 0.3);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: none;
+  }
+
+  .wood-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(62, 39, 35, 0.4);
+    filter: brightness(1.2);
+  }
+
+  .toggle-glow[data-state=checked] {
+    box-shadow: 0 0 10px rgba(140, 66, 31, 0.4);
+  }
+
+  .radio-card-active {
+    background: rgba(140, 66, 31, 0.08) !important;
+    border-color: #8C421F !important;
+    box-shadow: 0 0 0 1px #8C421F;
+  }
 }
 
 @keyframes floating {
