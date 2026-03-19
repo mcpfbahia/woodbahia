@@ -101,14 +101,14 @@ export default function PropostasPage() {
   return (
     <div className="space-y-8 animate-fade-in pb-20">
       {/* Header Administrativo */}
-      <div className="flex justify-between items-center bg-white/50 p-6 rounded-2xl border border-border/40 backdrop-blur-sm">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white/50 p-4 md:p-6 rounded-2xl border border-border/40 backdrop-blur-sm gap-4">
         <div>
-          <h1 className="text-3xl font-bold engraved-text">
+          <h1 className="text-xl md:text-3xl font-bold engraved-text">
             {view === 'form' ? 'Gerador de Propostas' : 'Resumo da Proposta'}
           </h1>
-          <p className="text-muted-foreground text-sm uppercase tracking-widest font-bold mt-1">Wood Bahia — Propostas Comerciais</p>
+          <p className="text-muted-foreground text-[10px] md:text-sm uppercase tracking-widest font-bold mt-1">Wood Bahia — Propostas Comerciais</p>
         </div>
-        <Button variant="outline" className="rounded-xl border-primary/20 hover:bg-primary/5" onClick={() => router.push('/admin')}>
+        <Button variant="outline" size="sm" className="rounded-xl border-primary/20 hover:bg-primary/5 w-full sm:w-auto" onClick={() => router.push('/admin')}>
           <LayoutDashboard className="mr-2 h-4 w-4 text-primary" />
           Dashboard
         </Button>
@@ -123,12 +123,12 @@ export default function PropostasPage() {
           >
             {/* Client Data */}
             <Card className="wood-card overflow-hidden">
-              <CardContent className="p-8 space-y-6">
+              <CardContent className="p-4 md:p-8 space-y-6">
                 <div className="flex items-center gap-3 border-b border-border/10 pb-4 mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <User className="w-5 h-5 text-primary" />
+                  <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <User className="w-4 h-4 md:w-5 md:h-5 text-primary" />
                   </div>
-                  <h2 className="font-bold text-xl engraved-text">Dados do Cliente</h2>
+                  <h2 className="font-bold text-lg md:text-xl engraved-text">Dados do Cliente</h2>
                 </div>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -158,12 +158,12 @@ export default function PropostasPage() {
 
             {/* Model & Kit */}
             <Card className="wood-card overflow-hidden">
-              <CardContent className="p-8 space-y-6">
+              <CardContent className="p-4 md:p-8 space-y-6">
                 <div className="flex items-center gap-3 border-b border-border/10 pb-4 mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <Home className="w-5 h-5 text-primary" />
+                  <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <Home className="w-4 h-4 md:w-5 md:h-5 text-primary" />
                   </div>
-                  <h2 className="font-bold text-xl engraved-text">Modelo e Configuração</h2>
+                  <h2 className="font-bold text-lg md:text-xl engraved-text">Modelo e Configuração</h2>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -398,49 +398,49 @@ export default function PropostasPage() {
                     </div>
 
                     <div className="space-y-6">
-                       <div className="bg-primary/5 p-8 rounded-[2.5rem] border border-primary/20 space-y-6 relative overflow-hidden shadow-xl">
-                          <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 -translate-y-1/2 translate-x-1/2 rounded-full" />
+                        <div className="bg-primary/5 p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-primary/20 space-y-4 md:space-y-6 relative overflow-hidden shadow-xl">
+                          <div className="absolute top-0 right-0 w-16 h-16 md:w-24 md:h-24 bg-primary/5 -translate-y-1/2 translate-x-1/2 rounded-full" />
                           
                           <p className="text-[10px] font-black uppercase tracking-widest text-primary/60 border-b border-primary/10 pb-3">Resumo de Investimento</p>
                           
-                          <div className="flex justify-between items-center text-green-700 font-bold bg-green-500/10 p-4 rounded-xl border border-green-500/20 mb-2">
+                          <div className="flex justify-between items-center text-green-700 font-bold bg-green-500/10 p-3 md:p-4 rounded-xl border border-green-500/20 mb-2">
                             <div className="flex flex-col">
-                              <span className="text-xs uppercase tracking-tighter">Bônus: Frete Compartilhado</span>
-                              <span className="text-[10px] font-normal opacity-80 pt-0.5">Wood Bahia paga 50%</span>
+                              <span className="text-[10px] md:text-xs uppercase tracking-tighter">Bônus: Frete Compartilhado</span>
+                              <span className="text-[9px] md:text-[10px] font-normal opacity-80 pt-0.5">Wood Bahia paga 50%</span>
                             </div>
-                            <span className="text-lg">-{fmt(summary.freight)}</span>
+                            <span className="text-sm md:text-lg">-{fmt(summary.freight)}</span>
                           </div>
 
                           {summary.discount > 0 && (
-                            <div className="flex justify-between items-center text-primary font-bold bg-primary/10 p-4 rounded-xl border border-primary/30 shadow-md animate-in fade-in zoom-in duration-500">
+                            <div className="flex justify-between items-center text-primary font-bold bg-primary/10 p-3 md:p-4 rounded-xl border border-primary/30 shadow-md animate-in fade-in zoom-in duration-500">
                               <div className="flex flex-col">
-                                <span className="text-xs uppercase tracking-tighter flex items-center gap-2">🎁 Desconto Especial</span>
-                                <span className="text-[10px] font-normal opacity-80 pt-0.5">Autorizado pelo Operador</span>
+                                <span className="text-[10px] md:text-xs uppercase tracking-tighter flex items-center gap-2">🎁 Desconto Especial</span>
+                                <span className="text-[9px] md:text-[10px] font-normal opacity-80 pt-0.5">Autorizado pelo Operador</span>
                               </div>
-                              <span className="text-xl">-{fmt(summary.discount)}</span>
+                              <span className="text-base md:text-xl">-{fmt(summary.discount)}</span>
                             </div>
                           )}
 
                           <Separator className="my-2 bg-primary/20" />
 
                           <div className="flex justify-between items-center px-2">
-                            <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest">Sinal (Início do Projeto)</span>
-                            <span className="font-black text-primary">{fmt(summary.total * 0.3)}</span>
+                            <span className="text-[10px] md:text-xs text-muted-foreground font-bold uppercase tracking-widest">Sinal (Início do Projeto)</span>
+                            <span className="text-sm md:text-base font-black text-primary">{fmt(summary.total * 0.3)}</span>
                           </div>
 
-                          <div className="pt-6 border-t border-primary/10 mt-2">
+                          <div className="pt-4 md:pt-6 border-t border-primary/10 mt-2">
                              <div className="text-center md:text-left">
-                                <p className="text-[10px] uppercase font-black text-primary/60 mb-2 tracking-[.2em] ml-1">Total do Investimento</p>
-                                <h3 className="text-5xl font-black engraved-text leading-tight">{fmt(summary.total)}</h3>
+                                <p className="text-[10px] uppercase font-black text-primary/60 mb-1 md:mb-2 tracking-[.2em] ml-1">Total do Investimento</p>
+                                <h3 className="text-3xl md:text-5xl font-black engraved-text leading-tight">{fmt(summary.total)}</h3>
                              </div>
                           </div>
 
-                          <div className="bg-primary p-5 rounded-2xl text-white text-center shadow-lg transform rotate-[-1deg] border-2 border-primary-foreground/20">
+                          <div className="bg-primary p-4 md:p-5 rounded-2xl text-white text-center shadow-lg transform rotate-[-1deg] border-2 border-primary-foreground/20">
                              <p className="text-[10px] uppercase font-bold opacity-80 mb-1 tracking-widest flex items-center justify-center gap-2">
                                 <span className="inline-block w-2 h-2 bg-white rounded-full animate-pulse" />
                                 Condição Facilitada
                              </p>
-                             <p className="text-sm font-bold">💳 <span className="opacity-80">Parcele em 18x de</span> <span className="text-2xl font-black">{fmt(Math.round(summary.total / (1 - 0.1877) / 18 * 100) / 100)}</span></p>
+                             <p className="text-xs md:text-sm font-bold">💳 <span className="opacity-80">Parcele em 18x de</span> <span className="text-lg md:text-2xl font-black">{fmt(Math.round(summary.total / (1 - 0.1877) / 18 * 100) / 100)}</span></p>
                           </div>
                           
                           <p className="text-[10px] text-center text-muted-foreground italic px-4">Valores sujeitos a alteração conforme tributação regional e prazos de operadora.</p>
@@ -450,21 +450,21 @@ export default function PropostasPage() {
                 </CardContent>
             </Card>
 
-            <div className="flex flex-col sm:flex-row gap-6 justify-center pt-8">
+            <div className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center pt-8">
               <Button
                 variant="outline"
                 size="lg"
                 onClick={() => setView('form')}
-                className="h-16 px-12 rounded-[1.5rem] border-2 border-primary/20 font-black text-primary/60 hover:bg-primary/5 hover:text-primary transition-all uppercase tracking-widest"
+                className="h-12 md:h-16 px-8 md:px-12 rounded-[1rem] md:rounded-[1.5rem] border-2 border-primary/20 font-black text-primary/60 hover:bg-primary/5 hover:text-primary transition-all uppercase tracking-widest text-xs md:text-base"
               >
                 Tentar Outras Opções
               </Button>
               <Button
                 onClick={handleGenerate}
                 size="lg"
-                className="h-20 px-16 text-xl font-black wood-button text-white rounded-[2rem] shadow-2xl flex items-center gap-4 group transition-all hover:scale-105 uppercase tracking-widest"
+                className="h-16 md:h-20 px-8 md:px-16 text-sm md:text-xl font-black wood-button text-white rounded-[1.5rem] md:rounded-[2rem] shadow-2xl flex items-center gap-2 md:gap-4 group transition-all hover:scale-105 uppercase tracking-widest"
               >
-                <FileDown className="w-7 h-7 group-hover:animate-bounce" />
+                <FileDown className="w-5 h-5 md:w-7 md:h-7 group-hover:animate-bounce" />
                 GERAR PDF COMERCIAL
               </Button>
             </div>
