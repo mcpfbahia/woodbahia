@@ -328,11 +328,12 @@ export default function PropostasPage() {
             </Card>
 
             {/* Action Button */}
-            <div className="flex justify-center pt-4">
+            <div className="flex justify-center pt-8">
               <Button
                 onClick={handleShowSummary}
-                className="w-full md:w-auto px-16 h-16 text-xl font-black wood-button text-white rounded-[2rem] shadow-2xl transition-all hover:scale-105 active:scale-95 uppercase tracking-[0.1em]"
+                className="h-16 md:h-20 px-8 md:px-16 text-sm md:text-xl font-black wood-button text-white rounded-[1.5rem] md:rounded-[2rem] shadow-2xl flex items-center gap-2 md:gap-4 group transition-all hover:scale-105 uppercase tracking-widest w-full md:w-auto"
               >
+                <FileDown className="w-5 h-5 md:w-7 md:h-7 group-hover:animate-bounce" />
                 Gerar Resumo da Proposta
               </Button>
             </div>
