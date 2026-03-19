@@ -14,7 +14,13 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 
-export function AdminSidebar({ currentPath }: { currentPath: string }) {
+export function AdminSidebar({ 
+  currentPath, 
+  onClose 
+}: { 
+  currentPath: string;
+  onClose?: () => void;
+}) {
   const { logout, user } = useAuth();
 
   const menuItems = [
@@ -26,10 +32,19 @@ export function AdminSidebar({ currentPath }: { currentPath: string }) {
     { name: "Leads (Contatos)", path: "/admin/leads", icon: Users },
   ];
 
+  const handleLinkClick = () => {
+    if (onClose) onClose();
+  };
+
+  const handleLogout = () => {
+    if (onClose) onClose();
+    logout();
+  };
+
   return (
-    <aside className="flex w-64 flex-col bg-slate-900 text-slate-300 transition-all">
+    <aside className="flex h-full w-64 flex-col bg-slate-900 text-slate-300 transition-all border-r border-slate-800 shadow-2xl">
       <div className="flex h-20 items-center justify-center border-b border-slate-800 px-6">
-        <Link href="/admin" className="relative h-12 w-32 flex items-center justify-center">
+        <Link href="/admin" onClick={handleLinkClick} className="relative h-12 w-32 flex items-center justify-center">
           <Image
             src="/logo.svg"
             alt="Wood Bahia"
@@ -50,9 +65,10 @@ export function AdminSidebar({ currentPath }: { currentPath: string }) {
               <Link
                 key={item.path}
                 href={item.path}
+                onClick={handleLinkClick}
                 className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                   isActive
-                    ? "bg-primary text-white"
+                    ? "bg-primary text-white shadow-lg shadow-primary/20"
                     : "hover:bg-slate-800 hover:text-white"
                 }`}
               >
@@ -71,13 +87,14 @@ export function AdminSidebar({ currentPath }: { currentPath: string }) {
         
         <Link 
           href="/"
+          onClick={handleLinkClick}
           className="group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-400 transition-colors hover:bg-slate-800 hover:text-white"
         >
           <ChevronLeft className="h-5 w-5 flex-shrink-0" />
           Voltar ao Site
         </Link>
         <button
-          onClick={logout}
+          onClick={handleLogout}
           className="group mt-1 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-400 transition-colors hover:bg-slate-800 hover:text-red-300"
         >
           <LogOut className="h-5 w-5 flex-shrink-0" />

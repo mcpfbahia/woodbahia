@@ -4,8 +4,10 @@ import { useAuth } from "~/contexts/AuthContext";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Loader2 } from "lucide-react";
+import { Loader2, Menu } from "lucide-react";
 import { AdminSidebar } from "~/components/admin/AdminSidebar";
+import { Sheet, SheetContent, SheetTrigger } from "~/components/ui/sheet";
+import { Button } from "~/components/ui/button";
 
 export default function ProtectedAdminLayout({
   children,
@@ -15,6 +17,8 @@ export default function ProtectedAdminLayout({
   const { user, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -39,11 +43,31 @@ export default function ProtectedAdminLayout({
 
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50">
-      <AdminSidebar currentPath={pathname} />
+      {/* Desktop Sidebar */}
+      <div className="hidden md:flex h-full">
+        <AdminSidebar currentPath={pathname} />
+      </div>
       
       <div className="flex flex-1 flex-col overflow-hidden">
-        <header className="flex h-20 items-center justify-between border-b border-slate-200 bg-white px-8 shadow-sm">
+        <header className="flex h-20 items-center justify-between border-b border-slate-200 bg-white px-4 md:px-8 shadow-sm">
           <div className="flex items-center gap-4">
+            {/* Mobile Menu Trigger */}
+            <div className="md:hidden">
+              <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+                <SheetTrigger render={
+                  <Button variant="ghost" size="icon" className="h-10 w-10 text-slate-500">
+                    <Menu className="h-6 w-6" />
+                  </Button>
+                } />
+                <SheetContent side="left" className="p-0 w-64 border-none bg-slate-900" showCloseButton={false}>
+                  <AdminSidebar 
+                    currentPath={pathname} 
+                    onClose={() => setIsMobileMenuOpen(false)} 
+                  />
+                </SheetContent>
+              </Sheet>
+            </div>
+
             <Image
               src="/logo.svg"
               alt="Wood Bahia Admin"
@@ -51,13 +75,14 @@ export default function ProtectedAdminLayout({
               height={40}
               className="h-8 md:h-10 w-auto"
             />
-            <span className="text-slate-300 font-light text-xl">|</span>
-            <h1 className="text-lg font-medium text-slate-500">
+            <span className="hidden sm:inline text-slate-300 font-light text-xl">|</span>
+            <h1 className="hidden sm:block text-lg font-medium text-slate-500">
               {pathname === "/admin" && "Dashboard"}
               {pathname.includes("/admin/modelos") && "Gestão de Modelos"}
               {pathname.includes("/admin/portfolio") && "Projetos e Portfólio"}
               {pathname.includes("/admin/diario-de-obras") && "Diário de Obras"}
               {pathname.includes("/admin/leads") && "Leads e Contatos"}
+              {pathname.includes("/admin/propostas") && "Gerador de Propostas"}
             </h1>
           </div>
         </header>
