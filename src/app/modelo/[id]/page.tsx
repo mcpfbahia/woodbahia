@@ -285,7 +285,7 @@ export default function ModelDetailPage() {
                     Modelo Exclusivo
                   </span>
                   {model.promoBadge && (
-                    <span className="inline-block rounded-full bg-red-600 px-4 py-2 text-sm font-bold text-white shadow-md animate-pulse">
+                    <span className="inline-block rounded-full px-4 py-2 text-sm font-bold text-white shadow-md animate-pulse" style={{ backgroundColor: '#B8860B' }}>
                       {model.promoBadge}
                     </span>
                   )}
@@ -322,8 +322,8 @@ export default function ModelDetailPage() {
                     </p>
                     {model.promoPrice ? (
                        <div className="flex flex-col">
-                         <span className="text-xl text-muted-foreground line-through decoration-red-500/50 font-serif">{model.price}</span>
-                         <span className="text-[#4A2B1D] font-serif text-4xl font-bold md:text-5xl text-red-600">{model.promoPrice}</span>
+                         <span className="text-xl text-muted-foreground line-through font-serif">{model.price}</span>
+                         <span className="font-serif text-4xl font-bold md:text-5xl" style={{ color: '#A67C00' }}>{model.promoPrice}</span>
                        </div>
                     ) : (
                        <p className="text-[#4A2B1D] font-serif text-4xl font-bold md:text-5xl">

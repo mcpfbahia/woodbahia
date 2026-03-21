@@ -106,7 +106,7 @@ export const ModelsSection = () => {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                     
                     {model.promoBadge && (
-                      <div className="absolute top-4 right-4 z-10 rounded-full bg-red-600 px-3 py-1 text-xs font-bold text-white shadow-lg">
+                      <div className="absolute top-4 right-4 z-10 rounded-full px-3 py-1 text-xs font-bold text-white shadow-lg" style={{ backgroundColor: '#B8860B' }}>
                         {model.promoBadge}
                       </div>
                     )}
@@ -143,8 +143,8 @@ export const ModelsSection = () => {
                           </p>
                           {model.promoPrice ? (
                             <div className="flex flex-col">
-                              <span className="text-xs text-muted-foreground line-through decoration-red-500/50">{model.price}</span>
-                              <span className="font-serif text-xl font-bold text-red-600">{model.promoPrice}</span>
+                              <span className="text-xs text-muted-foreground line-through">{model.price}</span>
+                              <span className="font-serif text-xl font-bold" style={{ color: '#A67C00' }}>{model.promoPrice}</span>
                             </div>
                           ) : (
                             <p className="font-serif text-xl font-bold text-primary">
