@@ -17,10 +17,10 @@ export const CABIN_MODELS: CabinModel[] = [
 ];
 
 export const CARD_RATES: [number, number][] = [
-  [1, 0], [2, 5.11], [3, 0], [4, 6.39], [5, 7.12], [6, 7.85],
-  [7, 9.00], [8, 9.77], [9, 10.56], [10, 11.36], [11, 12.19],
-  [12, 13.02], [13, 14.12], [14, 15.00], [15, 15.90],
-  [16, 16.83], [17, 17.76], [18, 18.77],
+  [1, 0], [2, 3.99], [3, 4.99], [4, 6.59], [5, 7.09], [6, 7.69],
+  [7, 7.89], [8, 8.59], [9, 9.29], [10, 9.99], [11, 11.79],
+  [12, 11.99], [13, 13.24], [14, 13.99], [15, 14.74],
+  [16, 15.49], [17, 16.24], [18, 16.99],
 ];
 
 export function calculateInstallmentValue(total: number, installments: number): { total: number; installment: number; isInterestFree: boolean } {
