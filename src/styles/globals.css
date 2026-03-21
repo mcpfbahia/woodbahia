@@ -7,6 +7,7 @@
 @theme {
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-montserrat), serif;
+  --font-display: var(--font-montserrat), serif;
   
   --color-primary: hsl(18 64% 34%);
   --color-secondary: hsl(21 47% 50%);
@@ -84,6 +85,7 @@
 @theme inline {
   --font-sans: var(--font-sans);
   --font-serif: var(--font-serif);
+  --font-display: var(--font-serif);
   --color-ring: hsl(var(--ring));
   --color-input: hsl(var(--input));
   --color-border: hsl(var(--border));
@@ -251,3 +253,243 @@
 .floating {
   animation: floating 4s ease-in-out infinite;
 }
+
+/* --- Estilos Migrados da Calculadora --- */
+
+
+
+
+
+@layer base {
+  :root {
+    /* ——— Paleta Wood Bahia — Rústico Moderno de Luxo ——— */
+    --background: 36 28% 96%;
+    --foreground: 22 30% 13%;
+
+    --card: 38 40% 99%;
+    --card-foreground: 22 30% 13%;
+
+    --popover: 38 40% 99%;
+    --popover-foreground: 22 30% 13%;
+
+    /* Verde musgo — confiança e natureza */
+    --primary: 148 18% 31%;
+    --primary-foreground: 38 40% 99%;
+
+    /* Bege quente */
+    --secondary: 34 25% 90%;
+    --secondary-foreground: 22 30% 13%;
+
+    --muted: 34 20% 92%;
+    --muted-foreground: 24 14% 46%;
+
+    /* COBRE — assinatura Wood Bahia */
+    --accent: 20 52% 38%;
+    --accent-foreground: 38 40% 99%;
+
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 33 18% 86%;
+    --input: 33 18% 86%;
+    --ring: 20 52% 38%;
+
+    --radius: 1rem;
+
+    /* Tokens exclusivos Wood Bahia */
+    --warm-glow: 36 55% 94%;
+    --timber: 22 42% 22%;
+    --timber-light: 24 36% 40%;
+    --amber: 38 82% 50%;
+    --copper: 20 52% 38%;
+    --copper-light: 24 46% 53%;
+    --linen: 36 28% 97%;
+    --bark: 22 30% 17%;
+  }
+
+  .dark {
+    --background: 22 20% 7%;
+    --foreground: 34 20% 90%;
+
+    --card: 22 16% 11%;
+    --card-foreground: 34 20% 90%;
+
+    --popover: 22 16% 11%;
+    --popover-foreground: 34 20% 90%;
+
+    --primary: 145 18% 50%;
+    --primary-foreground: 22 20% 7%;
+
+    --secondary: 22 18% 17%;
+    --secondary-foreground: 34 20% 90%;
+
+    --muted: 22 12% 16%;
+    --muted-foreground: 30 8% 54%;
+
+    --accent: 20 55% 50%;
+    --accent-foreground: 38 40% 99%;
+
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 22 14% 20%;
+    --input: 22 14% 20%;
+    --ring: 20 55% 50%;
+
+    --warm-glow: 22 18% 14%;
+    --timber: 24 28% 55%;
+    --timber-light: 24 24% 65%;
+  }
+}
+
+@layer base {
+  * { @apply border-border; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  
+
+}
+
+@layer utilities {
+
+  /* ——— Gradiente de texto — assinatura Wood Bahia ——— */
+  .text-gradient-warm {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(130deg,
+      hsl(var(--copper)) 0%,
+      hsl(var(--amber)) 52%,
+      hsl(var(--copper-light)) 100%);
+  }
+
+  /* ——— Glass card ——— */
+  .glass-card {
+    background: hsl(var(--card) / 0.80);
+    backdrop-filter: blur(18px) saturate(170%);
+    -webkit-backdrop-filter: blur(18px) saturate(170%);
+    border: 1px solid hsl(var(--border) / 0.55);
+    box-shadow:
+      0 2px 20px hsl(var(--accent) / 0.05),
+      0 1px 3px hsl(var(--foreground) / 0.04),
+      inset 0 1px 0 rgba(255,255,255,0.70);
+  }
+
+  /* ——— Sombra premium ——— */
+  .premium-shadow {
+    box-shadow:
+      0 8px 32px -8px hsl(var(--accent) / 0.18),
+      0 3px 10px -3px hsl(var(--foreground) / 0.07),
+      0 0 0 1px hsl(var(--accent) / 0.06),
+      inset 0 1px 0 rgba(255,255,255,0.55);
+  }
+
+  .premium-shadow-hover {
+    box-shadow:
+      0 20px 50px -10px hsl(var(--accent) / 0.25),
+      0 8px 20px -4px hsl(var(--foreground) / 0.10),
+      0 0 0 1px hsl(var(--accent) / 0.10);
+  }
+
+  /* ——— Wood card (superfície envernizada) ——— */
+  .wood-card {
+    @apply border-0 rounded-3xl;
+    background: hsl(var(--card));
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.82),
+      inset 0 -1px 0 rgba(0,0,0,0.03),
+      0 10px 40px -8px hsl(var(--accent) / 0.14),
+      0 2px 8px -2px rgba(0,0,0,0.06);
+  }
+
+  /* ——— Botão principal Wood Bahia ——— */
+  .wood-button {
+    @apply relative overflow-hidden font-bold tracking-wider transition-all duration-300;
+    background: linear-gradient(140deg,
+      hsl(var(--copper)) 0%,
+      hsl(var(--timber-light)) 55%,
+      hsl(var(--timber)) 100%);
+    box-shadow:
+      0 4px 0 hsl(var(--timber) / 0.65),
+      0 10px 28px -4px hsl(var(--accent) / 0.38),
+      inset 0 1px 0 rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.07);
+  }
+
+  .wood-button::before {
+    content: '';
+    @apply absolute inset-0 opacity-0 transition-opacity duration-300;
+    background: linear-gradient(140deg, rgba(255,255,255,0.18) 0%, transparent 55%);
+  }
+
+  .wood-button:hover::before { opacity: 1; }
+
+  .wood-button:hover {
+    transform: translateY(-1px);
+    box-shadow:
+      0 6px 0 hsl(var(--timber) / 0.65),
+      0 16px 36px -4px hsl(var(--accent) / 0.46),
+      inset 0 1px 0 rgba(255,255,255,0.22);
+  }
+
+  .wood-button:active {
+    @apply translate-y-[3px];
+    box-shadow:
+      0 1px 0 hsl(var(--timber) / 0.8),
+      0 4px 12px -4px hsl(var(--accent) / 0.3);
+  }
+
+  /* ——— Radio card ativo ——— */
+  .radio-card-active {
+    border-color: hsl(var(--accent));
+    background: hsl(var(--accent) / 0.06);
+    box-shadow:
+      0 0 0 2px hsl(var(--accent) / 0.22),
+      inset 0 0 18px hsl(var(--accent) / 0.05);
+  }
+
+  /* ——— Toggle brilho ——— */
+  .toggle-glow[data-state='checked'] {
+    box-shadow: 0 0 16px hsl(var(--accent) / 0.32);
+  }
+
+  /* ——— Texto gravado (efeito entalhado) ——— */
+  .engraved-text {
+    @apply text-accent font-display font-black tracking-widest uppercase;
+    text-shadow:
+      1px 1px 0 rgba(255,255,255,0.65),
+      -0.5px -0.5px 0 rgba(0,0,0,0.16);
+  }
+
+  /* ——— Input rebaixado ——— */
+  .recessed-input {
+    @apply transition-all duration-200;
+    background: hsl(var(--background) / 0.55);
+    border: 1px solid hsl(var(--border) / 0.65);
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.04);
+  }
+  .recessed-input:focus {
+    background: hsl(var(--card));
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.02), 0 0 0 3px hsl(var(--accent) / 0.13);
+  }
+
+  /* ——— Scroll oculto ——— */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* ——— Badge rústico ——— */
+  .badge-wood {
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest;
+    background: hsl(var(--accent) / 0.10);
+    color: hsl(var(--accent));
+    border: 1px solid hsl(var(--accent) / 0.22);
+  }
+
+  /* ——— Cartão de destaque (valores/parcelamento) ——— */
+  .highlight-card {
+    background: linear-gradient(135deg, hsl(var(--warm-glow)) 0%, hsl(var(--card)) 100%);
+    border: 1px solid hsl(var(--accent) / 0.14);
+    box-shadow:
+      0 4px 20px -4px hsl(var(--accent) / 0.11),
+      inset 0 1px 0 rgba(255,255,255,0.82);
+  }
+}
+

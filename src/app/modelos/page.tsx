@@ -91,6 +91,11 @@ export default function ModelsGalleryPage() {
                         className="object-cover transition-transform duration-500 group-hover:scale-110"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60 transition-opacity group-hover:opacity-40" />
+                      {model.promoBadge && (
+                        <div className="absolute top-4 right-4 z-10 rounded-full bg-red-600 px-3 py-1 text-xs font-bold text-white shadow-lg">
+                          {model.promoBadge}
+                        </div>
+                      )}
                       <div className="absolute bottom-4 left-4 right-4">
                         <p className="font-serif text-xl font-bold text-white drop-shadow-md">
                           {model.title || model.name}
@@ -122,9 +127,16 @@ export default function ModelsGalleryPage() {
                           <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
                             Kit Montado
                           </p>
-                          <p className="font-serif text-lg font-bold text-primary">
-                            {model.price}
-                          </p>
+                          {model.promoPrice ? (
+                            <div className="flex flex-col">
+                              <span className="text-sm text-muted-foreground line-through decoration-red-500/50">{model.price}</span>
+                              <span className="font-serif text-xl font-bold text-red-600">{model.promoPrice}</span>
+                            </div>
+                          ) : (
+                            <p className="font-serif text-lg font-bold text-primary">
+                              {model.price}
+                            </p>
+                          )}
                         </div>
                         <Link
                           href={`/modelo/${model.id}`}

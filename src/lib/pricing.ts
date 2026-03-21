@@ -16,6 +16,31 @@ export const CABIN_MODELS: CabinModel[] = [
   { id: 'baixios', name: 'Chalé Baixios', area: 35, kitPrice: 29500, tilesStainPrice: 14000, fixturesPrice: 7000 },
 ];
 
+export const CARD_RATES: [number, number][] = [
+  [1, 0], [2, 5.11], [3, 0], [4, 6.39], [5, 7.12], [6, 7.85],
+  [7, 9.00], [8, 9.77], [9, 10.56], [10, 11.36], [11, 12.19],
+  [12, 13.02], [13, 14.12], [14, 15.00], [15, 15.90],
+  [16, 16.83], [17, 17.76], [18, 18.77],
+];
+
+export function calculateInstallmentValue(total: number, installments: number): { total: number; installment: number; isInterestFree: boolean } {
+  const rateInfo = CARD_RATES.find(([n]) => n === installments);
+  const rate = rateInfo ? rateInfo[1] : 0;
+  const isInterestFree = installments <= 3;
+  
+  const totalWithInterest = isInterestFree 
+    ? total 
+    : Math.round(total / (1 - rate / 100) * 100) / 100;
+    
+  const installmentValue = Math.round(totalWithInterest / installments * 100) / 100;
+  
+  return {
+    total: totalWithInterest,
+    installment: installmentValue,
+    isInterestFree
+  };
+}
+
 // Per-m² rates for custom kit
 export function getTimberRate(area: number): number {
   if (area <= 14) return 940;
@@ -165,9 +190,121 @@ export interface ProposalData {
   discountValue: number;
 }
 
+/** Options available as add-ons for standard kits (1-4) */
+export interface KitAddons {
+  electrical: boolean;
+  glass: boolean;
+}
+
+export interface SimulationState {
+  model: CabinModel | null;
+  kitType: KitType | null;
+  customOptions: CustomOptions;
+  kitAddons: KitAddons;
+  foundationType: FoundationType | null;
+  customArea: number; // used when kitType === 'custom'
+  slidingDoor: boolean;
+}
+
+export function needsFoundationStep(state: SimulationState): boolean {
+  if (state.kitType === 'kit4') return true;
+  if (state.kitType === 'custom' && state.customOptions.labor) return true;
+  return false;
+}
+
 export interface LineItem {
   label: string;
   value: number;
+}
+
+export function getEffectiveArea(state: SimulationState): number {
+  if (state.kitType === 'custom') return state.customArea;
+  return state.model?.area ?? 0;
+}
+
+export function calculateSummary(state: SimulationState): { items: LineItem[]; freight: number; total: number } {
+  const items: LineItem[] = [];
+  const kit = state.kitType;
+  const area = getEffectiveArea(state);
+
+  if (kit === 'custom') {
+    // Custom kit — priced per m²
+    const timberRate = getTimberRate(area);
+    items.push({ label: `Kit Madeiramento (${area}m² × R$ ${timberRate})`, value: Math.round(area * timberRate) });
+
+    const opts = state.customOptions;
+    if (opts.fixtures) {
+      const fp = getFixturesPrice(area);
+      if (state.slidingDoor) {
+        items.push({ label: `Portas, Janelas e Ferragens + Porta de Correr (c/ 5% desc.)`, value: fp.withSlidingDoor });
+      } else {
+        items.push({ label: `Portas, Janelas e Ferragens`, value: fp.base });
+      }
+    }
+    if (opts.tilesStain) {
+      const ts = getTilesStainPrice(area);
+      items.push({ label: `Telhas e Stain (${area}m² — R$ ${ts.perM2.toLocaleString('pt-BR')}/m²)`, value: ts.total });
+    }
+    if (opts.labor) items.push({ label: `Mão de Obra (${area}m² × R$ ${getLaborRate(area).toLocaleString('pt-BR')})`, value: getLaborCost(area) });
+    if (opts.electrical) items.push({ label: `Kit Elétrica/Hidráulica`, value: getElectricalKit(area) });
+    if (opts.glass) items.push({ label: `Vidros`, value: getGlassPrice(area) });
+  } else {
+    // Standard kits (1-4) — use model prices
+    if (!state.model) return { items: [], freight: 0, total: 0 };
+    const model = state.model;
+
+    items.push({ label: 'Kit Madeiramento', value: model.kitPrice });
+
+    if (kit === 'kit2' || kit === 'kit3' || kit === 'kit4') {
+      const fp = getFixturesPrice(model.area);
+      if (state.slidingDoor) {
+        items.push({ label: `Portas, Janelas e Ferragens + Porta de Correr (c/ 5% desc.)`, value: fp.withSlidingDoor });
+      } else {
+        items.push({ label: 'Portas, Janelas e Ferragens', value: fp.base });
+      }
+    } else if (state.slidingDoor) {
+      items.push({ label: 'Porta de Correr (1.8m eucalipto)', value: SLIDING_DOOR_PRICE });
+    }
+    if (kit === 'kit3' || kit === 'kit4') {
+      const ts = getTilesStainPrice(model.area);
+      items.push({ label: `Telhas e Stain (${model.area}m² — R$ ${ts.perM2.toLocaleString('pt-BR')}/m²)`, value: ts.total });
+    }
+    if (kit === 'kit4') {
+      items.push({ label: `Mão de Obra (${model.area}m² × R$ ${getLaborRate(model.area).toLocaleString('pt-BR')})`, value: getLaborCost(model.area) });
+    }
+
+    // Kit add-ons (electrical / glass) available for all standard kits
+    const addons = state.kitAddons;
+    if (addons.electrical) items.push({ label: `Kit Elétrica/Hidráulica`, value: getElectricalKit(model.area) });
+    if (addons.glass) items.push({ label: `Vidros`, value: getGlassPrice(model.area) });
+  }
+
+  // Foundation
+  if (needsFoundationStep(state) && state.foundationType && state.foundationType !== 'none') {
+    let foundationValue = 0;
+    let foundationLabel = '';
+    switch (state.foundationType) {
+      case 'eucalyptus':
+        foundationValue = getEucalyptusFoundation(area);
+        foundationLabel = 'Base Sapatas em Eucalipto';
+        break;
+      case 'masonry':
+        foundationValue = getMasonryFoundation(area);
+        foundationLabel = 'Base Sapatas Manilhas de Alvenaria';
+        break;
+      case 'radier':
+        foundationValue = getRadierFoundation(area);
+        foundationLabel = 'Base Radier + Banheiro Alvenaria';
+        break;
+    }
+    if (foundationValue > 0) items.push({ label: foundationLabel, value: foundationValue });
+  }
+
+  const subtotal = items.reduce((sum, i) => sum + i.value, 0);
+  const freight = getFreight(area);
+  const total = subtotal + freight;
+
+  return { items, freight, total };
 }
 
 export function calculateProposalItems(data: ProposalData): { items: LineItem[]; freight: number; subtotal: number; total: number; discount: number } {

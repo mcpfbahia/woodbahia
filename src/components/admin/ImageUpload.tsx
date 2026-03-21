@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from "~/lib/firebase";
 import { UploadCloud, X, Loader2, CheckCircle2 } from "lucide-react";
@@ -19,6 +19,45 @@ export function ImageUpload({ onUploadComplete, folder = "uploads", defaultImage
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
+  const executeUpload = async (uploadFile: File) => {
+    if (!storage) return;
+
+    setUploading(true);
+    setError("");
+    setProgress(0);
+
+    const fileExtension = uploadFile.name.split('.').pop();
+    const fileName = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${fileExtension}`;
+    const storageRef = ref(storage, `${folder}/${fileName}`);
+    const uploadTask = uploadBytesResumable(storageRef, uploadFile);
+
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const prog = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setProgress(prog);
+      },
+      (err) => {
+        console.error("Erro no upload:", err);
+        setError("Falha ao enviar a imagem.");
+        setUploading(false);
+        setFile(null);
+      },
+      async () => {
+        try {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          onUploadComplete(downloadURL);
+          setUploading(false);
+          // Mantém a foto na tela (não setFile=null) para o CheckCircle aparecer
+        } catch (err) {
+          setError("Erro ao obter o link da imagem.");
+          setUploading(false);
+          setFile(null);
+        }
+      }
+    );
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
     if (selected) {
@@ -33,6 +72,9 @@ export function ImageUpload({ onUploadComplete, folder = "uploads", defaultImage
       setFile(selected);
       setPreview(URL.createObjectURL(selected));
       setError("");
+      
+      // Auto upload!
+      executeUpload(selected);
     }
   };
 
@@ -42,44 +84,6 @@ export function ImageUpload({ onUploadComplete, folder = "uploads", defaultImage
     setProgress(0);
     setError("");
     onUploadComplete(""); // Clear URL
-  };
-
-  const handleUpload = async () => {
-    if (!file || !storage) return;
-
-    setUploading(true);
-    setError("");
-
-    const fileExtension = file.name.split('.').pop();
-    const fileName = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${fileExtension}`;
-    const storageRef = ref(storage, `${folder}/${fileName}`);
-    const uploadTask = uploadBytesResumable(storageRef, file);
-
-    uploadTask.on(
-      "state_changed",
-      (snapshot) => {
-        const prog = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        setProgress(prog);
-      },
-      (err) => {
-        console.error("Erro no upload:", err);
-        setError("Falha ao enviar a imagem.");
-        setUploading(false);
-      },
-      async () => {
-        try {
-          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-          onUploadComplete(downloadURL);
-          setUploading(false);
-          setFile(null); // Upload succeeded, clear the local file object 
-          // We keep the preview URL pointing to the local blob for immediate feedback, 
-          // but arguably we could set it to the downloadURL
-        } catch (err) {
-          setError("Erro ao obter o link da imagem.");
-          setUploading(false);
-        }
-      }
-    );
   };
 
   return (
@@ -99,36 +103,17 @@ export function ImageUpload({ onUploadComplete, folder = "uploads", defaultImage
             </div>
           )}
           {!uploading && file && (
-            <div className="absolute bottom-4 right-4 flex gap-2">
-              <button
-                type="button"
-                onClick={clearImage}
-                className="flex items-center justify-center rounded-lg bg-red-500 p-2 text-white shadow-lg hover:bg-red-600"
-              >
-                <X className="h-5 w-5" />
-              </button>
-              <button
-                type="button"
-                onClick={handleUpload}
-                className="flex items-center gap-2 rounded-lg bg-green-500 px-4 py-2 font-semibold text-white shadow-lg hover:bg-green-600"
-              >
-                <UploadCloud className="h-5 w-5" />
-                Fazer Upload
-              </button>
-            </div>
-          )}
-          {!uploading && !file && (
             <div className="absolute top-4 right-4 flex items-center gap-2 rounded-full bg-green-100 px-3 py-1 text-sm font-semibold text-green-700 shadow-sm border border-green-200">
               <CheckCircle2 className="h-4 w-4" />
               Upload Concluído
             </div>
           )}
-          {!uploading && !file && preview === defaultImage && (
+          {!uploading && (
              <button
                 type="button"
                 onClick={clearImage}
-                className="absolute top-4 right-4 flex items-center justify-center rounded-lg bg-red-500 p-2 text-white shadow-lg hover:bg-red-600"
-                title="Remover imagem atual"
+                className="absolute right-4 bottom-4 flex items-center justify-center rounded-lg bg-red-500 p-2 text-white shadow-lg hover:bg-red-600"
+                title="Remover imagem"
              >
                <X className="h-5 w-5" />
              </button>
@@ -141,7 +126,7 @@ export function ImageUpload({ onUploadComplete, folder = "uploads", defaultImage
             <p className="mb-2 text-sm font-semibold">
               <span className="text-primary underline">Clique para selecionar</span> ou arraste
             </p>
-            <p className="text-xs text-slate-400">SVG, PNG, JPG ou WEBP (Max. 5MB)</p>
+            <p className="text-xs text-slate-400">Upload Automático (Max. 5MB)</p>
           </div>
           <input
             type="file"

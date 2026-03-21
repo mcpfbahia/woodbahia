@@ -6,6 +6,7 @@ import { db } from "~/lib/firebase";
 import { Loader2, Plus, Edit2, Trash2, X, Save, Image as ImageIcon, FileText, Settings, Minus } from "lucide-react";
 import Image from "next/image";
 import { ImageUpload } from "~/components/admin/ImageUpload";
+import { MultiImageUpload } from "~/components/admin/MultiImageUpload";
 
 interface ModelItem {
   id?: string;
@@ -30,6 +31,8 @@ interface ModelItem {
   floorPlanSuperiorImage?: string;
   floorPlanSuperiorLabel?: string;
   rooms?: { name: string; size: string }[];
+  promoPrice?: string;
+  promoBadge?: string;
 }
 
 const initialFormState: ModelItem = {
@@ -54,6 +57,8 @@ const initialFormState: ModelItem = {
   floorPlanSuperiorImage: "",
   floorPlanSuperiorLabel: "Planta Superior",
   rooms: [],
+  promoPrice: "",
+  promoBadge: "",
 };
 
 export default function AdminModelosPage() {
@@ -351,7 +356,17 @@ export default function AdminModelosPage() {
 
                     <div>
                       <label className="mb-1 block text-sm font-semibold text-slate-700">Preço do Kit (Montagem própria)</label>
-                      <input type="text" value={formData.kitPrice} onChange={e => setFormData(p => ({ ...p, kitPrice: e.target.value }))} className="w-full rounded-lg border border-slate-200 p-3" placeholder="Ex: R$ 45.000" />
+                      <input type="text" value={formData.kitPrice || ""} onChange={e => setFormData(p => ({ ...p, kitPrice: e.target.value }))} className="w-full rounded-lg border border-slate-200 p-3" placeholder="Ex: R$ 45.000" />
+                    </div>
+
+                    <div>
+                      <label className="mb-1 block text-sm font-semibold text-slate-700">Preço Promocional (Opcional)</label>
+                      <input type="text" value={formData.promoPrice || ""} onChange={e => setFormData(p => ({ ...p, promoPrice: e.target.value }))} className="w-full rounded-lg border-red-200 bg-red-50 p-3 focus:border-red-500 focus:ring-1 focus:ring-red-500" placeholder="Ex: R$ 75.000 (Substitui Preço)" />
+                    </div>
+
+                    <div>
+                      <label className="mb-1 block text-sm font-semibold text-slate-700">Etiqueta/Badge (Opcional)</label>
+                      <input type="text" value={formData.promoBadge || ""} onChange={e => setFormData(p => ({ ...p, promoBadge: e.target.value }))} className="w-full rounded-lg border-red-200 bg-red-50 p-3 focus:border-red-500 focus:ring-1 focus:ring-red-500" placeholder="Ex: 15% OFF | CHALÉ PRONTO" />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -471,9 +486,8 @@ export default function AdminModelosPage() {
                         ))}
                       </div>
 
-                       <div className="max-w-xs">
-                          <ImageUpload folder="models/gallery" onUploadComplete={url => { if(url) setFormData(p => ({ ...p, gallery: [...p.gallery, url] }))}} />
-                          <p className="text-xs text-slate-500 mt-2">Envie uma foto por vez.</p>
+                       <div>
+                          <MultiImageUpload folder="models/gallery" onUploadComplete={urls => { if(urls && urls.length > 0) setFormData(p => ({ ...p, gallery: [...p.gallery, ...urls] }))}} />
                        </div>
                     </div>
                   </div>

@@ -6,6 +6,7 @@ import { db } from "~/lib/firebase";
 import { Loader2, Plus, Edit2, Trash2, X, Save } from "lucide-react";
 import Image from "next/image";
 import { ImageUpload } from "~/components/admin/ImageUpload";
+import { MultiImageUpload } from "~/components/admin/MultiImageUpload";
 
 interface Obra {
   id?: string;
@@ -272,12 +273,13 @@ export default function AdminDiarioObrasPage() {
                     ))}
                   </div>
                   
-                  <div className="max-w-sm">
-                    <p className="text-xs text-slate-500 mb-2">Envie uma foto por vez para adicionar à galeria.</p>
-                    <ImageUpload 
+                  <div>
+                    <MultiImageUpload 
                       folder="diario_obras/galeria" 
-                      onUploadComplete={(url) => {
-                        handleAddGalleryImage(url);
+                      onUploadComplete={(urls) => {
+                        if (urls && urls.length > 0) {
+                          setFormData(prev => ({ ...prev, galeria: [...prev.galeria, ...urls] }));
+                        }
                       }} 
                     />
                   </div>

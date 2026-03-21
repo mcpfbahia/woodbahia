@@ -104,6 +104,13 @@ export const ModelsSection = () => {
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    
+                    {model.promoBadge && (
+                      <div className="absolute top-4 right-4 z-10 rounded-full bg-red-600 px-3 py-1 text-xs font-bold text-white shadow-lg">
+                        {model.promoBadge}
+                      </div>
+                    )}
+
                     <div className="absolute bottom-3 left-3 right-3 md:bottom-4 md:left-4 md:right-4">
                       <p className="font-serif text-lg font-bold text-white md:text-xl">
                         {model.name}
@@ -134,9 +141,16 @@ export const ModelsSection = () => {
                           <p className="text-[10px] uppercase text-muted-foreground">
                             Kit Montado
                           </p>
-                          <p className="font-serif text-xl font-bold text-primary">
-                            {model.price}
-                          </p>
+                          {model.promoPrice ? (
+                            <div className="flex flex-col">
+                              <span className="text-xs text-muted-foreground line-through decoration-red-500/50">{model.price}</span>
+                              <span className="font-serif text-xl font-bold text-red-600">{model.promoPrice}</span>
+                            </div>
+                          ) : (
+                            <p className="font-serif text-xl font-bold text-primary">
+                              {model.price}
+                            </p>
+                          )}
                         </div>
                         <p className="mt-1 text-[10px] font-medium leading-tight text-secondary">
                           * Frete grátis (consulte condições)

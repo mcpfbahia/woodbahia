@@ -6,6 +6,7 @@ import { db } from "~/lib/firebase";
 import { Loader2, Plus, Edit2, Trash2, X, Save } from "lucide-react";
 import Image from "next/image";
 import { ImageUpload } from "~/components/admin/ImageUpload";
+import { MultiImageUpload } from "~/components/admin/MultiImageUpload";
 
 interface PortfolioItem {
   id?: string;
@@ -13,6 +14,7 @@ interface PortfolioItem {
   location: string;
   description: string;
   image: string;
+  gallery?: string[];
   instagramUrl: string;
 }
 
@@ -21,6 +23,7 @@ const initialFormState: PortfolioItem = {
   location: "",
   description: "",
   image: "",
+  gallery: [],
   instagramUrl: "",
 };
 
@@ -85,7 +88,7 @@ export default function AdminPortfolioPage() {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.title || !formData.image) {
-      alert("Título e Imagem são obrigatórios. (Lembre-se de clicar em FAZER UPLOAD após escolher a imagem)");
+      alert("Título e Imagem são obrigatórios.");
       return;
     }
 
@@ -112,6 +115,14 @@ export default function AdminPortfolioPage() {
     }
   };
 
+  const handleRemoveGalleryImage = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      // @ts-ignore
+      gallery: (prev.gallery || []).filter((_, i) => i !== index),
+    }));
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -135,7 +146,7 @@ export default function AdminPortfolioPage() {
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {items.map(item => (
-            <div key={item.id} className="group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md">
+            <div key={item.id} className="group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md flex flex-col">
               <div className="relative aspect-video w-full bg-slate-100">
                 {item.image && (
                   <Image src={item.image} alt={item.title} fill className="object-cover" />
@@ -149,9 +160,12 @@ export default function AdminPortfolioPage() {
                   </button>
                 </div>
               </div>
-              <div className="p-4">
-                <h3 className="font-bold text-slate-800 truncate">{item.title}</h3>
-                <p className="text-sm text-slate-500 truncate">{item.location}</p>
+              <div className="flex flex-col flex-1 p-4">
+                <h3 className="font-bold text-slate-800 line-clamp-1 mb-1">{item.title}</h3>
+                <p className="text-sm text-slate-500 line-clamp-1 mb-2">{item.location}</p>
+                <div className="mt-auto pt-4 text-xs font-medium text-slate-400">
+                  {(item.gallery?.length || 0) > 0 ? `${item.gallery?.length} foto(s) extras` : "Apenas foto principal"}
+                </div>
               </div>
             </div>
           ))}
@@ -187,7 +201,6 @@ export default function AdminPortfolioPage() {
                     defaultImage={formData.image} 
                     onUploadComplete={(url) => setFormData(prev => ({ ...prev, image: url }))} 
                   />
-                  {!formData.image && <p className="mt-1 text-xs text-amber-600">Lembre-se de clicar em "Fazer Upload" após selecionar a imagem.</p>}
                 </div>
 
                 <div className="grid gap-6 md:grid-cols-2">
@@ -234,6 +247,51 @@ export default function AdminPortfolioPage() {
                     className="w-full rounded-lg border border-slate-200 p-3 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary resize-none"
                     placeholder="Breve descrição dos detalhes da obra..."
                   />
+                </div>
+
+                {/* Galeria Section */}
+                <div className="border-t border-slate-100 pt-6">
+                  <label className="mb-2 block text-sm font-semibold text-slate-700">Fotos Adicionais (Até 4 fotos)</label>
+                  <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 mb-4">
+                    {(formData.gallery || []).map((img, index) => (
+                      <div key={index} className="relative aspect-video overflow-hidden rounded-xl border border-slate-200 group">
+                        <Image src={img} alt={`Galeria ${index}`} fill className="object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveGalleryImage(index)}
+                          className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity shadow-md hover:bg-red-600"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {(formData.gallery || []).length < 4 && (
+                    <div className="max-w-sm">
+                      <MultiImageUpload 
+                        folder="portfolio/galeria" 
+                        onUploadComplete={(urls) => {
+                          if (urls && urls.length > 0) {
+                            setFormData(prev => {
+                              const currentLength = (prev.gallery || []).length;
+                              const availableSlots = 4 - currentLength;
+                              const urlsToAdd = urls.slice(0, availableSlots);
+                              if (urls.length > availableSlots) {
+                                alert(`Você só pode adicionar mais ${availableSlots} foto(s). O restante foi ignorado para manter o limite de 4 fotos.`);
+                              }
+                              return { ...prev, gallery: [...(prev.gallery || []), ...urlsToAdd] };
+                            });
+                          }
+                        }} 
+                      />
+                    </div>
+                  )}
+                  {(formData.gallery || []).length >= 4 && (
+                    <p className="text-sm text-amber-600 font-medium bg-amber-50 p-3 rounded-lg border border-amber-100">
+                      Limite de 4 fotos extras atingido.
+                    </p>
+                  )}
                 </div>
 
                 <div className="flex items-center justify-end gap-3 border-t border-slate-100 pt-6">
