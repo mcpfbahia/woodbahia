@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "~/lib/firebase";
 import { UploadCloud, X, Loader2, CheckCircle2 } from "lucide-react";
 import Image from "next/image";
@@ -29,33 +29,30 @@ export function ImageUpload({ onUploadComplete, folder = "uploads", defaultImage
     const fileExtension = uploadFile.name.split('.').pop();
     const fileName = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${fileExtension}`;
     const storageRef = ref(storage, `${folder}/${fileName}`);
-    const uploadTask = uploadBytesResumable(storageRef, uploadFile);
-
-    uploadTask.on(
-      "state_changed",
-      (snapshot) => {
-        const prog = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        setProgress(prog);
-      },
-      (err) => {
-        console.error("Erro no upload:", err);
-        setError("Falha ao enviar a imagem.");
-        setUploading(false);
-        setFile(null);
-      },
-      async () => {
+    
+    // Mostra progresso fake inicial
+    setProgress(50);
+    
+    uploadBytes(storageRef, uploadFile)
+      .then(async (snapshot) => {
+        setProgress(100);
         try {
-          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          const downloadURL = await getDownloadURL(snapshot.ref);
           onUploadComplete(downloadURL);
           setUploading(false);
           // Mantém a foto na tela (não setFile=null) para o CheckCircle aparecer
-        } catch (err) {
+        } catch (err: any) {
           setError("Erro ao obter o link da imagem.");
           setUploading(false);
           setFile(null);
         }
-      }
-    );
+      })
+      .catch((err: any) => {
+        console.error("Erro no upload (uploadBytes):", err);
+        setError(`Falha: ${err.message || 'Desconhecida'}`);
+        setUploading(false);
+        setFile(null);
+      });
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {

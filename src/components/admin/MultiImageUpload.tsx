@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "~/lib/firebase";
 import { UploadCloud, X, Loader2 } from "lucide-react";
 import Image from "next/image";
@@ -31,29 +31,26 @@ export function MultiImageUpload({ onUploadComplete, folder = "uploads" }: Multi
         const fileExtension = file.name.split(".").pop();
         const fileName = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${fileExtension}`;
         const storageRef = ref(storage, `${folder}/${fileName}`);
-        const uploadTask = uploadBytesResumable(storageRef, file);
+        
+        fileProgresses[index] = 50;
+        const totalProg = fileProgresses.reduce((a, b) => a + b, 0) / uploadFiles.length;
+        setProgress(totalProg);
 
-        uploadTask.on(
-          "state_changed",
-          (snapshot) => {
-            const prog = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            fileProgresses[index] = prog;
-            const totalProg = fileProgresses.reduce((a, b) => a + b, 0) / uploadFiles.length;
-            setProgress(totalProg);
-          },
-          (err) => {
-            console.error("Erro no upload múltiplo:", err);
-            reject(err);
-          },
-          async () => {
+        uploadBytes(storageRef, file)
+          .then(async (snapshot) => {
+            fileProgresses[index] = 100;
+            setProgress(fileProgresses.reduce((a, b) => a + b, 0) / uploadFiles.length);
             try {
-              const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+              const downloadURL = await getDownloadURL(snapshot.ref);
               resolve(downloadURL);
             } catch (err) {
               reject(err);
             }
-          }
-        );
+          })
+          .catch((err) => {
+            console.error("Erro no upload múltiplo:", err);
+            reject(err);
+          });
       });
     });
 
