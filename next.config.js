@@ -25,12 +25,6 @@ const config = {
     ],
   },
 
-  webpack: (config) => {
-    config.watchOptions = {
-        ignored: ['**/node_modules', '**/C:/Users/**'],
-    }
-    return config
-  },
   eslint: {
     // Evitar que erros de permissão ou lints externos falhem no deploy
     ignoreDuringBuilds: true,

@@ -1,0 +1,49 @@
+﻿
+> woodbahia-next@0.1.0 build
+> next build
+
+   Ôû▓ Next.js 15.5.12
+   - Environments: .env
+
+   Creating an optimized production build ...
+node.exe : glob error 
+[Error: EPERM: 
+operation not 
+permitted, scandir 'C:\
+Users\MCPF\Ambiente de 
+Impress├úo'] {
+No C:\Program Files\nod
+ejs\npm.ps1:29 
+caractere:3
++   & $NODE_EXE 
+$NPM_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (glob error [E   
+ rr... Impress├úo']    
+ {:String) [], Rem    
+oteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+  errno: -4048,
+  code: 'EPERM',
+  syscall: 'scandir',
+  path: 'C:\\Users\\MCP
+F\\Ambiente de 
+Impress├úo'
+}
+Failed to compile.
+
+Error: EPERM: 
+operation not 
+permitted, scandir 'C:\
+Users\MCPF\Ambiente de 
+Impress├úo'
+
+
+> Build failed because 
+of webpack errors

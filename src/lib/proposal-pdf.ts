@@ -548,7 +548,9 @@ export function generateProposalPDF(data: ProposalData): void {
     drawFooter(doc, pageWidth);
   }
 
-  // Save
-  const fileName = `Proposta_WoodBahia_${data.clientName.replace(/\s+/g, '_')}_${today.toISOString().slice(0, 10)}.pdf`;
+  // Save — Nome: PrimeiroNome_Modelo.pdf
+  const firstName = data.clientName.trim().split(/\s+/)[0] || 'Cliente';
+  const safeModelName = modelName.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_\u00C0-\u00FF]/g, '');
+  const fileName = `${firstName}_${safeModelName}.pdf`;
   doc.save(fileName);
 }

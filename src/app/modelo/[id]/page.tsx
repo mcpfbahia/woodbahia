@@ -35,6 +35,40 @@ import Image from "next/image";
 import { FooterWoodBahia } from "~/components/layout/FooterWoodBahia";
 import { TransparencySection } from "~/components/sections/TransparencySection";
 
+const renderFormattedText = (text: string) => {
+  if (!text) return null;
+  return text.split('\n').map((paragraph, index) => {
+    if (!paragraph.trim()) return null;
+    
+    const formatBold = (str: string) => {
+      const parts = str.split(/(\*\*.*?\*\*)/g);
+      return parts.map((part, i) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+          return <strong key={i} className="font-semibold text-[#5C3317]">{part.slice(2, -2)}</strong>;
+        }
+        return part;
+      });
+    };
+
+    const cleanPara = paragraph.trim();
+    const startsWithIcon = /^[\p{Emoji}\p{Emoji_Presentation}\p{Extended_Pictographic}]/u.test(cleanPara);
+
+    if (startsWithIcon || cleanPara.endsWith(':')) {
+      return (
+        <p key={index} className="text-base font-bold text-[#5C3317] mt-3">
+          {formatBold(paragraph)}
+        </p>
+      );
+    }
+
+    return (
+      <p key={index} className="text-base text-muted-foreground mt-1">
+        {formatBold(paragraph)}
+      </p>
+    );
+  });
+};
+
 export default function ModelDetailPage() {
   const { id } = useParams() as { id: string };
   const [model, setModel] = useState<any>(null);
@@ -401,10 +435,10 @@ export default function ModelDetailPage() {
           <div className="container mx-auto px-4">
             <div className="grid gap-12 lg:grid-cols-2">
               <ScrollReveal>
-                <h2 className="text-3xl font-bold mb-6 text-[#4A2B1D]">Sobre o Projeto</h2>
-                <p className="mb-8 text-lg leading-relaxed text-muted-foreground">
-                  {details.fullDescription}
-                </p>
+                <h2 className="text-3xl font-bold mb-4 text-[#4A2B1D]">Sobre o Projeto</h2>
+                <div className="mb-8">
+                  {renderFormattedText(details.fullDescription)}
+                </div>
 
                 <div className="space-y-6">
                   <div>
