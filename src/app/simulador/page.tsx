@@ -12,11 +12,12 @@ import type {
   SimulationState
 } from '@/lib/pricing';
 import { needsFoundationStep } from '@/lib/pricing';
-import { TreePine, Sparkles, BookOpen } from 'lucide-react';
+import { TreePine, Sparkles, BookOpen, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 const INITIAL_CUSTOM: CustomOptions = {
-  fixtures: false, tilesStain: false, labor: false, electrical: false, glass: false,
+  fixtures: false, tilesStain: false, labor: false, electrical: false, glass: false, project: false,
 };
 
 const INITIAL_ADDONS: KitAddons = { electrical: false, glass: false };
@@ -111,6 +112,19 @@ export default function Index() {
             <div className="absolute inset-0 opacity-[0.015]" style={{
               backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 60px, hsl(22 40% 22%) 60px, hsl(22 40% 22%) 61px)',
             }} />
+          </div>
+
+          {/* Botão de Voltar ao Site no Hero */}
+          <div className="absolute top-6 left-6 z-20">
+            <Link href="/">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-2 text-muted-foreground hover:text-accent hover:bg-accent/8 rounded-xl font-semibold text-sm py-5 px-5"
+              >
+                <Home className="w-4 h-4" /> Voltar ao Site
+              </Button>
+            </Link>
           </div>
 
           <motion.div
@@ -272,14 +286,25 @@ export default function Index() {
               </span>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowManual(true)}
-            className="gap-2 text-muted-foreground hover:text-accent hover:bg-accent/8 rounded-xl font-semibold text-sm transition-colors"
-          >
-            <BookOpen className="w-4 h-4" /> Como Usar
-          </Button>
+          <div className="flex items-center gap-2">
+            <Link href="/" className="hidden sm:inline-flex">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-2 text-muted-foreground hover:text-accent hover:bg-accent/8 rounded-xl font-semibold text-sm transition-colors"
+              >
+                <Home className="w-4 h-4" /> Ir para o Site
+              </Button>
+            </Link>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowManual(true)}
+              className="gap-2 text-muted-foreground hover:text-accent hover:bg-accent/8 rounded-xl font-semibold text-sm transition-colors"
+            >
+              <BookOpen className="w-4 h-4" /> Como Usar
+            </Button>
+          </div>
         </div>
       </header>
 

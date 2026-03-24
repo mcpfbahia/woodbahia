@@ -173,8 +173,8 @@ export const ModelsSection = () => {
             <StaggerItem index={5} className="hidden md:block">
               <div className="group flex h-full flex-col justify-between overflow-hidden rounded-2xl border-2 border-dashed border-primary/30 bg-gradient-to-br from-primary/5 to-secondary/5 p-6 transition-all duration-300 hover:border-primary/50">
                 <div className="flex flex-grow flex-col items-center justify-center py-8 text-center">
-                  <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 transition-transform group-hover:scale-110">
-                    <Pencil className="h-8 w-8 text-primary" />
+                  <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-accent/10 transition-transform group-hover:scale-110">
+                    <Pencil className="h-8 w-8 text-accent" />
                   </div>
 
                   <h3 className="mb-4 font-serif text-2xl font-bold text-primary">

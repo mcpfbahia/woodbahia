@@ -171,6 +171,7 @@ export interface CustomOptions {
   labor: boolean;
   electrical: boolean;
   glass: boolean;
+  project: boolean;
 }
 
 export interface ProposalData {
@@ -248,6 +249,7 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
     if (opts.labor) items.push({ label: `Mão de Obra (${area}m² × R$ ${getLaborRate(area).toLocaleString('pt-BR')})`, value: getLaborCost(area) });
     if (opts.electrical) items.push({ label: `Kit Elétrica/Hidráulica`, value: getElectricalKit(area) });
     if (opts.glass) items.push({ label: `Vidros`, value: getGlassPrice(area) });
+    if (opts.project) items.push({ label: `Projeto Personalizado (${area}m² × R$ 25,00)`, value: Math.round(area * 25) });
   } else {
     // Standard kits (1-4) — use model prices
     if (!state.model) return { items: [], freight: 0, total: 0 };
@@ -352,7 +354,7 @@ export function calculateProposalItems(data: ProposalData): { items: LineItem[];
     items.push({ label: 'Vidros', value: getGlassPrice(area) });
   }
   if (data.kitType === 'custom' && data.includeProject) {
-    items.push({ label: `Projeto (${area}m² × R$ 15)`, value: Math.round(area * 15) });
+    items.push({ label: `Projeto (${area}m² × R$ 25)`, value: Math.round(area * 25) });
   }
 
   const subtotal = items.reduce((s, i) => s + i.value, 0);

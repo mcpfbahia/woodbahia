@@ -20,6 +20,7 @@ const CUSTOM_ADDONS: { key: keyof CustomOptions; label: string }[] = [
   { key: 'labor', label: 'Mão de Obra' },
   { key: 'electrical', label: 'Kit Elétrica/Hidráulica' },
   { key: 'glass', label: 'Vidros' },
+  { key: 'project', label: 'Projeto Personalizado' },
 ];
 
 const STANDARD_ADDONS: { key: keyof KitAddons; label: string }[] = [
@@ -98,8 +99,8 @@ function StandardMode({ model, kitType, kitAddons, slidingDoor, onKitSelect, onK
               className={cn(
                 'flex flex-col p-5 rounded-2xl border-2 text-left transition-all duration-300',
                 isSelected
-                  ? 'border-accent bg-accent/5 premium-shadow'
-                  : 'border-border glass-card hover:border-accent/40'
+                  ? 'border-accent bg-accent/10 ring-1 ring-accent premium-shadow'
+                  : 'border-border glass-card hover:border-accent/50 hover:bg-accent/5'
               )}
             >
               <div className="flex items-center gap-3 flex-wrap">

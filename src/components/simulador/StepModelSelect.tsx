@@ -70,8 +70,8 @@ export function StepModelSelect({ selected, isCustom, onSelect, onSelectCustom }
               className={cn(
                 'group relative flex flex-col items-start p-6 rounded-2xl border-2 text-left transition-all duration-300',
                 isSelected
-                  ? 'border-accent bg-accent/5 premium-shadow'
-                  : 'border-border glass-card hover:border-accent/40 hover:premium-shadow'
+                  ? 'border-accent bg-accent/10 ring-1 ring-accent premium-shadow'
+                  : 'border-border glass-card hover:border-accent/50 hover:bg-accent/5 hover:premium-shadow'
               )}
             >
               {/* Badge "Mais simulado" reposicionado no topo do card */}
@@ -94,7 +94,7 @@ export function StepModelSelect({ selected, isCustom, onSelect, onSelectCustom }
                 'w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-all duration-300',
                 isSelected
                   ? 'bg-accent text-accent-foreground'
-                  : 'bg-secondary text-muted-foreground group-hover:bg-accent/10 group-hover:text-accent'
+                  : 'bg-muted text-muted-foreground group-hover:bg-accent/10 group-hover:text-accent'
               )}>
                 {isCamping ? <TreePine className="w-5 h-5" /> : <Home className="w-5 h-5" />}
               </div>
@@ -127,15 +127,15 @@ export function StepModelSelect({ selected, isCustom, onSelect, onSelectCustom }
           className={cn(
             'group relative flex flex-col items-start p-6 rounded-2xl border-2 text-left transition-all duration-300 border-dashed',
             isCustom
-              ? 'border-accent bg-accent/5 premium-shadow'
-              : 'border-border glass-card hover:border-accent/40 hover:premium-shadow'
+              ? 'border-accent bg-accent/10 ring-1 ring-accent premium-shadow'
+              : 'border-border glass-card hover:border-accent/50 hover:bg-accent/5 hover:premium-shadow'
           )}
         >
           <div className={cn(
             'w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-all duration-300',
             isCustom
               ? 'bg-accent text-accent-foreground'
-              : 'bg-secondary text-muted-foreground group-hover:bg-accent/10 group-hover:text-accent'
+              : 'bg-muted text-muted-foreground group-hover:bg-accent/10 group-hover:text-accent'
           )}>
             <SlidersHorizontal className="w-5 h-5" />
           </div>

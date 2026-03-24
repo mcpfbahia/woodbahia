@@ -150,11 +150,11 @@ export function StepSummary({ state, onBack, onReset }: Props) {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5 + i * 0.08 }}
-                    className="bg-secondary/60 rounded-xl p-4"
+                    className="bg-secondary/40 border border-secondary/20 rounded-xl p-4 transition-colors hover:bg-secondary/60"
                   >
-                    <span className="text-xs text-muted-foreground font-medium">{p.label}</span>
-                    <p className="font-bold text-base mt-1 font-display tabular-nums">{fmt(p.value)}</p>
-                    <span className="text-xs text-muted-foreground">{p.desc}</span>
+                    <span className="text-[10px] text-foreground/60 font-bold uppercase tracking-wider">{p.label}</span>
+                    <p className="font-bold text-lg mt-1 font-display tabular-nums text-primary">{fmt(p.value)}</p>
+                    <span className="text-[10px] text-muted-foreground font-medium">{p.desc}</span>
                   </motion.div>
                 ))}
               </div>
@@ -180,25 +180,25 @@ export function StepSummary({ state, onBack, onReset }: Props) {
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.7 + i * 0.06 }}
-                        className={`rounded-xl p-4 border ${
+                        className={`rounded-xl p-4 border transition-all duration-300 hover:shadow-md ${
                           n === 3
-                            ? 'bg-green-500/5 border-green-500/20'
+                            ? 'bg-green-500/10 border-green-500/20'
                             : n === 18
-                            ? 'bg-accent/10 border-accent/20 ring-2 ring-accent/10'
-                            : 'bg-secondary/60 border-transparent'
+                            ? 'bg-accent/15 border-accent/30 ring-1 ring-accent/20'
+                            : 'bg-secondary/40 border-secondary/20 hover:bg-secondary/60'
                         }`}
                       >
-                        <span className={`text-xs font-bold uppercase tracking-wide ${
-                          n === 3 ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'
+                        <span className={`text-[10px] font-bold uppercase tracking-widest ${
+                          n === 3 ? 'text-green-700 dark:text-green-400' : 'text-foreground/70'
                         }`}>
                           {n}x {res.isInterestFree ? 'sem juros' : 'c/ taxas'}
                         </span>
-                        <p className={`font-bold text-lg mt-1 font-display tabular-nums ${
-                          n === 3 ? 'text-green-700 dark:text-green-400' : 'text-accent'
+                        <p className={`font-bold text-xl mt-1 font-display tabular-nums ${
+                          n === 3 ? 'text-green-700 dark:text-green-400' : 'text-primary'
                         }`}>
                           {fmt(res.installment)}
                         </p>
-                        <span className="text-[10px] text-muted-foreground">Total: {fmt(res.total)}</span>
+                        <span className="text-[10px] text-muted-foreground font-medium">Total: {fmt(res.total)}</span>
                       </motion.div>
                     );
                   })}
