@@ -172,8 +172,8 @@ export default function InstallmentSimulatorPage() {
                       <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 font-bold group-focus-within:text-primary transition-colors text-xl">R$</span>
                       <input 
                         type="number" 
-                        value={valorProjeto}
-                        onChange={(e) => setValorProjeto(Number(e.target.value))}
+                        value={valorProjeto || ""}
+                        onChange={(e) => setValorProjeto(e.target.value === "" ? 0 : Number(e.target.value))}
                         className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-5 pl-14 pr-6 text-2xl font-black text-slate-800 focus:outline-none focus:border-primary focus:bg-white transition-all shadow-inner"
                       />
                     </div>
@@ -188,8 +188,8 @@ export default function InstallmentSimulatorPage() {
                       <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 font-bold group-focus-within:text-primary transition-colors text-xl">R$</span>
                       <input 
                         type="number" 
-                        value={entrada}
-                        onChange={(e) => setEntrada(Number(e.target.value))}
+                        value={entrada || ""}
+                        onChange={(e) => setEntrada(e.target.value === "" ? 0 : Number(e.target.value))}
                         className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-5 pl-14 pr-6 text-2xl font-black text-slate-800 focus:outline-none focus:border-primary focus:bg-white transition-all shadow-inner"
                         placeholder="0,00"
                       />

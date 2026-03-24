@@ -212,8 +212,8 @@ export default function PropostasPage() {
                             type="number"
                             min={6}
                             max={150}
-                            value={customArea}
-                            onChange={e => setCustomArea(Number(e.target.value))}
+                            value={customArea || ""}
+                            onChange={e => setCustomArea(e.target.value === "" ? 0 : Number(e.target.value))}
                             className="h-12 recessed-input rounded-xl"
                           />
                         </div>
@@ -316,7 +316,7 @@ export default function PropostasPage() {
                             type="number"
                             placeholder={discountType === 'percentage' ? 'Ex: 10%' : 'Ex: 5.000'}
                             value={discountValue || ''}
-                            onChange={e => setDiscountValue(Number(e.target.value))}
+                            onChange={e => setDiscountValue(e.target.value === "" ? 0 : Number(e.target.value))}
                             className="h-12 recessed-input rounded-xl"
                           />
                         </motion.div>

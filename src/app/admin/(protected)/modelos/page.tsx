@@ -387,7 +387,7 @@ export default function AdminModelosPage() {
                       </div>
                       <div>
                         <label className="mb-1 block text-sm font-semibold text-slate-700">Quartos</label>
-                        <input type="number" min="0" value={formData.bedrooms} onChange={e => setFormData(p => ({ ...p, bedrooms: parseInt(e.target.value)||0 }))} className="w-full rounded-lg border border-slate-200 p-3" />
+                        <input type="number" min="0" value={formData.bedrooms || ""} onChange={e => setFormData(p => ({ ...p, bedrooms: e.target.value === "" ? 0 : parseInt(e.target.value)||0 }))} className="w-full rounded-lg border border-slate-200 p-3" />
                       </div>
                     </div>
 
