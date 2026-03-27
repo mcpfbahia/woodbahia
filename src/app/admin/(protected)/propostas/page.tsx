@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import React, { useState, useMemo, useEffect } from "react";
 import { motion } from 'framer-motion';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
@@ -8,9 +8,9 @@ import { Label } from '~/components/ui/label';
 import { Card, CardContent } from '~/components/ui/card';
 import { Switch } from '~/components/ui/switch';
 import { Separator } from '~/components/ui/separator';
-import { FileDown, User, Home, Settings2, Tag, LayoutDashboard } from 'lucide-react';
+import { FileDown, User, Home, Settings2, Tag, LayoutDashboard, Plus, Trash2, Layers } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { CABIN_MODELS, calculateProposalItems, type KitType, type ProposalData } from '~/lib/pricing';
+import { CABIN_MODELS, calculateProposalItems, type KitType, type ProposalData, type ExtraItem } from '~/lib/pricing';
 import { generateProposalPDF } from '~/lib/proposal-pdf';
 import {
   Select,
@@ -46,6 +46,38 @@ export default function PropostasPage() {
   const [includeProject, setIncludeProject] = useState(false);
   const [discountType, setDiscountType] = useState<'none' | 'percentage' | 'fixed'>('none');
   const [discountValue, setDiscountValue] = useState(0);
+  const [showExtraItems, setShowExtraItems] = useState(false);
+  const [extraItems, setExtraItems] = useState<ExtraItem[]>([{ description: '', value: 0 }]);
+  
+  const [kitPriceOverride, setKitPriceOverride] = useState<number | undefined>(undefined);
+  const [fixturesPriceOverride, setFixturesPriceOverride] = useState<number | undefined>(undefined);
+  const [tilesStainPriceOverride, setTilesStainPriceOverride] = useState<number | undefined>(undefined);
+  const [laborPriceOverride, setLaborPriceOverride] = useState<number | undefined>(undefined);
+  const [electricalPriceOverride, setElectricalPriceOverride] = useState<number | undefined>(undefined);
+  const [glassPriceOverride, setGlassPriceOverride] = useState<number | undefined>(undefined);
+  const [projectPriceOverride, setProjectPriceOverride] = useState<number | undefined>(undefined);
+
+  // Limpar overrides ao mudar modelo ou área para evitar erros de cálculo entre modelos
+  useEffect(() => {
+    setKitPriceOverride(undefined);
+    setFixturesPriceOverride(undefined);
+    setTilesStainPriceOverride(undefined);
+    setLaborPriceOverride(undefined);
+    setElectricalPriceOverride(undefined);
+    setGlassPriceOverride(undefined);
+    setProjectPriceOverride(undefined);
+  }, [modelId, kitType, customArea]);
+
+  const addExtraItem = () => setExtraItems([...extraItems, { description: '', value: 0 }]);
+  const removeExtraItem = (index: number) => {
+    const newItems = extraItems.filter((_, i) => i !== index);
+    setExtraItems(newItems.length > 0 ? newItems : [{ description: '', value: 0 }]);
+  };
+  const updateExtraItem = (index: number, fields: Partial<ExtraItem>) => {
+    const newItems = [...extraItems];
+    newItems[index] = { ...newItems[index]!, ...fields };
+    setExtraItems(newItems);
+  };
 
   const getProposalData = (): ProposalData => ({
     clientName: clientName.trim(),
@@ -62,6 +94,14 @@ export default function PropostasPage() {
     includeProject,
     discountType,
     discountValue: discountType !== 'none' ? discountValue : 0,
+    extraItems: showExtraItems ? extraItems.filter(i => i.description.trim() && i.value > 0) : undefined,
+    kitPriceOverride,
+    fixturesPriceOverride,
+    tilesStainPriceOverride,
+    laborPriceOverride,
+    electricalPriceOverride,
+    glassPriceOverride,
+    projectPriceOverride,
   });
 
   const handleShowSummary = () => {
@@ -97,6 +137,52 @@ export default function PropostasPage() {
   const proposalData = getProposalData();
   const summary = calculateProposalItems(proposalData);
   const selectedModel = CABIN_MODELS.find(m => m.id === modelId);
+
+  // Suggested values (without overrides)
+  const suggested = calculateProposalItems({
+    ...proposalData,
+    kitPriceOverride: undefined,
+    fixturesPriceOverride: undefined,
+    tilesStainPriceOverride: undefined,
+    laborPriceOverride: undefined,
+    electricalPriceOverride: undefined,
+    glassPriceOverride: undefined,
+    projectPriceOverride: undefined,
+  });
+
+  const getSugg = (label: string) => suggested.items.find(i => i.label.toLowerCase().includes(label.toLowerCase()))?.value ?? 0;
+
+  const EditablePrice = ({ 
+    label, 
+    value, 
+    onChange, 
+    suggested: suggValue,
+    className = ""
+  }: { 
+    label: string, 
+    value: number | undefined, 
+    onChange: (v: number | undefined) => void,
+    suggested: number,
+    className?: string
+  }) => (
+    <div className={`flex flex-col gap-1 p-2 bg-primary/5 rounded-xl border border-primary/10 ${className}`}>
+      <div className="flex justify-between items-center px-1">
+        <Label className="text-[9px] font-black uppercase tracking-widest text-primary/60">{label}</Label>
+        {value !== undefined && value !== suggValue && (
+          <button onClick={() => onChange(undefined)} className="text-[8px] font-bold text-primary hover:underline uppercase">Resetar</button>
+        )}
+      </div>
+      <div className="relative">
+        <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-muted-foreground">R$</span>
+        <Input
+          type="number"
+          value={value ?? suggValue}
+          onChange={(e) => onChange(e.target.value === "" ? undefined : Number(e.target.value))}
+          className="h-8 pl-8 text-xs recessed-input rounded-lg border-primary/10 focus:ring-1 focus:ring-primary/20"
+        />
+      </div>
+    </div>
+  );
 
   return (
     <div className="space-y-8 animate-fade-in pb-20">
@@ -201,7 +287,15 @@ export default function PropostasPage() {
                             </SelectContent>
                           </Select>
                         </div>
-
+                        {modelId && (
+                          <EditablePrice 
+                            label="Valor Sugerido do Kit" 
+                            suggested={getSugg('Kit Madeiramento')} 
+                            value={kitPriceOverride} 
+                            onChange={setKitPriceOverride} 
+                            className="mt-4"
+                          />
+                        )}
                       </div>
                     ) : (
                       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
@@ -217,6 +311,13 @@ export default function PropostasPage() {
                             className="h-12 recessed-input rounded-xl"
                           />
                         </div>
+                        
+                        <EditablePrice 
+                          label="Valor Sugerido do Kit (Customizado)" 
+                          suggested={getSugg('Kit Madeiramento')} 
+                          value={kitPriceOverride} 
+                          onChange={setKitPriceOverride} 
+                        />
 
                         <div className="space-y-3 pt-4 border-t border-border/10">
                           <p className="text-[10px] uppercase font-bold text-primary/60 tracking-widest mb-2">Composição do Kit</p>
@@ -226,13 +327,33 @@ export default function PropostasPage() {
                             { id: 'l', label: 'Mão de Obra de Montagem', state: includeLabor, set: setIncludeLabor },
                             { id: 'p', label: 'Projeto Arquitetônico', state: includeProject, set: setIncludeProject },
                           ].map((item) => (
-                            <div key={item.id} className="flex items-center justify-between group">
-                              <Label className="text-sm cursor-pointer group-hover:text-primary transition-colors">{item.label}</Label>
-                              <Switch 
-                                checked={item.state} 
-                                onCheckedChange={item.set} 
-                                className="toggle-glow data-[state=checked]:bg-primary"
-                              />
+                            <div key={item.id} className="space-y-2">
+                              <div className="flex items-center justify-between group">
+                                <Label className="text-sm cursor-pointer group-hover:text-primary transition-colors">{item.label}</Label>
+                                <Switch 
+                                  checked={item.state} 
+                                  onCheckedChange={item.set} 
+                                  className="toggle-glow data-[state=checked]:bg-primary"
+                                />
+                              </div>
+                              {item.state && (
+                                <EditablePrice 
+                                  label={`Valor: ${item.label}`}
+                                  suggested={getSugg(item.label)} 
+                                  value={
+                                    item.id === 'f' ? fixturesPriceOverride :
+                                    item.id === 't' ? tilesStainPriceOverride :
+                                    item.id === 'l' ? laborPriceOverride :
+                                    projectPriceOverride
+                                  }
+                                  onChange={
+                                    item.id === 'f' ? setFixturesPriceOverride :
+                                    item.id === 't' ? setTilesStainPriceOverride :
+                                    item.id === 'l' ? setLaborPriceOverride :
+                                    setProjectPriceOverride
+                                  } 
+                                />
+                              )}
                             </div>
                           ))}
                         </div>
@@ -254,23 +375,53 @@ export default function PropostasPage() {
                         </div>
                         <Switch checked={slidingDoor} onCheckedChange={setSlidingDoor} className="toggle-glow data-[state=checked]:bg-primary" />
                       </div>
+                      {slidingDoor && !(['kit2', 'kit3', 'kit4'].includes(kitType)) && (
+                        <EditablePrice 
+                          label="Porta de Correr" 
+                          suggested={getSugg('Porta de Correr')} 
+                          value={fixturesPriceOverride} 
+                          onChange={setFixturesPriceOverride} 
+                        />
+                      )}
 
                       {(kitType === 'kit4' || (kitType === 'custom' && includeLabor)) && (
                         <>
-                          <div className="flex items-center justify-between group">
-                            <div>
-                              <Label className="text-sm font-bold text-foreground">Incluir Vidros</Label>
-                              <p className="text-[10px] text-muted-foreground">Conforme projeto</p>
+                          <div className="pt-2">
+                            <div className="flex items-center justify-between group">
+                              <div>
+                                <Label className="text-sm font-bold text-foreground">Incluir Vidros</Label>
+                                <p className="text-[10px] text-muted-foreground">Conforme projeto</p>
+                              </div>
+                              <Switch checked={includeGlass} onCheckedChange={setIncludeGlass} className="toggle-glow data-[state=checked]:bg-primary" />
                             </div>
-                            <Switch checked={includeGlass} onCheckedChange={setIncludeGlass} className="toggle-glow data-[state=checked]:bg-primary" />
+                            {includeGlass && (
+                              <EditablePrice 
+                                label="Valor Vidros" 
+                                suggested={getSugg('Vidros')} 
+                                value={glassPriceOverride} 
+                                onChange={setGlassPriceOverride} 
+                                className="mt-2"
+                              />
+                            )}
                           </div>
 
-                          <div className="flex items-center justify-between group">
-                            <div>
-                              <Label className="text-sm font-bold text-foreground">Elétrica/Hidráulica Básica</Label>
-                              <p className="text-[10px] text-muted-foreground">Mão de obra inclusa</p>
+                          <div className="pt-2">
+                            <div className="flex items-center justify-between group">
+                              <div>
+                                <Label className="text-sm font-bold text-foreground">Elétrica/Hidráulica Básica</Label>
+                                <p className="text-[10px] text-muted-foreground">Mão de obra inclusa</p>
+                              </div>
+                              <Switch checked={includeElectrical} onCheckedChange={setIncludeElectrical} className="toggle-glow data-[state=checked]:bg-primary" />
                             </div>
-                            <Switch checked={includeElectrical} onCheckedChange={setIncludeElectrical} className="toggle-glow data-[state=checked]:bg-primary" />
+                            {includeElectrical && (
+                              <EditablePrice 
+                                label="Valor Elétrica/Hidráulica" 
+                                suggested={getSugg('Instalação Elétrica')} 
+                                value={electricalPriceOverride} 
+                                onChange={setElectricalPriceOverride} 
+                                className="mt-2"
+                              />
+                            )}
                           </div>
                         </>
                       )}
@@ -319,6 +470,62 @@ export default function PropostasPage() {
                             onChange={e => setDiscountValue(e.target.value === "" ? 0 : Number(e.target.value))}
                             className="h-12 recessed-input rounded-xl"
                           />
+                        </motion.div>
+                      )}
+                    </div>
+                    <div className="pt-6 border-t border-primary/10 mt-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <Layers className="w-4 h-4 text-primary" />
+                          <h3 className="font-black text-[10px] uppercase tracking-widest text-primary/80">Edições Especiais</h3>
+                        </div>
+                        <Switch checked={showExtraItems} onCheckedChange={setShowExtraItems} className="toggle-glow data-[state=checked]:bg-primary" />
+                      </div>
+
+                      {showExtraItems && (
+                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="space-y-4 overflow-hidden">
+                          {extraItems.map((item, index) => (
+                            <div key={index} className="space-y-2 p-3 bg-white/20 rounded-xl border border-primary/5 relative group">
+                              <div className="flex gap-2">
+                                <div className="flex-1 space-y-1">
+                                  <Label className="text-[9px] font-bold uppercase text-muted-foreground ml-1">Descrição</Label>
+                                  <Input
+                                    placeholder="Ex: Madeiramento para Deck"
+                                    value={item.description}
+                                    onChange={e => updateExtraItem(index, { description: e.target.value })}
+                                    className="h-9 text-xs recessed-input rounded-lg"
+                                  />
+                                </div>
+                                <div className="w-28 space-y-1">
+                                  <Label className="text-[9px] font-bold uppercase text-muted-foreground ml-1">Valor (R$)</Label>
+                                  <Input
+                                    type="number"
+                                    placeholder="0,00"
+                                    value={item.value || ''}
+                                    onChange={e => updateExtraItem(index, { value: Number(e.target.value) })}
+                                    className="h-9 text-xs recessed-input rounded-lg"
+                                  />
+                                </div>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => removeExtraItem(index)}
+                                  className="self-end h-9 w-9 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={addExtraItem}
+                            className="w-full h-9 border-dashed border-primary/30 text-primary hover:bg-primary/5 rounded-xl uppercase text-[10px] font-black tracking-widest"
+                          >
+                            <Plus className="w-4 h-4 mr-2" />
+                            Adicionar Item Extra
+                          </Button>
                         </motion.div>
                       )}
                     </div>

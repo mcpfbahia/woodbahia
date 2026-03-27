@@ -151,6 +151,11 @@ export function getFreight(area: number): number {
 export type KitType = 'kit1' | 'kit2' | 'kit3' | 'kit4' | 'custom';
 export type FoundationType = 'eucalyptus' | 'masonry' | 'radier' | 'none';
 
+export interface ExtraItem {
+  description: string;
+  value: number;
+}
+
 export interface CustomOptions {
   fixtures: boolean;
   tilesStain: boolean;
@@ -175,6 +180,14 @@ export interface ProposalData {
   includeProject: boolean;
   discountType: 'none' | 'percentage' | 'fixed';
   discountValue: number;
+  extraItems?: ExtraItem[];
+  kitPriceOverride?: number;
+  fixturesPriceOverride?: number;
+  tilesStainPriceOverride?: number;
+  laborPriceOverride?: number;
+  electricalPriceOverride?: number;
+  glassPriceOverride?: number;
+  projectPriceOverride?: number;
 }
 
 /** Options available as add-ons for standard kits (1-4) */
@@ -300,47 +313,82 @@ export function calculateProposalItems(data: ProposalData): { items: LineItem[];
   const area = data.customArea || model?.area || 0;
   const items: LineItem[] = [];
 
+  // 1. Kit Madeiramento
+  let kitPrice = 0;
   if (data.kitType === 'custom') {
     const timberRate = getTimberRate(area);
-    items.push({ label: `Kit Madeiramento (${area}m² × R$ ${timberRate})`, value: Math.round(area * timberRate) });
+    kitPrice = Math.round(area * timberRate);
   } else {
-    if (model) items.push({ label: 'Kit Madeiramento', value: model.kitPrice });
+    if (model) kitPrice = model.kitPrice;
   }
+  if (data.kitPriceOverride !== undefined) kitPrice = data.kitPriceOverride;
+  items.push({ label: data.kitType === 'custom' ? `Kit Madeiramento (${area}m²)` : 'Kit Madeiramento', value: kitPrice });
 
-  // Fixtures: standard kits 2-4 always include; custom only if selected
+  // 2. Fixtures
   const hasFixtures = data.kitType === 'custom' ? data.includeFixtures : ['kit2', 'kit3', 'kit4'].includes(data.kitType);
   if (hasFixtures) {
+    let fpValue = 0;
     const fp = getFixturesPrice(area);
     if (data.slidingDoor) {
-      items.push({ label: 'Portas, Janelas e Ferragens + Porta de Correr (c/ 5% desc.)', value: fp.withSlidingDoor });
+      fpValue = fp.withSlidingDoor;
     } else {
-      items.push({ label: 'Portas, Janelas e Ferragens', value: fp.base });
+      fpValue = fp.base;
     }
+    if (data.fixturesPriceOverride !== undefined) fpValue = data.fixturesPriceOverride;
+    items.push({ 
+      label: data.slidingDoor ? 'Portas, Janelas e Ferragens + Porta de Correr (c/ 5% desc.)' : 'Portas, Janelas e Ferragens', 
+      value: fpValue 
+    });
   } else if (data.slidingDoor) {
-    items.push({ label: 'Porta de Correr (1.8m eucalipto)', value: SLIDING_DOOR_PRICE });
+    let sdPrice = SLIDING_DOOR_PRICE;
+    if (data.fixturesPriceOverride !== undefined) sdPrice = data.fixturesPriceOverride;
+    items.push({ label: 'Porta de Correr (1.8m eucalipto)', value: sdPrice });
   }
 
-  // Tiles & Stain: standard kits 3-4 always include; custom only if selected
+  // 3. Tiles & Stain
   const hasTiles = data.kitType === 'custom' ? data.includeTilesStain : ['kit3', 'kit4'].includes(data.kitType);
   if (hasTiles) {
-    const ts = getTilesStainPrice(area);
-    items.push({ label: `Telhas e Stain (${area}m²)`, value: ts.total });
+    let tsValue = getTilesStainPrice(area).total;
+    if (data.tilesStainPriceOverride !== undefined) tsValue = data.tilesStainPriceOverride;
+    items.push({ label: `Telhas e Stain (${area}m²)`, value: tsValue });
   }
 
-  // Labor: kit4 always includes; custom only if selected
+  // 4. Labor
   const hasLabor = data.kitType === 'custom' ? data.includeLabor : data.kitType === 'kit4';
   if (hasLabor) {
-    items.push({ label: `Mão de Obra (${area}m² × R$ ${getLaborRate(area).toLocaleString('pt-BR')})`, value: getLaborCost(area) });
+    let laborValue = getLaborCost(area);
+    if (data.laborPriceOverride !== undefined) laborValue = data.laborPriceOverride;
+    items.push({ label: 'Mão de Obra', value: laborValue });
   }
 
+  // 5. Electrical
   if (data.includeElectrical) {
-    items.push({ label: 'Instalação Elétrica e Hidráulica Básica (cliente fornece material)', value: getElectricalKit(area) });
+    let elecValue = getElectricalKit(area);
+    if (data.electricalPriceOverride !== undefined) elecValue = data.electricalPriceOverride;
+    items.push({ label: 'Instalação Elétrica e Hidráulica Básica', value: elecValue });
   }
+
+  // 6. Glass
   if (data.includeGlass) {
-    items.push({ label: 'Vidros', value: getGlassPrice(area) });
+    let glassValue = getGlassPrice(area);
+    if (data.glassPriceOverride !== undefined) glassValue = data.glassPriceOverride;
+    items.push({ label: 'Vidros', value: glassValue });
   }
+
+  // 7. Project
   if (data.kitType === 'custom' && data.includeProject) {
-    items.push({ label: `Projeto (${area}m² × R$ 25)`, value: Math.round(area * 25) });
+    let projValue = Math.round(area * 25);
+    if (data.projectPriceOverride !== undefined) projValue = data.projectPriceOverride;
+    items.push({ label: 'Projeto', value: projValue });
+  }
+
+  // Extra items
+  if (data.extraItems && data.extraItems.length > 0) {
+    data.extraItems.forEach(item => {
+      if (item.description.trim() && item.value > 0) {
+        items.push({ label: item.description, value: item.value });
+      }
+    });
   }
 
   const subtotal = items.reduce((s, i) => s + i.value, 0);
