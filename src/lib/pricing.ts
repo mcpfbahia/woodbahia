@@ -8,12 +8,12 @@ export interface CabinModel {
 }
 
 export const CABIN_MODELS: CabinModel[] = [
-  { id: 'guarajuba', name: 'Chalé Guarajuba', area: 52, kitPrice: 41100, tilesStainPrice: 18000, fixturesPrice: 7900 },
-  { id: 'itacimirim', name: 'Chalé Itacimirim', area: 32, kitPrice: 23890, tilesStainPrice: 13900, fixturesPrice: 7510 },
-  { id: 'curralinho', name: 'Cabana Camping Curralinho', area: 6.5, kitPrice: 6700, tilesStainPrice: 0, fixturesPrice: 0 },
-  { id: 'praia-do-forte', name: 'Chalé Praia do Forte', area: 19.5, kitPrice: 17700, tilesStainPrice: 12840, fixturesPrice: 4560 },
-  { id: 'arembepe', name: 'Cabana Camping Arembepe', area: 10.5, kitPrice: 10815, tilesStainPrice: 0, fixturesPrice: 0 },
-  { id: 'baixios', name: 'Chalé Baixios', area: 35, kitPrice: 29500, tilesStainPrice: 14000, fixturesPrice: 7000 },
+  { id: 'guarajuba', name: 'Chalé Guarajuba', area: 52, kitPrice: 33800, tilesStainPrice: 18000, fixturesPrice: 5200 },
+  { id: 'itacimirim', name: 'Chalé Itacimirim', area: 32, kitPrice: 20800, tilesStainPrice: 13900, fixturesPrice: 3200 },
+  { id: 'curralinho', name: 'Cabana Camping Curralinho', area: 6.5, kitPrice: 5122, tilesStainPrice: 0, fixturesPrice: 650 },
+  { id: 'praia-do-forte', name: 'Chalé Praia do Forte', area: 19.5, kitPrice: 12675, tilesStainPrice: 12840, fixturesPrice: 1950 },
+  { id: 'arembepe', name: 'Cabana Camping Arembepe', area: 10.5, kitPrice: 8274, tilesStainPrice: 0, fixturesPrice: 1050 },
+  { id: 'baixios', name: 'Chalé Baixios', area: 35, kitPrice: 22750, tilesStainPrice: 14000, fixturesPrice: 3500 },
 ];
 
 export const CARD_RATES: [number, number][] = [
@@ -43,10 +43,9 @@ export function calculateInstallmentValue(total: number, installments: number): 
 
 // Per-m² rates for custom kit
 export function getTimberRate(area: number): number {
-  if (area <= 14) return 940;
-  if (area <= 25) return 840;
-  if (area <= 55) return 746;
-  return 617;
+  if (area <= 12) return 788;
+  if (area <= 80) return 650;
+  return 600;
 }
 /** Telhas e Stain — precificação progressiva em 3 faixas */
 export const TILES_BASE = 3000;
@@ -88,20 +87,7 @@ export const SLIDING_DOOR_PRICE = 3000;
 export const SLIDING_DOOR_DISCOUNT = 0.05;
 
 export function getFixturesPrice(area: number): { base: number; withSlidingDoor: number } {
-  // Regra especial para Kits Camping abaixo de 10m² (ex: Curralinho)
-  if (area < 10) {
-    const base = 1800;
-    const withSlidingDoor = Math.round((base + SLIDING_DOOR_PRICE) * (1 - SLIDING_DOOR_DISCOUNT) * 100) / 100;
-    return { base, withSlidingDoor };
-  }
-
-  let base = FIXTURES_BASE + area * FIXTURES_RATE;
-  if (area > FIXTURES_TIER2) {
-    base += FIXTURES_TIER2_EXTRA;
-  } else if (area > FIXTURES_TIER1) {
-    base += FIXTURES_TIER1_EXTRA;
-  }
-  base = Math.round(base * 100) / 100;
+  const base = area * 100;
   const withSlidingDoor = Math.round((base + SLIDING_DOOR_PRICE) * (1 - SLIDING_DOOR_DISCOUNT) * 100) / 100;
   return { base, withSlidingDoor };
 }

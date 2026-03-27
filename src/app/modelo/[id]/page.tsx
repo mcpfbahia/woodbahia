@@ -364,12 +364,30 @@ export default function ModelDetailPage() {
                          {model.price}
                        </p>
                     )}
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      Investimento a partir de
+                    <p className="mt-2 text-sm text-muted-foreground uppercase tracking-widest font-bold">
+                      {model.freight_value ? "Frete" : "Frete (consulte condições)"}
                     </p>
-                    <p className="mt-1 text-sm font-medium text-cta">
-                      * Frete grátis (consulte condições)
-                    </p>
+                    {model.freight_value && (
+                      <div className="mt-1">
+                        {model.freight_is_promo ? (
+                          <div className="flex flex-col">
+                            <div className="flex items-center gap-3">
+                              <span className="text-lg text-muted-foreground line-through font-serif">{model.freight_value}</span>
+                              <span className="font-serif text-2xl font-bold text-emerald-600">
+                                R$ {(parseFloat(model.freight_value.replace(/[^\d,]/g, '').replace(',', '.')) / 2).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                              </span>
+                            </div>
+                            <p className="text-xs font-bold text-emerald-600 uppercase animate-pulse mt-1">
+                              CONDIÇÃO ESPECIAL: PAGAMOS 50% DO SEU FRETE!
+                            </p>
+                          </div>
+                        ) : (
+                          <p className="text-[#4A2B1D] font-serif text-2xl font-bold">
+                            {model.freight_value}
+                          </p>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {model.kitPrice && (

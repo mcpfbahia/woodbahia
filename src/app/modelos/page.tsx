@@ -137,6 +137,31 @@ export default function ModelsGalleryPage() {
                               {model.price}
                             </p>
                           )}
+
+                          {/* Frete */}
+                          {model.freight_value && (
+                            <div className="mt-1 flex flex-col pt-1 border-t border-border/50">
+                              <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/80 mb-0.5">
+                                Frete
+                              </p>
+                              {model.freight_is_promo ? (
+                                <div className="flex flex-col">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs text-muted-foreground line-through">{model.freight_value}</span>
+                                    <span className="text-sm font-bold text-emerald-600">
+                                      {/* Aqui assumimos o valor promocional de 50% apenas como texto informativo se necessário,
+                                          ou calculamos se for numérico. Mas o usuário pediu "50% do frete".
+                                          Como o valor pode vir formatado como string "R$ 3.500", vamos mostrar o selo. */}
+                                      R$ {(parseFloat(model.freight_value.replace(/[^\d,]/g, '').replace(',', '.')) / 2).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                    </span>
+                                  </div>
+                                  <span className="text-[10px] font-bold text-emerald-600 uppercase">Pagamos 50% do seu frete</span>
+                                </div>
+                              ) : (
+                                <span className="text-sm font-bold text-muted-foreground">{model.freight_value}</span>
+                              )}
+                            </div>
+                          )}
                         </div>
                         <Link
                           href={`/modelo/${model.id}`}

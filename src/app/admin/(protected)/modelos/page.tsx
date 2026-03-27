@@ -33,6 +33,8 @@ interface ModelItem {
   rooms?: { name: string; size: string }[];
   promoPrice?: string;
   promoBadge?: string;
+  freight_value?: string;
+  freight_is_promo?: boolean;
 }
 
 const initialFormState: ModelItem = {
@@ -59,6 +61,8 @@ const initialFormState: ModelItem = {
   rooms: [],
   promoPrice: "",
   promoBadge: "",
+  freight_value: "",
+  freight_is_promo: false,
 };
 
 export default function AdminModelosPage() {
@@ -367,6 +371,24 @@ export default function AdminModelosPage() {
                     <div>
                       <label className="mb-1 block text-sm font-semibold text-slate-700">Etiqueta/Badge (Opcional)</label>
                       <input type="text" value={formData.promoBadge || ""} onChange={e => setFormData(p => ({ ...p, promoBadge: e.target.value }))} className="w-full rounded-lg border-red-200 bg-red-50 p-3 focus:border-red-500 focus:ring-1 focus:ring-red-500" placeholder="Ex: 15% OFF | CHALÉ PRONTO" />
+                    </div>
+
+                    <div className="p-4 rounded-xl border border-primary/20 bg-primary/5 col-span-full grid md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="mb-1 block text-sm font-semibold text-slate-700">Valor do Frete (Opcional)</label>
+                        <input type="text" value={formData.freight_value || ""} onChange={e => setFormData(p => ({ ...p, freight_value: e.target.value }))} className="w-full rounded-lg border border-slate-200 p-3" placeholder="Ex: R$ 3.500" />
+                      </div>
+                      <div className="flex items-center">
+                        <label className="flex items-center gap-3 cursor-pointer select-none">
+                          <input 
+                            type="checkbox" 
+                            checked={formData.freight_is_promo} 
+                            onChange={e => setFormData(p => ({ ...p, freight_is_promo: e.target.checked }))}
+                            className="h-5 w-5 rounded border-slate-300 text-primary focus:ring-primary"
+                          />
+                          <span className="text-sm font-bold text-primary">Nós pagamos 50% do seu frete</span>
+                        </label>
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
