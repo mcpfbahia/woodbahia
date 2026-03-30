@@ -43,42 +43,87 @@ function fmt(v: number): string {
   return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
-function getIncludedItems(kitType: KitType): string[] {
+function getIncludedItems(data: ProposalData): string[] {
   const items: string[] = [
     'Estrutura completa em madeira Pinus autoclavada',
     'Paredes, forros e estrutura do telhado',
     'Ripas, canaletas, rodapés, molduras',
   ];
-  if (kitType === 'kit2' || kitType === 'kit3' || kitType === 'kit4') {
+  
+  const hasFixtures = data.kitType === 'custom' ? data.includeFixtures : ['kit2', 'kit3', 'kit4'].includes(data.kitType);
+  if (hasFixtures) {
     items.push('Portas e janelas em madeira');
     items.push('Ferragens completas');
   }
-  if (kitType === 'kit3' || kitType === 'kit4') {
+  
+  const hasTiles = data.kitType === 'custom' ? data.includeTilesStain : ['kit3', 'kit4'].includes(data.kitType);
+  if (hasTiles) {
     items.push('Cobertura com telhas');
     items.push('Stain protetor aplicado');
   }
-  if (kitType === 'kit4') {
+  
+  const hasLabor = data.kitType === 'custom' ? data.includeLabor : data.kitType === 'kit4';
+  if (hasLabor) {
     items.push('Mão de obra completa de montagem');
   }
+
+  if (data.includeElectrical) {
+    items.push('Instalações elétricas e hidráulicas (Básica)');
+  }
+
+  if (data.includeGlass) {
+    items.push('Vidros inclusos');
+  }
+
+  if (data.kitType === 'custom' && data.includeProject) {
+    items.push('Projeto Arquitetônico Personalizado');
+  }
+
+  if (data.foundationType && data.foundationType !== 'none') {
+    const fLabel = data.foundationType === 'eucalyptus' ? 'Sapatas de Eucalipto Tratado'
+                 : data.foundationType === 'masonry' ? 'Sapatas de Manilhas em Alvenaria'
+                 : 'Base Radier Completo';
+    items.push(fLabel);
+  }
+
+  if (data.masonryBathroomCount && data.masonryBathroomCount > 0) {
+    items.push(data.masonryBathroomCount === 1 ? '1 Banheiro em Alvenaria' : `${data.masonryBathroomCount} Banheiros em Alvenaria`);
+  }
+
   return items;
 }
 
-function getNotIncludedItems(kitType: KitType): string[] {
+function getNotIncludedItems(data: ProposalData): string[] {
   const items: string[] = [];
-  if (kitType !== 'kit4') {
+
+  const hasLabor = data.kitType === 'custom' ? data.includeLabor : data.kitType === 'kit4';
+  if (!hasLabor) {
     items.push('Mão de obra de montagem');
   }
-  if (kitType === 'kit1') {
+
+  const hasFixtures = data.kitType === 'custom' ? data.includeFixtures : ['kit2', 'kit3', 'kit4'].includes(data.kitType);
+  if (!hasFixtures) {
     items.push('Portas, janelas e ferragens');
+  }
+
+  const hasTiles = data.kitType === 'custom' ? data.includeTilesStain : ['kit3', 'kit4'].includes(data.kitType);
+  if (!hasTiles) {
     items.push('Cobertura e telhas');
   }
-  if (kitType === 'kit2') {
-    items.push('Cobertura e telhas');
+
+  if (!data.foundationType || data.foundationType === 'none') {
+    items.push('Fundação estrutural e base');
   }
-  items.push('Fundação (radier ou sapata)');
-  items.push('Instalações elétricas e hidráulicas');
+  
+  if (!data.includeElectrical) {
+    items.push('Instalações elétricas e hidráulicas');
+  }
+  if (!data.includeGlass) {
+    items.push('Vidros e envidraçamento');
+  }
+
   items.push('Pintura externa adicional');
-  items.push('Frete (cotado separadamente)');
+  items.push('Frete (salvo combinado na proposta)');
   items.push('Licenças ou projetos legais');
   return items;
 }
@@ -123,7 +168,7 @@ export function generateProposalPDF(data: ProposalData): void {
   const kitName = KIT_NAMES[data.kitType] || data.kitType;
   const kitDesc = KIT_DESCRIPTIONS[data.kitType] || '';
   const modelName = model?.name || 'Kit Personalizado';
-  const { items, freight, subtotal, total: totalFinal, discount } = calculateProposalItems(data);
+  const { items, freight, additionalFreight, subtotal, total: totalFinal, discount } = calculateProposalItems(data);
 
   const subtotalComDesconto = subtotal - discount;
   const totalAVista = Math.round(totalFinal * 0.95);
@@ -232,10 +277,13 @@ export function generateProposalPDF(data: ProposalData): void {
 
   const tableBody = items.map(item => [item.label, fmt(item.value)]);
   
-  // Strategy: Double the freight and give 50% discount
   const freightBase = freight * 2;
   tableBody.push(['Frete Base Estimado (' + area + 'm² × R$ 180)', fmt(freightBase)]);
   tableBody.push(['Promoção: Frete Compartilhado (Nós pagamos 50% do seu frete)', '-' + fmt(freight)]);
+
+  if (additionalFreight > 0) {
+    tableBody.push(['Frete Adicional (> 200km)', '+' + fmt(additionalFreight)]);
+  }
 
   autoTable(doc, {
     startY: y,
@@ -445,8 +493,8 @@ export function generateProposalPDF(data: ProposalData): void {
   y = checkPageBreak(doc, y, 60);
 
   // ─── INCLUDED / NOT INCLUDED ───
-  const included = getIncludedItems(data.kitType);
-  const notIncluded = getNotIncludedItems(data.kitType);
+  const included = getIncludedItems(data);
+  const notIncluded = getNotIncludedItems(data);
 
   const colWidth = (contentWidth - 6) / 2;
 

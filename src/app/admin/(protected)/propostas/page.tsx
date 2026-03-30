@@ -10,7 +10,7 @@ import { Switch } from '~/components/ui/switch';
 import { Separator } from '~/components/ui/separator';
 import { FileDown, User, Home, Settings2, Tag, LayoutDashboard, Plus, Trash2, Layers } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { CABIN_MODELS, calculateProposalItems, type KitType, type ProposalData, type ExtraItem } from '~/lib/pricing';
+import { CABIN_MODELS, calculateProposalItems, type KitType, type ProposalData, type ExtraItem, type FoundationType } from '~/lib/pricing';
 import { generateProposalPDF } from '~/lib/proposal-pdf';
 import {
   Select,
@@ -28,6 +28,41 @@ const KIT_OPTIONS: { value: KitType; label: string; emoji: string }[] = [
   { value: 'kit4', label: 'Kit 4 — Refúgio Completo', emoji: '🏕️' },
   { value: 'custom', label: 'Kit Personalizado', emoji: '⚙️' },
 ];
+
+const EditablePrice = ({ 
+  label, 
+  value, 
+  onChange, 
+  suggested: suggValue,
+  className = ""
+}: { 
+  label: string, 
+  value: number | string | undefined, 
+  onChange: (v: number | string | undefined) => void,
+  suggested: number,
+  className?: string
+}) => (
+  <div className={`flex flex-col gap-1 p-2 bg-primary/5 rounded-xl border border-primary/10 ${className}`}>
+    <div className="flex justify-between items-center px-1">
+      <Label className="text-[9px] font-black uppercase tracking-widest text-primary/60">{label}</Label>
+      {value !== undefined && value !== suggValue && (
+        <button onClick={() => onChange(undefined)} className="text-[8px] font-bold text-primary hover:underline uppercase">Resetar</button>
+      )}
+    </div>
+    <div className="relative">
+      <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-muted-foreground">R$</span>
+      <Input
+        type="number"
+        value={value ?? suggValue}
+        onChange={(e) => onChange(e.target.value === "" ? "" : Number(e.target.value))}
+        onBlur={() => {
+          if (value === "") onChange(undefined);
+        }}
+        className="h-8 pl-8 text-xs recessed-input rounded-lg border-primary/10 focus:ring-1 focus:ring-primary/20"
+      />
+    </div>
+  </div>
+);
 
 export default function PropostasPage() {
   const router = useRouter();
@@ -49,13 +84,20 @@ export default function PropostasPage() {
   const [showExtraItems, setShowExtraItems] = useState(false);
   const [extraItems, setExtraItems] = useState<ExtraItem[]>([{ description: '', value: 0 }]);
   
-  const [kitPriceOverride, setKitPriceOverride] = useState<number | undefined>(undefined);
-  const [fixturesPriceOverride, setFixturesPriceOverride] = useState<number | undefined>(undefined);
-  const [tilesStainPriceOverride, setTilesStainPriceOverride] = useState<number | undefined>(undefined);
-  const [laborPriceOverride, setLaborPriceOverride] = useState<number | undefined>(undefined);
-  const [electricalPriceOverride, setElectricalPriceOverride] = useState<number | undefined>(undefined);
-  const [glassPriceOverride, setGlassPriceOverride] = useState<number | undefined>(undefined);
-  const [projectPriceOverride, setProjectPriceOverride] = useState<number | undefined>(undefined);
+  const [kitPriceOverride, setKitPriceOverride] = useState<number | string | undefined>(undefined);
+  const [fixturesPriceOverride, setFixturesPriceOverride] = useState<number | string | undefined>(undefined);
+  const [tilesStainPriceOverride, setTilesStainPriceOverride] = useState<number | string | undefined>(undefined);
+  const [laborPriceOverride, setLaborPriceOverride] = useState<number | string | undefined>(undefined);
+  const [electricalPriceOverride, setElectricalPriceOverride] = useState<number | string | undefined>(undefined);
+  const [glassPriceOverride, setGlassPriceOverride] = useState<number | string | undefined>(undefined);
+  const [projectPriceOverride, setProjectPriceOverride] = useState<number | string | undefined>(undefined);
+  const [freightOverride, setFreightOverride] = useState<number | string | undefined>(undefined);
+  const [distanceFromFactory, setDistanceFromFactory] = useState<number | string | undefined>(undefined);
+  
+  const [foundationType, setFoundationType] = useState<FoundationType>('none');
+  const [foundationPriceOverride, setFoundationPriceOverride] = useState<number | string | undefined>(undefined);
+  const [masonryBathroomCount, setMasonryBathroomCount] = useState<number>(0);
+  const [masonryBathroomPriceOverride, setMasonryBathroomPriceOverride] = useState<number | string | undefined>(undefined);
 
   // Limpar overrides ao mudar modelo ou área para evitar erros de cálculo entre modelos
   useEffect(() => {
@@ -66,6 +108,10 @@ export default function PropostasPage() {
     setElectricalPriceOverride(undefined);
     setGlassPriceOverride(undefined);
     setProjectPriceOverride(undefined);
+    setFreightOverride(undefined);
+    setDistanceFromFactory(undefined);
+    setFoundationPriceOverride(undefined);
+    setMasonryBathroomPriceOverride(undefined);
   }, [modelId, kitType, customArea]);
 
   const addExtraItem = () => setExtraItems([...extraItems, { description: '', value: 0 }]);
@@ -95,13 +141,19 @@ export default function PropostasPage() {
     discountType,
     discountValue: discountType !== 'none' ? discountValue : 0,
     extraItems: showExtraItems ? extraItems.filter(i => i.description.trim() && i.value > 0) : undefined,
-    kitPriceOverride,
-    fixturesPriceOverride,
-    tilesStainPriceOverride,
-    laborPriceOverride,
-    electricalPriceOverride,
-    glassPriceOverride,
-    projectPriceOverride,
+    kitPriceOverride: typeof kitPriceOverride === 'number' ? kitPriceOverride : undefined,
+    fixturesPriceOverride: typeof fixturesPriceOverride === 'number' ? fixturesPriceOverride : undefined,
+    tilesStainPriceOverride: typeof tilesStainPriceOverride === 'number' ? tilesStainPriceOverride : undefined,
+    laborPriceOverride: typeof laborPriceOverride === 'number' ? laborPriceOverride : undefined,
+    electricalPriceOverride: typeof electricalPriceOverride === 'number' ? electricalPriceOverride : undefined,
+    glassPriceOverride: typeof glassPriceOverride === 'number' ? glassPriceOverride : undefined,
+    projectPriceOverride: typeof projectPriceOverride === 'number' ? projectPriceOverride : undefined,
+    freightOverride: typeof freightOverride === 'number' ? freightOverride : undefined,
+    distanceFromFactory: typeof distanceFromFactory === 'number' ? distanceFromFactory : undefined,
+    foundationType,
+    foundationPriceOverride: typeof foundationPriceOverride === 'number' ? foundationPriceOverride : undefined,
+    masonryBathroomCount,
+    masonryBathroomPriceOverride: typeof masonryBathroomPriceOverride === 'number' ? masonryBathroomPriceOverride : undefined,
   });
 
   const handleShowSummary = () => {
@@ -151,38 +203,6 @@ export default function PropostasPage() {
   });
 
   const getSugg = (label: string) => suggested.items.find(i => i.label.toLowerCase().includes(label.toLowerCase()))?.value ?? 0;
-
-  const EditablePrice = ({ 
-    label, 
-    value, 
-    onChange, 
-    suggested: suggValue,
-    className = ""
-  }: { 
-    label: string, 
-    value: number | undefined, 
-    onChange: (v: number | undefined) => void,
-    suggested: number,
-    className?: string
-  }) => (
-    <div className={`flex flex-col gap-1 p-2 bg-primary/5 rounded-xl border border-primary/10 ${className}`}>
-      <div className="flex justify-between items-center px-1">
-        <Label className="text-[9px] font-black uppercase tracking-widest text-primary/60">{label}</Label>
-        {value !== undefined && value !== suggValue && (
-          <button onClick={() => onChange(undefined)} className="text-[8px] font-bold text-primary hover:underline uppercase">Resetar</button>
-        )}
-      </div>
-      <div className="relative">
-        <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-muted-foreground">R$</span>
-        <Input
-          type="number"
-          value={value ?? suggValue}
-          onChange={(e) => onChange(e.target.value === "" ? undefined : Number(e.target.value))}
-          className="h-8 pl-8 text-xs recessed-input rounded-lg border-primary/10 focus:ring-1 focus:ring-primary/20"
-        />
-      </div>
-    </div>
-  );
 
   return (
     <div className="space-y-8 animate-fade-in pb-20">
@@ -235,8 +255,36 @@ export default function PropostasPage() {
                       placeholder="Ex: Salvador - BA"
                       value={workLocation}
                       onChange={e => setWorkLocation(e.target.value)}
-                      className="h-12 recessed-input rounded-xl"
+                      className="h-12 recessed-input rounded-xl mb-4"
                     />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="distanceFromFactory" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">
+                          Distância (Lauro de Freitas) - km
+                        </Label>
+                        <Input
+                          id="distanceFromFactory"
+                          type="number"
+                          placeholder="Ex: 250"
+                          value={distanceFromFactory ?? ''}
+                          onChange={e => setDistanceFromFactory(e.target.value === "" ? undefined : Number(e.target.value))}
+                          className="h-12 recessed-input rounded-xl text-sm"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="freightOverride" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">
+                          Frete Base Total Customizado (R$)
+                        </Label>
+                        <Input
+                          id="freightOverride"
+                          type="number"
+                          placeholder="Ex: 5000"
+                          value={freightOverride ?? ''}
+                          onChange={e => setFreightOverride(e.target.value === "" ? undefined : Number(e.target.value))}
+                          className="h-12 recessed-input rounded-xl text-sm"
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -429,6 +477,65 @@ export default function PropostasPage() {
 
                     <div className="pt-6 border-t border-primary/10 mt-6">
                       <div className="flex items-center gap-2 mb-4">
+                        <Layers className="w-4 h-4 text-primary" />
+                        <h3 className="font-black text-[10px] uppercase tracking-widest text-primary/80">Fundações e Base</h3>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                           <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Tipo de Base</Label>
+                           <Select value={foundationType} onValueChange={(v) => setFoundationType(v as FoundationType)}>
+                             <SelectTrigger className="h-10 text-xs recessed-input rounded-xl w-full">
+                               <SelectValue />
+                             </SelectTrigger>
+                             <SelectContent className="rounded-xl border-primary/20">
+                               <SelectItem value="none">Sem Fundação Inclusa</SelectItem>
+                               <SelectItem value="eucalyptus">Sapatas de Eucalipto Tratado</SelectItem>
+                               <SelectItem value="masonry">Sapatas de Manilhas em Alvenaria</SelectItem>
+                               <SelectItem value="radier">Base Radier</SelectItem>
+                             </SelectContent>
+                           </Select>
+                        </div>
+                        {foundationType !== 'none' && (
+                          <EditablePrice 
+                            label="Valor da Base"
+                            suggested={
+                              foundationType === 'eucalyptus' ? getSugg('Eucalipto') :
+                              foundationType === 'masonry' ? getSugg('Manilhas') :
+                              getSugg('Radier')
+                            }
+                            value={foundationPriceOverride} 
+                            onChange={setFoundationPriceOverride} 
+                          />
+                        )}
+
+                        <div className="pt-2">
+                          <div className="flex items-center justify-between group">
+                            <div>
+                              <Label className="text-sm font-bold text-foreground">Banheiros em Alvenaria</Label>
+                              <p className="text-[10px] text-muted-foreground">R$ 8.000 un (10% OFF a partir de 2)</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Button type="button" variant="outline" size="icon" className="h-6 w-6 rounded-full" onClick={() => setMasonryBathroomCount(Math.max(0, masonryBathroomCount - 1))}><span className="text-lg mb-1">-</span></Button>
+                              <span className="text-sm font-bold w-4 text-center">{masonryBathroomCount}</span>
+                              <Button type="button" variant="outline" size="icon" className="h-6 w-6 rounded-full" onClick={() => setMasonryBathroomCount(masonryBathroomCount + 1)}><span className="text-lg mb-1">+</span></Button>
+                            </div>
+                          </div>
+                          {masonryBathroomCount > 0 && (
+                            <EditablePrice 
+                              label="Valor do(s) Banheiro(s)" 
+                              suggested={getSugg('Banheiro')} 
+                              value={masonryBathroomPriceOverride} 
+                              onChange={setMasonryBathroomPriceOverride} 
+                              className="mt-2"
+                            />
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-6 border-t border-primary/10 mt-6">
+                      <div className="flex items-center gap-2 mb-4">
                         <Tag className="w-4 h-4 text-primary" />
                         <h3 className="font-black text-[10px] uppercase tracking-widest text-primary/80">Política de Desconto</h3>
                       </div>
@@ -601,6 +708,12 @@ export default function PropostasPage() {
                               <span className="text-muted-foreground font-medium">Frete Estimado (Logística)</span>
                               <span className="font-bold line-through opacity-30 text-primary">{fmt(summary.freight * 2)}</span>
                             </div>
+                            {summary.additionalFreight > 0 && (
+                              <div className="flex justify-between text-sm py-2 border-b border-primary/5">
+                                <span className="text-muted-foreground font-medium text-amber-600">Frete Adicional (&gt; 200km)</span>
+                                <span className="font-bold text-amber-600">+{fmt(summary.additionalFreight)}</span>
+                              </div>
+                            )}
                         </div>
                       </div>
                     </div>

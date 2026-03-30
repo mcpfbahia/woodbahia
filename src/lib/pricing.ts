@@ -136,12 +136,7 @@ export function getMasonryFoundation(area: number): number {
 }
 
 export function getRadierFoundation(area: number): number {
-  if (area <= 10) return 6000;
-  if (area <= 16) return 10000;
-  if (area <= 25) return 13000;
-  if (area <= 35) return 15000;
-  if (area <= 55) return 20000;
-  return 23000;
+  return Math.round(area * 300);
 }
 
 export function getFreight(area: number): number {
@@ -188,6 +183,12 @@ export interface ProposalData {
   electricalPriceOverride?: number;
   glassPriceOverride?: number;
   projectPriceOverride?: number;
+  freightOverride?: number;
+  distanceFromFactory?: number;
+  foundationType?: FoundationType;
+  foundationPriceOverride?: number;
+  masonryBathroomCount?: number;
+  masonryBathroomPriceOverride?: number;
 }
 
 /** Options available as add-ons for standard kits (1-4) */
@@ -308,7 +309,7 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
   return { items, freight, total };
 }
 
-export function calculateProposalItems(data: ProposalData): { items: LineItem[]; freight: number; subtotal: number; total: number; discount: number } {
+export function calculateProposalItems(data: ProposalData): { items: LineItem[]; freight: number; additionalFreight: number; subtotal: number; total: number; discount: number } {
   const model = CABIN_MODELS.find(m => m.id === data.modelId);
   const area = data.customArea || model?.area || 0;
   const items: LineItem[] = [];
@@ -382,6 +383,44 @@ export function calculateProposalItems(data: ProposalData): { items: LineItem[];
     items.push({ label: 'Projeto', value: projValue });
   }
 
+  // 8. Foundation
+  if (data.foundationType && data.foundationType !== 'none') {
+    let foundationValue = 0;
+    let foundationLabel = '';
+    switch (data.foundationType) {
+      case 'eucalyptus':
+        foundationValue = getEucalyptusFoundation(area);
+        foundationLabel = 'Sapatas de Eucalipto Tratado';
+        break;
+      case 'masonry':
+        foundationValue = getMasonryFoundation(area);
+        foundationLabel = 'Sapatas de Manilhas em Alvenaria';
+        break;
+      case 'radier':
+        foundationValue = getRadierFoundation(area); // We preserve the base radier value
+        foundationLabel = 'Base Radier';
+        break;
+    }
+    if (data.foundationPriceOverride !== undefined) {
+      foundationValue = data.foundationPriceOverride;
+    }
+    if (foundationValue > 0) items.push({ label: foundationLabel, value: foundationValue });
+  }
+
+  // 9. Masonry Bathroom
+  if (data.masonryBathroomCount && data.masonryBathroomCount > 0) {
+    let baseValue = 8000 * data.masonryBathroomCount;
+    if (data.masonryBathroomCount >= 2) {
+      baseValue = baseValue * 0.9; // 10% discount for 2 or more
+    }
+    let bathroomValue = Math.round(baseValue); 
+    if (data.masonryBathroomPriceOverride !== undefined) {
+      bathroomValue = data.masonryBathroomPriceOverride;
+    }
+    const label = data.masonryBathroomCount === 1 ? '1 Banheiro em Alvenaria' : `${data.masonryBathroomCount} Banheiros em Alvenaria`;
+    items.push({ label, value: bathroomValue });
+  }
+
   // Extra items
   if (data.extraItems && data.extraItems.length > 0) {
     data.extraItems.forEach(item => {
@@ -392,7 +431,15 @@ export function calculateProposalItems(data: ProposalData): { items: LineItem[];
   }
 
   const subtotal = items.reduce((s, i) => s + i.value, 0);
-  const freight = getFreight(area);
+  let freight = getFreight(area);
+  if (data.freightOverride !== undefined) {
+    freight = data.freightOverride;
+  }
+
+  let additionalFreight = 0;
+  if (data.distanceFromFactory && data.distanceFromFactory > 200) {
+    additionalFreight = (data.distanceFromFactory - 200) * 5;
+  }
 
   let discount = 0;
   if (data.discountType === 'percentage') {
@@ -401,7 +448,7 @@ export function calculateProposalItems(data: ProposalData): { items: LineItem[];
     discount = Math.min(data.discountValue, subtotal);
   }
 
-  const total = subtotal - discount + freight;
+  const total = subtotal - discount + freight + additionalFreight;
 
-  return { items, freight, subtotal, total, discount };
+  return { items, freight, additionalFreight, subtotal, total, discount };
 }
