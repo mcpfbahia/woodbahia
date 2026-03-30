@@ -349,7 +349,7 @@ export function generateProposalPDF(data: ProposalData): void {
     // Destaque do Desconto Especial
     doc.setTextColor(180, 255, 180); // Verde bem claro para contrastar com o fundo
     doc.setFontSize(11);
-    doc.text(`★ DESCONTO BÔNUS APLICADO: -${fmt(discount)}`, margin + 6, y + 16);
+    doc.text(`DESCONTO BONUS APLICADO: -${fmt(discount)}`, margin + 6, y + 16);
     
     // Restaura estilo para o total
     doc.setTextColor(...COLORS.white);
@@ -428,7 +428,7 @@ export function generateProposalPDF(data: ProposalData): void {
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
   doc.setTextColor(...COLORS.white);
-  doc.text('💳 CONDIÇÃO ESPECIAL DE PARCELAMENTO', margin + 6, y + 8);
+  doc.text('CONDICAO ESPECIAL DE PARCELAMENTO', margin + 6, y + 8);
   
   y += 18;
   
@@ -446,7 +446,7 @@ export function generateProposalPDF(data: ProposalData): void {
 
   const cardTableBody = CARD_RATES.map(([n]) => {
     const res = calculateInstallmentValue(totalFinal, n);
-    const label = res.isInterestFree ? `${n}x sem juros ✓` : `${n}x`;
+    const label = res.isInterestFree ? `${n}x sem juros` : `${n}x`;
     return [label, fmt(res.installment)];
   });
 
