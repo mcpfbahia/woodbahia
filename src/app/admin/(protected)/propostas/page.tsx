@@ -8,9 +8,9 @@ import { Label } from '~/components/ui/label';
 import { Card, CardContent } from '~/components/ui/card';
 import { Switch } from '~/components/ui/switch';
 import { Separator } from '~/components/ui/separator';
-import { FileDown, User, Home, Settings2, Tag, LayoutDashboard, Plus, Trash2, Layers } from 'lucide-react';
+import { FileDown, User, Home, Settings2, Tag, LayoutDashboard, Plus, Trash2, Layers, Paintbrush } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { CABIN_MODELS, calculateProposalItems, type KitType, type ProposalData, type ExtraItem, type FoundationType } from '~/lib/pricing';
+import { CABIN_MODELS, calculateProposalItems, type KitType, type ProposalData, type ExtraItem, type FoundationType, type PaintType } from '~/lib/pricing';
 import { generateProposalPDF } from '~/lib/proposal-pdf';
 import {
   Select,
@@ -98,6 +98,8 @@ export default function PropostasPage() {
   const [foundationPriceOverride, setFoundationPriceOverride] = useState<number | string | undefined>(undefined);
   const [masonryBathroomCount, setMasonryBathroomCount] = useState<number>(0);
   const [masonryBathroomPriceOverride, setMasonryBathroomPriceOverride] = useState<number | string | undefined>(undefined);
+  const [paintType, setPaintType] = useState<PaintType>('none');
+  const [paintPriceOverride, setPaintPriceOverride] = useState<number | string | undefined>(undefined);
 
   // Limpar overrides ao mudar modelo ou área para evitar erros de cálculo entre modelos
   useEffect(() => {
@@ -112,6 +114,7 @@ export default function PropostasPage() {
     setDistanceFromFactory(undefined);
     setFoundationPriceOverride(undefined);
     setMasonryBathroomPriceOverride(undefined);
+    setPaintPriceOverride(undefined);
   }, [modelId, kitType, customArea]);
 
   const addExtraItem = () => setExtraItems([...extraItems, { description: '', value: 0 }]);
@@ -154,6 +157,8 @@ export default function PropostasPage() {
     foundationPriceOverride: typeof foundationPriceOverride === 'number' ? foundationPriceOverride : undefined,
     masonryBathroomCount,
     masonryBathroomPriceOverride: typeof masonryBathroomPriceOverride === 'number' ? masonryBathroomPriceOverride : undefined,
+    paintType,
+    paintPriceOverride: typeof paintPriceOverride === 'number' ? paintPriceOverride : undefined,
   });
 
   const handleShowSummary = () => {
@@ -530,6 +535,37 @@ export default function PropostasPage() {
                               className="mt-2"
                             />
                           )}
+                        </div>
+
+                        <div className="pt-4 border-t border-primary/10">
+                          <div className="flex items-center gap-2 mb-4">
+                            <Paintbrush className="w-4 h-4 text-primary" />
+                            <h3 className="font-black text-[10px] uppercase tracking-widest text-primary/80">Pintura Completa</h3>
+                          </div>
+                          
+                          <div className="space-y-3">
+                            <div className="space-y-2">
+                              <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Tipo de Pintura</Label>
+                              <Select value={paintType} onValueChange={(v) => setPaintType(v as PaintType)}>
+                                <SelectTrigger className="h-10 text-xs recessed-input rounded-xl w-full">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="rounded-xl border-primary/20">
+                                  <SelectItem value="none">Sem Pintura Inclusa</SelectItem>
+                                  <SelectItem value="1cor">Pintura Completa — 1 Cor (R$ 2.500)</SelectItem>
+                                  <SelectItem value="2cores">Pintura Completa — 2 Cores (R$ 3.500)</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            {paintType !== 'none' && (
+                              <EditablePrice 
+                                label="Valor da Pintura"
+                                suggested={paintType === '1cor' ? 2500 : 3500}
+                                value={paintPriceOverride} 
+                                onChange={setPaintPriceOverride} 
+                              />
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>

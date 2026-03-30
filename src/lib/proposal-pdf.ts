@@ -90,6 +90,10 @@ function getIncludedItems(data: ProposalData): string[] {
     items.push(data.masonryBathroomCount === 1 ? '1 Banheiro em Alvenaria' : `${data.masonryBathroomCount} Banheiros em Alvenaria`);
   }
 
+  if (data.paintType && data.paintType !== 'none') {
+    items.push(data.paintType === '1cor' ? 'Pintura Completa com Stain (1 Cor)' : 'Pintura Completa com Stain (2 Cores)');
+  }
+
   return items;
 }
 
@@ -122,7 +126,9 @@ function getNotIncludedItems(data: ProposalData): string[] {
     items.push('Vidros e envidraçamento');
   }
 
-  items.push('Pintura externa adicional');
+  if (!data.paintType || data.paintType === 'none') {
+    items.push('Pintura externa adicional');
+  }
   items.push('Frete (salvo combinado na proposta)');
   items.push('Licenças ou projetos legais');
   return items;

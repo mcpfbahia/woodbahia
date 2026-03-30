@@ -145,6 +145,7 @@ export function getFreight(area: number): number {
 
 export type KitType = 'kit1' | 'kit2' | 'kit3' | 'kit4' | 'custom';
 export type FoundationType = 'eucalyptus' | 'masonry' | 'radier' | 'none';
+export type PaintType = 'none' | '1cor' | '2cores';
 
 export interface ExtraItem {
   description: string;
@@ -189,6 +190,8 @@ export interface ProposalData {
   foundationPriceOverride?: number;
   masonryBathroomCount?: number;
   masonryBathroomPriceOverride?: number;
+  paintType?: PaintType;
+  paintPriceOverride?: number;
 }
 
 /** Options available as add-ons for standard kits (1-4) */
@@ -419,6 +422,18 @@ export function calculateProposalItems(data: ProposalData): { items: LineItem[];
     }
     const label = data.masonryBathroomCount === 1 ? '1 Banheiro em Alvenaria' : `${data.masonryBathroomCount} Banheiros em Alvenaria`;
     items.push({ label, value: bathroomValue });
+  }
+
+  // 10. Pintura Completa
+  if (data.paintType && data.paintType !== 'none') {
+    let paintValue = data.paintType === '1cor' ? 2500 : 3500;
+    if (data.paintPriceOverride !== undefined) {
+      paintValue = data.paintPriceOverride;
+    }
+    const paintLabel = data.paintType === '1cor' 
+      ? 'Pintura Completa com Stain (1 Cor)' 
+      : 'Pintura Completa com Stain (2 Cores)';
+    items.push({ label: paintLabel, value: paintValue });
   }
 
   // Extra items
