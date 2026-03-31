@@ -77,7 +77,10 @@ export const metadata: Metadata = {
     images: ["/og-image.jpeg"],
   },
   verification: {
-    google: "8DhgGi3RMG7W9JtdOfauMqmcMmXx2_jdlczhKlezqBg",
+    google: [
+      "8DhgGi3RMG7W9JtdOfauMqmcMmXx2_jdlczhKlezqBg",
+      "PRt6rrgmPO2NSexaZxjBffPMvFx-ayXhOgRa7r3HKBY"
+    ],
   },
 };
 
