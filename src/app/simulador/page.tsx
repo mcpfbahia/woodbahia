@@ -103,7 +103,7 @@ export default function Index() {
       <div className="min-h-screen flex flex-col overflow-hidden">
         <div className="flex-1 flex items-center justify-center px-4 py-16 relative">
           
-          {/* Background decorativo — idêntico ao woodbahia.site */}
+          {/* Background decorativo — idêntico ao woodbahia.com */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
             <div className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full bg-amber/8 blur-[120px]" />
             <div className="absolute -bottom-32 -right-32 w-[600px] h-[600px] rounded-full bg-accent/6 blur-[140px]" />
@@ -133,7 +133,7 @@ export default function Index() {
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             className="text-center max-w-4xl mx-auto relative z-10"
           >
-            {/* Badge de credibilidade — estilo woodbahia.site */}
+            {/* Badge de credibilidade — estilo woodbahia.com */}
             <motion.div
               initial={{ opacity: 0, scale: 0.8, y: -10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -257,7 +257,7 @@ export default function Index() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Header — estilo woodbahia.site */}
+      {/* Header — estilo woodbahia.com */}
       <header className="border-b border-border/50 sticky top-0 z-50"
         style={{
           background: 'hsl(var(--card) / 0.85)',

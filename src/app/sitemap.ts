@@ -4,7 +4,7 @@ import { db } from '~/lib/firebase';
 import { initialModels } from '~/lib/data';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://www.woodbahia.site';
+  const baseUrl = 'https://www.woodbahia.com';
   
   // Base routes
   const staticRoutes: MetadataRoute.Sitemap = [

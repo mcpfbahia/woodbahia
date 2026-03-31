@@ -30,7 +30,7 @@ export default function TermsOfUsePage() {
             <ScrollReveal>
               <div className="prose prose-slate max-w-none">
                 <p className="text-lg text-muted-foreground leading-relaxed">
-                  Bem-vindo ao site da <strong>Wood Bahia - Casas Pré Fabricadas</strong> (<a href="https://www.woodbahia.site" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-semibold">https://www.woodbahia.site</a>). Ao aceder e utilizar este site, concorda em cumprir e ficar vinculado aos seguintes Termos e Condições de Uso. Se não concordar com qualquer parte destes termos, não deverá utilizar o nosso site.
+                  Bem-vindo ao site da <strong>Wood Bahia - Casas Pré Fabricadas</strong> (<a href="https://www.woodbahia.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-semibold">https://www.woodbahia.com</a>). Ao aceder e utilizar este site, concorda em cumprir e ficar vinculado aos seguintes Termos e Condições de Uso. Se não concordar com qualquer parte destes termos, não deverá utilizar o nosso site.
                 </p>
               </div>
             </ScrollReveal>

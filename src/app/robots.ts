@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/admin/'],
     },
-    sitemap: 'https://www.woodbahia.site/sitemap.xml',
+    sitemap: 'https://www.woodbahia.com/sitemap.xml',
   }
 }

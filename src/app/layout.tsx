@@ -6,7 +6,7 @@ import { Montserrat, Inter } from "next/font/google";
 import { TRPCReactProvider } from "~/trpc/react";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.woodbahia.site"),
+  metadataBase: new URL("https://www.woodbahia.com"),
   title: {
     default: "Chalés de Madeira e Casas Pré-Fabricadas na Bahia | Wood Bahia",
     template: "%s | Wood Bahia"
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
   ].join(", "),
   authors: [{ name: "Wood Bahia" }],
   alternates: {
-    canonical: "https://www.woodbahia.site",
+    canonical: "https://www.woodbahia.com",
   },
   robots: {
     index: true,
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Wood Bahia | Casas Pré-Fabricadas e Chalés de Madeira em toda a Bahia",
     description: "Referência em casas de madeira sustentável na Bahia e Sergipe. +100 projetos entregues com alta durabilidade e design premium.",
-    url: "https://www.woodbahia.site/",
+    url: "https://www.woodbahia.com/",
     siteName: "Wood Bahia",
     images: [
       {
@@ -89,19 +89,19 @@ const schemaJSON = {
   "@graph": [
     {
       "@type": "Organization",
-      "@id": "https://www.woodbahia.site/#organization",
+      "@id": "https://www.woodbahia.com/#organization",
       "name": "Wood Bahia",
-      "url": "https://www.woodbahia.site/",
+      "url": "https://www.woodbahia.com/",
       "logo": {
         "@type": "ImageObject",
-        "@id": "https://www.woodbahia.site/#logo",
-        "url": "https://www.woodbahia.site/logo.png",
-        "contentUrl": "https://www.woodbahia.site/logo.png",
+        "@id": "https://www.woodbahia.com/#logo",
+        "url": "https://www.woodbahia.com/logo.png",
+        "contentUrl": "https://www.woodbahia.com/logo.png",
         "width": 512,
         "height": 512,
         "caption": "Wood Bahia"
       },
-      "image": { "@id": "https://www.woodbahia.site/#logo" },
+      "image": { "@id": "https://www.woodbahia.com/#logo" },
       "sameAs": [
         "https://www.instagram.com/woodbahiacasasprefabricadas/",
         "https://www.facebook.com/woodbahia"
@@ -116,17 +116,17 @@ const schemaJSON = {
     },
     {
       "@type": "WebSite",
-      "@id": "https://www.woodbahia.site/#website",
-      "url": "https://www.woodbahia.site/",
+      "@id": "https://www.woodbahia.com/#website",
+      "url": "https://www.woodbahia.com/",
       "name": "Wood Bahia - Casas Pré-Fabricadas",
-      "publisher": { "@id": "https://www.woodbahia.site/#organization" },
+      "publisher": { "@id": "https://www.woodbahia.com/#organization" },
       "inLanguage": "pt-BR"
     },
     {
       "@type": "LocalBusiness",
-      "parentOrganization": { "@id": "https://www.woodbahia.site/#organization" },
+      "parentOrganization": { "@id": "https://www.woodbahia.com/#organization" },
       "name": "Wood Bahia Casas Pré-Fabricadas",
-      "image": "https://www.woodbahia.site/og-image.jpeg",
+      "image": "https://www.woodbahia.com/og-image.jpeg",
       "priceRange": "$$$",
       "telephone": "+55 71 99293-6290",
       "email": "woodbahia@gmail.com",
@@ -143,7 +143,7 @@ const schemaJSON = {
         "latitude": "-12.8997267",
         "longitude": "-38.383889"
       },
-      "url": "https://www.woodbahia.site/",
+      "url": "https://www.woodbahia.com/",
       "areaServed": [
         "Bahia", "Sergipe",
         "Salvador", "Lauro de Freitas", "Camaçari", "Feira de Santana", 

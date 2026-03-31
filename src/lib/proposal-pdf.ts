@@ -147,7 +147,7 @@ function drawFooter(doc: jsPDF, pageWidth: number) {
   doc.setFontSize(7);
   doc.setFont('helvetica', 'normal');
   doc.text(
-    '(71) 99293-6290  •  @woodbahiacasasprefabricadas  •  woodbahia.site  •  CNPJ 57.721.838/0001-91',
+    '(71) 99293-6290  •  @woodbahiacasasprefabricadas  •  woodbahia.com  •  CNPJ 57.721.838/0001-91',
     pageWidth / 2, footerY + 10, { align: 'center' }
   );
 }

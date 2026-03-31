@@ -19,9 +19,9 @@ export const FooterWoodBahia = () => {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": "Wood Bahia Casas Pré-Fabricadas",
-    "image": "https://www.woodbahia.site/logo-rodape.svg",
-    "@id": "https://www.woodbahia.site",
-    "url": "https://www.woodbahia.site",
+    "image": "https://www.woodbahia.com/logo-rodape.svg",
+    "@id": "https://www.woodbahia.com",
+    "url": "https://www.woodbahia.com",
     "telephone": "+5571992936290",
     "address": {
       "@type": "PostalAddress",

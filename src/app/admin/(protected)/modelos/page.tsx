@@ -349,7 +349,7 @@ export default function AdminModelosPage() {
                       <div>
                         <label className="mb-1 block text-sm font-semibold text-slate-700">Link do Modelo (Slug SEO)</label>
                         <input type="text" value={formData.slug} onChange={e => setFormData(p => ({ ...p, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') }))} className="w-full rounded-lg border border-slate-200 p-3 font-mono text-sm" placeholder="Ex: chale-itacimirim" />
-                        <p className="text-[10px] text-slate-500 mt-1">Gera a URL: woodbahia.site/modelo/<strong>{formData.slug || "id-automatico"}</strong></p>
+                        <p className="text-[10px] text-slate-500 mt-1">Gera a URL: woodbahia.com/modelo/<strong>{formData.slug || "id-automatico"}</strong></p>
                       </div>
                     </div>
                     
