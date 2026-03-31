@@ -1,9 +1,3 @@
 {
-  "redirects": [
-    {
-      "source": "/:path*",
-      "destination": "https://www.woodbahia.com/:path*",
-      "permanent": true
-    }
-  ]
+  "cleanUrls": true
 }

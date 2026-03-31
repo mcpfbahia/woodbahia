@@ -60,7 +60,7 @@ export function StepSummary({ state, onBack, onReset }: Props) {
     `• Saldo Final (50%): ${fmt(saldo)}`,
   ].join('\n');
 
-  const whatsappUrl = `https://wa.me/5571999999999?text=${encodeURIComponent(whatsappMessage)}`;
+  const whatsappUrl = `https://wa.me/5571992936290?text=${encodeURIComponent(whatsappMessage)}`;
 
   return (
     <motion.div
