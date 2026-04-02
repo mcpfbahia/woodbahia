@@ -26,16 +26,18 @@ export const HeroSection = () => {
           <source src="/hero-background.webm" type="video/webm" />
         </video>
 
-        {/* Imagem apenas para Mobile */}
-        <div className="md:hidden">
-          <Image
-            src="/fundo-hero-section-mobile.webp"
-            alt="chalé de madeira moderno para Airbnb construído com madeira pinus tratada"
-            fill
-            className="object-cover"
-            priority
-          />
-        </div>
+        {/* Vídeo apenas para Mobile */}
+        <video
+          key="hero-video-mobile"
+          autoPlay
+          loop
+          muted
+          playsInline
+          poster="/fundo-hero-section-mobile.webp"
+          className="md:hidden h-full w-full object-cover"
+        >
+          <source src="/video/video-cabecalho-mobile.mp4" type="video/mp4" />
+        </video>
 
         <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-black/50 md:from-black/80 md:via-black/60 md:to-black/40" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent md:from-black/50" />

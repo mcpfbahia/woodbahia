@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Quote, MessageCircle, Loader2 } from "lucide-react";
+import { Quote, MessageCircle, Loader2, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "~/lib/firebase";
 import { Header } from "~/components/layout/Header";
@@ -23,8 +23,9 @@ interface Obra {
   };
 }
 
-const ObraCard = ({ obra }: { obra: Obra }) => {
+const ObraCard = ({ obra, onOpenLightbox }: { obra: Obra; onOpenLightbox: (gallery: string[], index: number, title: string) => void }) => {
   const [mainImage, setMainImage] = useState(obra.imagem_principal);
+  const gallery = [obra.imagem_principal, ...(obra.galeria || [])].filter(Boolean);
 
   return (
     <motion.div
@@ -36,7 +37,13 @@ const ObraCard = ({ obra }: { obra: Obra }) => {
       className="bg-card group flex flex-col overflow-hidden rounded-3xl border border-border shadow-md transition-shadow hover:shadow-lg"
     >
       {/* Imagem Principal */}
-      <div className="relative aspect-[4/3] overflow-hidden">
+      <div 
+        className="relative aspect-[4/3] cursor-pointer overflow-hidden"
+        onClick={() => {
+          const currentIndex = gallery.indexOf(mainImage);
+          onOpenLightbox(gallery, currentIndex > -1 ? currentIndex : 0, obra.titulo);
+        }}
+      >
         <Image
           src={mainImage}
           alt={obra.titulo}
@@ -108,6 +115,52 @@ export default function DiarioObrasPage() {
   const [obras, setObras] = useState<Obra[]>([]);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [lightboxData, setLightboxData] = useState<{
+    isOpen: boolean;
+    gallery: string[];
+    index: number;
+    title: string;
+  }>({
+    isOpen: false,
+    gallery: [],
+    index: 0,
+    title: "",
+  });
+
+  const openLightbox = (gallery: string[], index: number, title: string) => {
+    setLightboxData({ isOpen: true, gallery, index, title });
+    document.body.style.overflow = "hidden";
+  };
+
+  const closeLightbox = () => {
+    setLightboxData((prev) => ({ ...prev, isOpen: false }));
+    document.body.style.overflow = "auto";
+  };
+
+  const nextImage = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setLightboxData((prev) => ({ ...prev, index: (prev.index + 1) % prev.gallery.length }));
+  };
+
+  const prevImage = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setLightboxData((prev) => ({ ...prev, index: (prev.index - 1 + prev.gallery.length) % prev.gallery.length }));
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!lightboxData.isOpen) return;
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowRight") {
+        setLightboxData((prev) => ({ ...prev, index: (prev.index + 1) % prev.gallery.length }));
+      }
+      if (e.key === "ArrowLeft") {
+        setLightboxData((prev) => ({ ...prev, index: (prev.index - 1 + prev.gallery.length) % prev.gallery.length }));
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [lightboxData.isOpen]);
 
   useEffect(() => {
     setMounted(true);
@@ -191,7 +244,7 @@ export default function DiarioObrasPage() {
               <AnimatePresence mode="popLayout">
                 {filteredObras.length > 0 ? (
                   filteredObras.map((obra) => (
-                    <ObraCard key={obra.id} obra={obra} />
+                    <ObraCard key={obra.id} obra={obra} onOpenLightbox={openLightbox} />
                   ))
                 ) : (
                   <div className="col-span-full rounded-3xl border border-border bg-card py-20 text-center">
@@ -232,6 +285,66 @@ export default function DiarioObrasPage() {
 
       <FooterWoodBahia />
       <WhatsAppButton />
+
+      {/* Lightbox Modal */}
+      {lightboxData.isOpen && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-md" 
+          onClick={closeLightbox}
+        >
+          <button 
+            type="button"
+            onClick={closeLightbox} 
+            className="absolute right-4 top-4 z-[110] p-2 text-white/70 transition-colors hover:text-white"
+          >
+            <X className="h-8 w-8" />
+          </button>
+
+          {lightboxData.gallery.length > 1 && (
+            <>
+              <button 
+                type="button"
+                onClick={prevImage} 
+                className="absolute left-4 top-1/2 z-[110] -translate-y-1/2 p-2 text-white/70 transition-all hover:scale-110 hover:text-white md:left-8"
+              >
+                <ChevronLeft className="h-10 w-10 md:h-14 md:w-14" />
+              </button>
+              <button 
+                type="button"
+                onClick={nextImage} 
+                className="absolute right-4 top-1/2 z-[110] -translate-y-1/2 p-2 text-white/70 transition-all hover:scale-110 hover:text-white md:right-8"
+              >
+                <ChevronRight className="h-10 w-10 md:h-14 md:w-14" />
+              </button>
+            </>
+          )}
+
+          <div 
+            className="relative flex h-full w-full max-w-6xl flex-col items-center justify-center p-4 md:p-8" 
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="relative h-[80vh] w-full">
+              <Image
+                src={lightboxData.gallery[lightboxData.index] || ""}
+                alt={`${lightboxData.title} - Imagem ${lightboxData.index + 1}`}
+                fill
+                className="object-contain"
+                quality={100}
+                priority
+              />
+            </div>
+            
+            <div className="mt-4 text-center text-white/90">
+              <h3 className="text-lg font-medium">{lightboxData.title}</h3>
+              {lightboxData.gallery.length > 1 && (
+                <p className="text-sm opacity-70">
+                  {lightboxData.index + 1} / {lightboxData.gallery.length}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -6,6 +6,9 @@ import {
   Loader2,
   Image as ImageIcon,
   Instagram,
+  X,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import Link from "next/link";
 import { collection, getDocs } from "firebase/firestore";
@@ -17,13 +20,19 @@ import { Header } from "~/components/layout/Header";
 import { FooterWoodBahia } from "~/components/layout/FooterWoodBahia";
 import { WhatsAppButton } from "~/components/common/WhatsAppButton";
 
-function PortfolioCard({ item }: { item: any }) {
+function PortfolioCard({ item, onOpenLightbox }: { item: any; onOpenLightbox: (gallery: string[], index: number, title: string) => void }) {
   const [activeImage, setActiveImage] = useState(item.image);
   const gallery = [item.image, ...(item.gallery || [])].filter(Boolean);
 
   return (
     <StaggerItem key={item.id}>
-      <div className="group relative aspect-[4/3] cursor-pointer overflow-hidden rounded-xl bg-muted shadow-lg transition-all duration-300 hover:shadow-xl">
+      <div 
+        className="group relative aspect-[4/3] cursor-pointer overflow-hidden rounded-xl bg-muted shadow-lg transition-all duration-300 hover:shadow-xl"
+        onClick={() => {
+          const currentIndex = gallery.indexOf(activeImage);
+          onOpenLightbox(gallery, currentIndex > -1 ? currentIndex : 0, item.title);
+        }}
+      >
         {item.image ? (
           <Image
             src={activeImage}
@@ -102,6 +111,52 @@ export default function PortfolioPage() {
   const [portfolioItems, setPortfolioItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [lightboxData, setLightboxData] = useState<{
+    isOpen: boolean;
+    gallery: string[];
+    index: number;
+    title: string;
+  }>({
+    isOpen: false,
+    gallery: [],
+    index: 0,
+    title: "",
+  });
+
+  const openLightbox = (gallery: string[], index: number, title: string) => {
+    setLightboxData({ isOpen: true, gallery, index, title });
+    document.body.style.overflow = "hidden";
+  };
+
+  const closeLightbox = () => {
+    setLightboxData((prev) => ({ ...prev, isOpen: false }));
+    document.body.style.overflow = "auto";
+  };
+
+  const nextImage = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setLightboxData((prev) => ({ ...prev, index: (prev.index + 1) % prev.gallery.length }));
+  };
+
+  const prevImage = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setLightboxData((prev) => ({ ...prev, index: (prev.index - 1 + prev.gallery.length) % prev.gallery.length }));
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!lightboxData.isOpen) return;
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowRight") {
+        setLightboxData((prev) => ({ ...prev, index: (prev.index + 1) % prev.gallery.length }));
+      }
+      if (e.key === "ArrowLeft") {
+        setLightboxData((prev) => ({ ...prev, index: (prev.index - 1 + prev.gallery.length) % prev.gallery.length }));
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [lightboxData.isOpen]);
 
   useEffect(() => {
     setMounted(true);
@@ -165,7 +220,7 @@ export default function PortfolioPage() {
           ) : (
             <StaggerContainer className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8 lg:grid-cols-3">
               {portfolioItems.map((item) => (
-                <PortfolioCard key={item.id} item={item} />
+                <PortfolioCard key={item.id} item={item} onOpenLightbox={openLightbox} />
               ))}
             </StaggerContainer>
           )}
@@ -183,6 +238,66 @@ export default function PortfolioPage() {
 
       <FooterWoodBahia />
       <WhatsAppButton />
+
+      {/* Lightbox Modal */}
+      {lightboxData.isOpen && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-md" 
+          onClick={closeLightbox}
+        >
+          <button 
+            type="button"
+            onClick={closeLightbox} 
+            className="absolute right-4 top-4 z-[110] p-2 text-white/70 transition-colors hover:text-white"
+          >
+            <X className="h-8 w-8" />
+          </button>
+
+          {lightboxData.gallery.length > 1 && (
+            <>
+              <button 
+                type="button"
+                onClick={prevImage} 
+                className="absolute left-4 top-1/2 z-[110] -translate-y-1/2 p-2 text-white/70 transition-all hover:scale-110 hover:text-white md:left-8"
+              >
+                <ChevronLeft className="h-10 w-10 md:h-14 md:w-14" />
+              </button>
+              <button 
+                type="button"
+                onClick={nextImage} 
+                className="absolute right-4 top-1/2 z-[110] -translate-y-1/2 p-2 text-white/70 transition-all hover:scale-110 hover:text-white md:right-8"
+              >
+                <ChevronRight className="h-10 w-10 md:h-14 md:w-14" />
+              </button>
+            </>
+          )}
+
+          <div 
+            className="relative flex h-full w-full max-w-6xl flex-col items-center justify-center p-4 md:p-8" 
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="relative h-[80vh] w-full">
+              <Image
+                src={lightboxData.gallery[lightboxData.index] || ""}
+                alt={`${lightboxData.title} - Imagem ${lightboxData.index + 1}`}
+                fill
+                className="object-contain"
+                quality={100}
+                priority
+              />
+            </div>
+            
+            <div className="mt-4 text-center text-white/90">
+              <h3 className="text-lg font-medium">{lightboxData.title}</h3>
+              {lightboxData.gallery.length > 1 && (
+                <p className="text-sm opacity-70">
+                  {lightboxData.index + 1} / {lightboxData.gallery.length}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
