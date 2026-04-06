@@ -152,8 +152,18 @@ export const ModelsSection = () => {
                             </p>
                           )}
                         </div>
-                        <p className="mt-1 text-[10px] font-medium leading-tight text-secondary">
-                          * Frete grátis (consulte condições)
+                        {model.kitPrice && (
+                          <div className="pt-1">
+                            <p className="text-[10px] uppercase text-emerald-600 font-semibold">
+                              Apenas o Kit
+                            </p>
+                            <p className="font-serif text-base font-bold text-foreground">
+                              {model.kitPrice}
+                            </p>
+                          </div>
+                        )}
+                        <p className="mt-1 flex items-center justify-between text-[10px] font-medium leading-tight text-secondary">
+                          Frete compartilhado (pagamos 50% do seu frete)
                         </p>
                       </div>
                       <Link

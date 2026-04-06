@@ -349,59 +349,68 @@ export default function ModelDetailPage() {
                   {model.description}
                 </p>
 
-                <div className="relative mb-8 flex flex-col gap-6 overflow-hidden rounded-2xl border-2 border-primary/20 bg-card p-6 md:flex-row md:gap-12">
-                  <div className="relative z-10 flex-1">
-                    <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-primary">
+                <div className="relative mb-8 flex flex-col gap-6 overflow-hidden rounded-3xl border border-border bg-card shadow-sm p-6 md:p-8 md:flex-row md:gap-8">
+                  <div className="relative z-10 flex-1 flex flex-col justify-center">
+                    <p className="mb-2 text-xs font-bold uppercase tracking-widest text-primary/80">
                       Kit Completamente Montado
                     </p>
                     {model.promoPrice ? (
-                       <div className="flex flex-col">
-                         <span className="text-xl text-muted-foreground line-through font-serif">{model.price}</span>
-                         <span className="font-serif text-4xl font-bold md:text-5xl" style={{ color: '#A67C00' }}>{model.promoPrice}</span>
+                       <div className="flex flex-col gap-1">
+                         <span className="text-lg text-muted-foreground line-through font-serif">{model.price}</span>
+                         <span className="font-serif text-3xl md:text-4xl font-bold" style={{ color: '#A67C00' }}>{model.promoPrice}</span>
                        </div>
                     ) : (
-                       <p className="text-[#4A2B1D] font-serif text-4xl font-bold md:text-5xl">
+                       <p className="text-[#4A2B1D] font-serif text-3xl md:text-4xl font-bold">
                          {model.price}
                        </p>
                     )}
-                    <p className="mt-2 text-sm text-muted-foreground uppercase tracking-widest font-bold">
-                      {model.freight_value ? "Frete" : "Frete (consulte condições)"}
-                    </p>
-                    {model.freight_value && (
-                      <div className="mt-1">
-                        {model.freight_is_promo ? (
-                          <div className="flex flex-col">
-                            <div className="flex items-center gap-3">
-                              <span className="text-lg text-muted-foreground line-through font-serif">{model.freight_value}</span>
-                              <span className="font-serif text-2xl font-bold text-emerald-600">
-                                R$ {(parseFloat(model.freight_value.replace(/[^\d,]/g, '').replace(',', '.')) / 2).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                              </span>
+                    
+                    <div className="mt-4 border-t border-border/50 pt-4">
+                      <p className="text-xs uppercase tracking-widest font-bold text-muted-foreground mb-1">
+                        Frete
+                      </p>
+                      {model.freight_value ? (
+                        <div>
+                          {model.freight_is_promo ? (
+                            <div className="flex flex-col gap-1">
+                              <div className="flex items-center gap-3">
+                                <span className="text-base text-muted-foreground line-through font-serif">{model.freight_value}</span>
+                                <span className="font-serif text-xl font-bold text-emerald-600">
+                                  R$ {(parseFloat(model.freight_value.replace(/[^\d,]/g, '').replace(',', '.')) / 2).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                </span>
+                              </div>
+                              <p className="text-xs font-bold text-emerald-600 uppercase mt-1">
+                                Frete compartilhado (pagamos 50% do seu frete)
+                              </p>
                             </div>
-                            <p className="text-xs font-bold text-emerald-600 uppercase animate-pulse mt-1">
-                              CONDIÇÃO ESPECIAL: PAGAMOS 50% DO SEU FRETE!
+                          ) : (
+                            <p className="text-[#4A2B1D] font-serif text-xl font-bold">
+                              {model.freight_value}
                             </p>
-                          </div>
-                        ) : (
-                          <p className="text-[#4A2B1D] font-serif text-2xl font-bold">
-                            {model.freight_value}
-                          </p>
-                        )}
-                      </div>
-                    )}
+                          )}
+                        </div>
+                      ) : (
+                        <p className="text-xs font-bold text-muted-foreground uppercase">
+                          Frete compartilhado (pagamos 50% do seu frete)
+                        </p>
+                      )}
+                    </div>
                   </div>
 
                   {model.kitPrice && (
-                    <div className="relative z-10 flex flex-1 flex-col justify-center border-t border-border/50 pt-6 md:border-l md:border-t-0 md:pt-0 md:pl-12">
-                      <p className="mb-1 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
-                        <Package className="h-3.5 w-3.5" />
-                        Compre Apenas o Kit
-                      </p>
-                      <p className="font-serif text-3xl font-bold text-foreground">
-                        {model.kitPrice}
-                      </p>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        Ideal para auto-montagem
-                      </p>
+                    <div className="relative z-10 flex flex-1 flex-col justify-center border-t border-border/60 pt-6 md:border-l md:border-t-0 md:pt-0 md:pl-8">
+                      <div className="rounded-2xl bg-secondary/5 p-6 h-full flex flex-col justify-center">
+                        <p className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-emerald-600">
+                          <Package className="h-4 w-4" />
+                          Compre Apenas o Kit
+                        </p>
+                        <p className="font-serif text-3xl font-bold text-foreground">
+                          {model.kitPrice}
+                        </p>
+                        <p className="mt-2 text-sm text-muted-foreground">
+                          Ideal para auto-montagem
+                        </p>
+                      </div>
                     </div>
                   )}
                 </div>

@@ -15,9 +15,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { saveLead } from "~/lib/leads";
 
 const TAXAS = {
-  1: 3.29,           // 1x (MDR)
-  2: 2.47 + 2.64,    // 5.11%
-  3: 2.47 + 3.27,    // 5.74%
+  1: 0,              // 1x (Sem juros)
+  2: 0,              // 2x (Sem juros)
+  3: 0,              // 3x (Sem juros)
   4: 2.47 + 3.92,    // 6.39%
   5: 2.47 + 4.65,    // 7.12%
   6: 2.47 + 5.38,    // 7.85%
@@ -237,7 +237,13 @@ export default function InstallmentSimulatorPage() {
                     </div>
                     <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-2 rounded-xl">
                       <Info className="w-4 h-4 text-primary" />
-                      <p className="text-white/70 text-sm">Taxa da operadora inclusa: <b>{simulacaoAtual.taxa?.toFixed(2)}%</b></p>
+                      <p className="text-white/70 text-sm">
+                        {simulacaoAtual.taxa === 0 ? (
+                          <span className="text-emerald-400 font-bold uppercase tracking-wider text-xs">Condição sem juros</span>
+                        ) : (
+                          <>Taxa da operadora inclusa: <b>{simulacaoAtual.taxa?.toFixed(2)}%</b></>
+                        )}
+                      </p>
                     </div>
                   </div>
 
@@ -297,7 +303,7 @@ export default function InstallmentSimulatorPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
-                    {tabelaSimulacao.slice(1).map((opcao) => (
+                    {tabelaSimulacao.map((opcao) => (
                       <tr 
                         key={opcao.parcelas} 
                         className={`transition-colors hover:bg-primary/5 cursor-pointer ${parcelasSelecionadas === opcao.parcelas ? "bg-primary/10 border-l-4 border-primary" : "border-l-4 border-transparent"}`}
@@ -305,7 +311,11 @@ export default function InstallmentSimulatorPage() {
                       >
                         <td className="p-4 font-bold text-slate-800">{opcao.parcelas}x</td>
                         <td className="p-4 font-bold text-primary">{formatCurrency(opcao.valorDaParcela)}</td>
-                        <td className="p-4 text-slate-500">{opcao.taxa.toFixed(2)}%</td>
+                        <td className="p-4 text-slate-500">
+                          {opcao.taxa === 0 
+                            ? <span className="font-bold text-emerald-600 text-xs uppercase tracking-wider">Sem juros</span> 
+                            : `${opcao.taxa.toFixed(2)}%`}
+                        </td>
                         <td className="p-4 text-right font-medium text-slate-700">{formatCurrency(opcao.totalNoCartao)}</td>
                       </tr>
                     ))}

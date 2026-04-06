@@ -137,6 +137,17 @@ export default function ModelsGalleryPage() {
                               {model.price}
                             </p>
                           )}
+                          
+                          {model.kitPrice && (
+                            <div className="pt-1">
+                              <p className="text-[10px] font-medium uppercase tracking-wider text-emerald-600">
+                                Apenas o Kit
+                              </p>
+                              <p className="font-serif text-base font-bold text-foreground">
+                                {model.kitPrice}
+                              </p>
+                            </div>
+                          )}
 
                           {/* Frete */}
                           {model.freight_value && (
