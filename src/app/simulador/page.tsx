@@ -2,6 +2,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { StepProgress } from '@/components/simulador/StepProgress';
+import { StepLocation } from '@/components/simulador/StepLocation';
 import { StepModelSelect } from '@/components/simulador/StepModelSelect';
 import { StepKitSelect } from '@/components/simulador/StepKitSelect';
 import { StepFoundation } from '@/components/simulador/StepFoundation';
@@ -23,7 +24,8 @@ const INITIAL_CUSTOM: CustomOptions = {
 const INITIAL_ADDONS: KitAddons = { electrical: false, glass: false };
 
 export default function Index() {
-  const [step, setStep] = useState(0); // 0 = hero, 1+ = wizard
+  const [step, setStep] = useState(0); // 0 = hero, 1 = location, 2+ = wizard
+  const [clientData, setClientData] = useState({ name: '', city: '', state: '' });
   const [model, setModel] = useState<CabinModel | null>(null);
   const [isCustomPath, setIsCustomPath] = useState(false);
   const [kitType, setKitType] = useState<KitType | null>(null);
@@ -35,6 +37,7 @@ export default function Index() {
   const [showManual, setShowManual] = useState(false);
 
   const simState: SimulationState = useMemo(() => ({
+    clientData,
     model,
     kitType: isCustomPath ? 'custom' : kitType,
     customOptions,
@@ -42,12 +45,12 @@ export default function Index() {
     foundationType,
     customArea,
     slidingDoor,
-  }), [model, isCustomPath, kitType, customOptions, kitAddons, foundationType, customArea, slidingDoor]);
+  }), [clientData, model, isCustomPath, kitType, customOptions, kitAddons, foundationType, customArea, slidingDoor]);
 
   const showFoundation = needsFoundationStep(simState);
 
   const stepLabels = useMemo(() => {
-    const labels = ['Modelo', 'Kit'];
+    const labels = ['Local', 'Modelo', 'Kit'];
     if (showFoundation) labels.push('Base');
     labels.push('Resumo');
     return labels;
@@ -56,33 +59,39 @@ export default function Index() {
   const totalSteps = stepLabels.length;
 
   const displayStep = useMemo(() => {
-    if (!showFoundation && step >= 3) return step - 1;
+    if (!showFoundation && step >= 4) return step - 1;
     return step;
   }, [step, showFoundation]);
+
+  const handleLocationNext = useCallback((data: { name: string; city: string; state: string }) => {
+    setClientData(data);
+    setStep(2);
+  }, []);
 
   const handleModelSelect = useCallback((m: CabinModel) => {
     setModel(m);
     setIsCustomPath(false);
     setKitType(null);
-    setStep(2);
+    setStep(3);
   }, []);
 
   const handleCustomSelect = useCallback(() => {
     setIsCustomPath(true);
     setModel(null);
     setKitType(null);
-    setStep(2);
+    setStep(3);
   }, []);
 
   const handleKitNext = useCallback(() => {
-    if (showFoundation) setStep(3);
-    else setStep(4);
+    if (showFoundation) setStep(4);
+    else setStep(5);
   }, [showFoundation]);
 
-  const handleFoundationNext = useCallback(() => setStep(4), []);
+  const handleFoundationNext = useCallback(() => setStep(5), []);
 
   const handleReset = useCallback(() => {
     setStep(0);
+    setClientData({ name: '', city: '', state: '' });
     setModel(null);
     setIsCustomPath(false);
     setKitType(null);
@@ -318,6 +327,14 @@ export default function Index() {
 
         <AnimatePresence mode="wait">
           {step === 1 && (
+            <StepLocation
+              key="location"
+              initialData={clientData}
+              onNext={handleLocationNext}
+              onBack={() => handleBack(0)}
+            />
+          )}
+          {step === 2 && (
             <StepModelSelect
               key="model"
               selected={model}
@@ -326,10 +343,11 @@ export default function Index() {
               onSelectCustom={handleCustomSelect}
             />
           )}
-          {step === 2 && !isCustomPath && model && (
+          {step === 3 && !isCustomPath && model && (
             <StepKitSelect
               key="kit-standard"
               mode="standard"
+              isEligibleForFull={['BA', 'SE'].includes(clientData.state)}
               model={model}
               kitType={kitType as Exclude<KitType, 'custom'> | null}
               kitAddons={kitAddons}
@@ -337,40 +355,41 @@ export default function Index() {
               onKitSelect={(k) => setKitType(k)}
               onKitAddonsChange={setKitAddons}
               onSlidingDoorChange={setSlidingDoor}
-              onBack={() => handleBack(1)}
+              onBack={() => handleBack(2)}
               onNext={handleKitNext}
             />
           )}
-          {step === 2 && isCustomPath && (
+          {step === 3 && isCustomPath && (
             <StepKitSelect
               key="kit-custom"
               mode="custom"
+              isEligibleForFull={['BA', 'SE'].includes(clientData.state)}
               customArea={customArea}
               customOptions={customOptions}
               slidingDoor={slidingDoor}
               onCustomAreaChange={setCustomArea}
               onCustomChange={setCustomOptions}
               onSlidingDoorChange={setSlidingDoor}
-              onBack={() => handleBack(1)}
+              onBack={() => handleBack(2)}
               onNext={handleKitNext}
             />
           )}
-          {step === 3 && showFoundation && (
+          {step === 4 && showFoundation && (
             <StepFoundation
               key="foundation"
               area={effectiveArea}
               modelName={isCustomPath ? `Personalizado (${customArea}m²)` : model?.name ?? ''}
               foundationType={foundationType}
               onSelect={setFoundationType}
-              onBack={() => handleBack(2)}
+              onBack={() => handleBack(3)}
               onNext={handleFoundationNext}
             />
           )}
-          {step === 4 && (
+          {step === 5 && (
             <StepSummary
               key="summary"
               state={simState}
-              onBack={() => handleBack(showFoundation ? 3 : 2)}
+              onBack={() => handleBack(showFoundation ? 4 : 3)}
               onReset={handleReset}
             />
           )}

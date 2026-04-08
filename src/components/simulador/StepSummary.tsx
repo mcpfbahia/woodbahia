@@ -44,6 +44,7 @@ export function StepSummary({ state, onBack, onReset }: Props) {
     `Olá! Fiz uma simulação no site e gostaria de uma proposta real.`,
     ``,
     `📋 *RELATÓRIO DA SIMULAÇÃO*`,
+    `👤 Cliente: ${state.clientData?.name || 'Não informado'} - ${state.clientData?.city || '-'}/${state.clientData?.state || '-'}`,
     `🏡 Modelo: ${modelLabel}`,
     `📦 Kit: ${kitLabel}`,
     ``,

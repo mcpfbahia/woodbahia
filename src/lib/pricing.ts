@@ -136,7 +136,7 @@ export function getMasonryFoundation(area: number): number {
 }
 
 export function getRadierFoundation(area: number): number {
-  return Math.round(area * 300);
+  return Math.round(area * 400);
 }
 
 export function getFreight(area: number): number {
@@ -201,6 +201,7 @@ export interface KitAddons {
 }
 
 export interface SimulationState {
+  clientData: { name: string; city: string; state: string; };
   model: CabinModel | null;
   kitType: KitType | null;
   customOptions: CustomOptions;

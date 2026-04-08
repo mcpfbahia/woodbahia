@@ -35,6 +35,7 @@ const itemVariants = {
 
 interface StandardProps {
   mode: 'standard';
+  isEligibleForFull: boolean;
   model: CabinModel;
   kitType: Exclude<KitType, 'custom'> | null;
   kitAddons: KitAddons;
@@ -48,6 +49,7 @@ interface StandardProps {
 
 interface CustomProps {
   mode: 'custom';
+  isEligibleForFull: boolean;
   customArea: number;
   customOptions: CustomOptions;
   slidingDoor: boolean;
@@ -65,7 +67,7 @@ export function StepKitSelect(props: Props) {
   return <StandardMode {...props} />;
 }
 
-function StandardMode({ model, kitType, kitAddons, slidingDoor, onKitSelect, onKitAddonsChange, onSlidingDoorChange, onBack, onNext }: StandardProps) {
+function StandardMode({ isEligibleForFull, model, kitType, kitAddons, slidingDoor, onKitSelect, onKitAddonsChange, onSlidingDoorChange, onBack, onNext }: StandardProps) {
   const showSlidingDoor = kitType === 'kit2' || kitType === 'kit3' || kitType === 'kit4';
   return (
     <motion.div
@@ -89,18 +91,22 @@ function StandardMode({ model, kitType, kitAddons, slidingDoor, onKitSelect, onK
       >
         {KIT_OPTIONS.map((opt) => {
           const isSelected = kitType === opt.id;
+          const isDisabled = !isEligibleForFull && opt.id === 'kit4';
           return (
             <motion.button
               key={opt.id}
               variants={itemVariants}
-              whileHover={{ x: 4, transition: { duration: 0.15 } }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => onKitSelect(opt.id)}
+              whileHover={!isDisabled ? { x: 4, transition: { duration: 0.15 } } : {}}
+              whileTap={!isDisabled ? { scale: 0.98 } : {}}
+              onClick={() => !isDisabled && onKitSelect(opt.id)}
+              disabled={isDisabled}
               className={cn(
                 'flex flex-col p-5 rounded-2xl border-2 text-left transition-all duration-300',
                 isSelected
                   ? 'border-accent bg-accent/10 ring-1 ring-accent premium-shadow'
-                  : 'border-border glass-card hover:border-accent/50 hover:bg-accent/5'
+                  : isDisabled
+                    ? 'border-border/40 opacity-60 bg-muted/20 cursor-not-allowed'
+                    : 'border-border glass-card hover:border-accent/50 hover:bg-accent/5'
               )}
             >
               <div className="flex items-center gap-3 flex-wrap">
@@ -122,6 +128,11 @@ function StandardMode({ model, kitType, kitAddons, slidingDoor, onKitSelect, onK
                 )}
               </div>
               <span className="text-sm text-muted-foreground mt-1">{opt.desc}</span>
+              {isDisabled && (
+                <span className="text-xs text-destructive font-medium mt-2 block">
+                  * Indisponível para o seu estado (Kit completo com montagem apenas para Bahia e Sergipe).
+                </span>
+              )}
             </motion.button>
           );
         })}
@@ -179,7 +190,7 @@ function StandardMode({ model, kitType, kitAddons, slidingDoor, onKitSelect, onK
   );
 }
 
-function CustomMode({ customArea, customOptions, slidingDoor, onCustomAreaChange, onCustomChange, onSlidingDoorChange, onBack, onNext }: CustomProps) {
+function CustomMode({ isEligibleForFull, customArea, customOptions, slidingDoor, onCustomAreaChange, onCustomChange, onSlidingDoorChange, onBack, onNext }: CustomProps) {
   return (
     <motion.div
       initial={{ opacity: 0, x: 40 }}
@@ -215,20 +226,31 @@ function CustomMode({ customArea, customOptions, slidingDoor, onCustomAreaChange
       <div className="max-w-xl mx-auto glass-card rounded-2xl p-6 mb-8">
         <p className="text-sm font-semibold mb-4 font-display">Itens adicionais (Kit Madeiramento incluso):</p>
         <div className="flex flex-col gap-3">
-          {CUSTOM_ADDONS.map((addon) => (
-            <div key={addon.key} className="flex items-center gap-3">
-              <Checkbox
-                id={`cust-${addon.key}`}
-                checked={customOptions[addon.key]}
-                onCheckedChange={(checked) =>
-                  onCustomChange({ ...customOptions, [addon.key]: !!checked })
-                }
-              />
-              <Label htmlFor={`cust-${addon.key}`} className="text-sm cursor-pointer">
-                {addon.label}
-              </Label>
-            </div>
-          ))}
+          {CUSTOM_ADDONS.map((addon) => {
+            const isDisabled = !isEligibleForFull && addon.key === 'labor';
+            return (
+              <div key={addon.key} className={cn("flex flex-col gap-1", isDisabled && "opacity-60")}>
+                <div className="flex items-center gap-3">
+                  <Checkbox
+                    id={`cust-${addon.key}`}
+                    checked={customOptions[addon.key]}
+                    disabled={isDisabled}
+                    onCheckedChange={(checked) =>
+                      onCustomChange({ ...customOptions, [addon.key]: !!checked })
+                    }
+                  />
+                  <Label htmlFor={`cust-${addon.key}`} className={cn("text-sm cursor-pointer", isDisabled && "cursor-not-allowed")}>
+                    {addon.label}
+                  </Label>
+                </div>
+                {isDisabled && (
+                  <span className="text-[11px] text-destructive pl-7">
+                    * Indisponível para o seu estado
+                  </span>
+                )}
+              </div>
+            );
+          })}
           {customOptions.fixtures && (
             <div className="flex items-start gap-3 pt-2 border-t border-border/50">
               <Checkbox
