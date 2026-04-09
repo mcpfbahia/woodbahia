@@ -10,7 +10,9 @@ import {
   Users,
   LogOut,
   ChevronLeft,
-  FileText
+  FileText,
+  ShieldAlert,
+  UserCog
 } from "lucide-react";
 import Image from "next/image";
 
@@ -30,6 +32,7 @@ export function AdminSidebar({
     { name: "Diário de Obras", path: "/admin/diario-de-obras", icon: Hammer },
     { name: "Propostas", path: "/admin/propostas", icon: FileText },
     { name: "Leads (Contatos)", path: "/admin/leads", icon: Users },
+    { name: "Operadores", path: "/admin/operadores", icon: UserCog },
   ];
 
   const handleLinkClick = () => {

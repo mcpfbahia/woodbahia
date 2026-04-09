@@ -30,4 +30,10 @@ if (env.NEXT_PUBLIC_FIREBASE_API_KEY && env.NEXT_PUBLIC_FIREBASE_API_KEY !== "")
   }
 }
 
+export const createSecondaryAuth = () => {
+  if (!env.NEXT_PUBLIC_FIREBASE_API_KEY) return null;
+  const adminApp = getApps().find(app => app.name === 'SecondaryAdminApp') || initializeApp(firebaseConfig, 'SecondaryAdminApp');
+  return getAuth(adminApp);
+};
+
 export { auth, db, storage };
