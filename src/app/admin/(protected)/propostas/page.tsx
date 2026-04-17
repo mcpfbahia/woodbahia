@@ -64,6 +64,80 @@ const EditablePrice = ({
   </div>
 );
 
+interface InlineEditablePriceProps {
+  value: number;
+  onChange: (v: number | string | undefined) => void;
+  onReset: () => void;
+  isOverridden: boolean;
+}
+
+const InlineEditablePrice = ({ 
+  value, 
+  onChange, 
+  onReset,
+  isOverridden 
+}: InlineEditablePriceProps) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [inputValue, setInputValue] = useState(value.toString());
+
+  useEffect(() => {
+    if (!isEditing) setInputValue(value.toString());
+  }, [value, isEditing]);
+
+  if (isEditing) {
+    return (
+      <div className="flex items-center gap-1">
+        <span className="text-[10px] font-bold text-muted-foreground">R$</span>
+        <Input
+          type="number"
+          autoFocus
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onBlur={() => {
+            setIsEditing(false);
+            if (inputValue !== "" && !isNaN(Number(inputValue))) {
+              onChange(Number(inputValue));
+            }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              setIsEditing(false);
+              if (inputValue !== "" && !isNaN(Number(inputValue))) {
+                onChange(Number(inputValue));
+              }
+            }
+            if (e.key === 'Escape') {
+              setIsEditing(false);
+              setInputValue(value.toString());
+            }
+          }}
+          className="h-7 w-24 text-right text-xs font-bold font-mono p-1 border-primary/30 rounded-lg focus-visible:ring-1 focus-visible:ring-primary/40 bg-white"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-2 group/item">
+      <button 
+        onClick={() => setIsEditing(true)}
+        className={`font-bold tabular-nums transition-all hover:text-primary hover:scale-105 ${isOverridden ? 'text-primary' : 'text-primary/80'}`}
+      >
+        {value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+      </button>
+      {isOverridden && (
+        <button 
+          onClick={onReset}
+          className="text-[10px] opacity-30 hover:opacity-100 transition-opacity"
+          title="Resetar para valor original"
+        >
+          ↩️
+        </button>
+      )}
+    </div>
+  );
+};
+
 export default function PropostasPage() {
   const router = useRouter();
   const [view, setView] = useState<'form' | 'summary'>('form');
@@ -208,6 +282,67 @@ export default function PropostasPage() {
   });
 
   const getSugg = (label: string) => suggested.items.find(i => i.label.toLowerCase().includes(label.toLowerCase()))?.value ?? 0;
+
+  const renderSummaryItem = (item: { label: string, value: number }) => {
+    const label = item.label.toLowerCase();
+    
+    let setter: ((v: any) => void) | null = null;
+    let isOverridden = false;
+    let onReset = () => {};
+
+    if (label.includes('madeiramento')) {
+      setter = setKitPriceOverride;
+      isOverridden = kitPriceOverride !== undefined;
+      onReset = () => setKitPriceOverride(undefined);
+    } else if (label.includes('portas') || label.includes('janelas')) {
+      setter = setFixturesPriceOverride;
+      isOverridden = fixturesPriceOverride !== undefined;
+      onReset = () => setFixturesPriceOverride(undefined);
+    } else if (label.includes('telhas') || label.includes('stain')) {
+      setter = setTilesStainPriceOverride;
+      isOverridden = tilesStainPriceOverride !== undefined;
+      onReset = () => setTilesStainPriceOverride(undefined);
+    } else if (label.includes('mão de obra')) {
+      setter = setLaborPriceOverride;
+      isOverridden = laborPriceOverride !== undefined;
+      onReset = () => setLaborPriceOverride(undefined);
+    } else if (label.includes('elétrica')) {
+      setter = setElectricalPriceOverride;
+      isOverridden = electricalPriceOverride !== undefined;
+      onReset = () => setElectricalPriceOverride(undefined);
+    } else if (label.includes('vidros')) {
+      setter = setGlassPriceOverride;
+      isOverridden = glassPriceOverride !== undefined;
+      onReset = () => setGlassPriceOverride(undefined);
+    } else if (label.includes('projeto')) {
+      setter = setProjectPriceOverride;
+      isOverridden = projectPriceOverride !== undefined;
+      onReset = () => setProjectPriceOverride(undefined);
+    } else if (label.includes('base') || label.includes('sapata') || label.includes('manilha')) {
+      setter = setFoundationPriceOverride;
+      isOverridden = foundationPriceOverride !== undefined;
+      onReset = () => setFoundationPriceOverride(undefined);
+    } else if (label.includes('banheiro')) {
+      setter = setMasonryBathroomPriceOverride;
+      isOverridden = masonryBathroomPriceOverride !== undefined;
+      onReset = () => setMasonryBathroomPriceOverride(undefined);
+    } else if (label.includes('pintura')) {
+      setter = setPaintPriceOverride;
+      isOverridden = paintPriceOverride !== undefined;
+      onReset = () => setPaintPriceOverride(undefined);
+    }
+
+    if (!setter) return <span className="font-bold text-primary/80">{fmt(item.value)}</span>;
+
+    return (
+      <InlineEditablePrice 
+        value={item.value} 
+        onChange={setter} 
+        onReset={onReset}
+        isOverridden={isOverridden}
+      />
+    );
+  };
 
   return (
     <div className="space-y-8 animate-fade-in pb-20">
@@ -735,14 +870,22 @@ export default function PropostasPage() {
                         <p className="text-[10px] font-black uppercase tracking-widest text-primary/60 border-l-4 border-primary pl-3">Detalhamento Técnico</p>
                         <div className="space-y-2">
                           {summary.items.map((item, i) => (
-                            <div key={i} className="flex justify-between text-sm py-2 border-b border-primary/5">
+                            <div key={i} className="flex justify-between text-sm py-2 border-b border-primary/5 items-center">
                               <span className="text-muted-foreground font-medium">{item.label}</span>
-                              <span className="font-bold text-primary/80">{fmt(item.value)}</span>
+                              {renderSummaryItem(item)}
                             </div>
                           ))}
-                           <div className="flex justify-between text-sm py-2 border-b border-primary/5">
+                           <div className="flex justify-between text-sm py-2 border-b border-primary/5 items-center">
                               <span className="text-muted-foreground font-medium">Frete Estimado (Logística)</span>
-                              <span className="font-bold line-through opacity-30 text-primary">{fmt(summary.freight * 2)}</span>
+                              <div className="flex items-center gap-4">
+                                <span className="font-bold line-through opacity-30 text-primary text-xs">{fmt(summary.freight * 2)}</span>
+                                <InlineEditablePrice 
+                                  value={summary.freight * 2} 
+                                  onChange={setFreightOverride} 
+                                  onReset={() => setFreightOverride(undefined)} 
+                                  isOverridden={freightOverride !== undefined}
+                                />
+                              </div>
                             </div>
                             {summary.additionalFreight > 0 && (
                               <div className="flex justify-between text-sm py-2 border-b border-primary/5">
