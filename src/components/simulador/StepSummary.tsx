@@ -25,7 +25,7 @@ const KIT_NAMES: Record<string, string> = {
 };
 
 export function StepSummary({ state, onBack, onReset }: Props) {
-  const { items, freight, total } = calculateSummary(state);
+  const { items, freight, total, materialSubtotal } = calculateSummary(state);
   const area = getEffectiveArea(state);
   const isCustom = state.kitType === 'custom';
   const modelLabel = isCustom
@@ -34,7 +34,7 @@ export function StepSummary({ state, onBack, onReset }: Props) {
   const kitLabel = state.kitType ? KIT_NAMES[state.kitType] || state.kitType : '';
 
   const CASH_DISCOUNT = 0.05;
-  const totalAVista = Math.round(total * (1 - CASH_DISCOUNT) * 100) / 100;
+  const totalAVista = Math.round(total - (materialSubtotal * CASH_DISCOUNT));
   const sinal = total * 0.3;
   const entrega = total * 0.2;
   const saldo = total * 0.5;

@@ -4,6 +4,7 @@ import { type Metadata } from "next";
 import { Montserrat, Inter } from "next/font/google";
 
 import { TRPCReactProvider } from "~/trpc/react";
+import { Toaster } from "~/components/ui/sonner";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.woodbahia.com"),
@@ -217,6 +218,7 @@ export default function RootLayout({
       <body className="font-inter">
         <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PK9Q2HQX" height="0" width="0" style={{display:'none',visibility:'hidden'}}></iframe></noscript>
         <TRPCReactProvider>{children}</TRPCReactProvider>
+        <Toaster />
       </body>
     </html>
   );

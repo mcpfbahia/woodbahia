@@ -174,10 +174,11 @@ export function generateProposalPDF(data: ProposalData): void {
   const kitName = KIT_NAMES[data.kitType] || data.kitType;
   const kitDesc = KIT_DESCRIPTIONS[data.kitType] || '';
   const modelName = model?.name || 'Kit Personalizado';
-  const { items, freight, additionalFreight, subtotal, total: totalFinal, discount } = calculateProposalItems(data);
+  const { items, freight, additionalFreight, subtotal, total: totalFinal, discount, materialSubtotal } = calculateProposalItems(data);
 
   const subtotalComDesconto = subtotal - discount;
-  const totalAVista = Math.round(totalFinal * 0.95);
+  const materialLiquido = materialSubtotal - discount;
+  const totalAVista = Math.round(totalFinal - (materialLiquido * 0.05));
 
   let y = 0;
 

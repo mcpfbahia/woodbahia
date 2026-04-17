@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { collection, getDocs, doc, setDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
 import { createUserWithEmailAndPassword, signOut } from "firebase/auth";
 import { db, createSecondaryAuth } from "~/lib/firebase";
-import { Loader2, Plus, Trash2, ShieldCheck, Mail, Key } from "lucide-react";
+import { Loader2, Plus, Trash2, ShieldCheck, Mail, Key, Eye, EyeOff } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -32,6 +32,7 @@ export default function OperadoresPage() {
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -99,13 +100,13 @@ export default function OperadoresPage() {
       setFormData({ name: "", email: "", password: "", role: "vendedor" });
       fetchOperadores();
     } catch (error: any) {
-      console.error("Erro ao criar operador:", error);
+      console.error("Erro ao criar operador no handleCreate:", error);
       if (error.code === 'auth/email-already-in-use') {
         toast.error("Este e-mail já está em uso por outro usuário.");
       } else if (error.code === 'auth/weak-password') {
         toast.error("A senha deve ter pelo menos 6 caracteres.");
       } else {
-        toast.error("Ocorreu um erro ao criar a conta. Tente novamente.");
+        toast.error(`Acesso negado ou erro desconhecido: ${error.message}`);
       }
     } finally {
       setIsSubmitting(false);
@@ -260,8 +261,8 @@ export default function OperadoresPage() {
                 <div className="relative">
                   <Input
                     id="password"
-                    type="password"
-                    className="pl-9"
+                    type={showPassword ? "text" : "password"}
+                    className="pl-9 pr-10"
                     placeholder="Mín. 6 caracteres"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -269,6 +270,18 @@ export default function OperadoresPage() {
                     minLength={6}
                   />
                   <Key className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 focus:outline-none"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
+                  </button>
                 </div>
               </div>
             </div>

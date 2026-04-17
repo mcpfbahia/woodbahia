@@ -227,7 +227,7 @@ export function getEffectiveArea(state: SimulationState): number {
   return state.model?.area ?? 0;
 }
 
-export function calculateSummary(state: SimulationState): { items: LineItem[]; freight: number; total: number } {
+export function calculateSummary(state: SimulationState): { items: LineItem[]; freight: number; total: number; materialSubtotal: number; laborTotal: number } {
   const items: LineItem[] = [];
   const kit = state.kitType;
   const area = getEffectiveArea(state);
@@ -306,14 +306,15 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
     if (foundationValue > 0) items.push({ label: foundationLabel, value: foundationValue });
   }
 
-  const subtotal = items.reduce((sum, i) => sum + i.value, 0);
+  const laborTotal = items.filter(i => i.label.includes('Mão de Obra')).reduce((sum, i) => sum + i.value, 0);
+  const materialSubtotal = subtotal - laborTotal;
   const freight = getFreight(area);
   const total = subtotal + freight;
 
-  return { items, freight, total };
+  return { items, freight, total, materialSubtotal, laborTotal };
 }
 
-export function calculateProposalItems(data: ProposalData): { items: LineItem[]; freight: number; additionalFreight: number; subtotal: number; total: number; discount: number } {
+export function calculateProposalItems(data: ProposalData): { items: LineItem[]; freight: number; additionalFreight: number; subtotal: number; total: number; discount: number; materialSubtotal: number; laborTotal: number } {
   const model = CABIN_MODELS.find(m => m.id === data.modelId);
   const area = data.customArea || model?.area || 0;
   const items: LineItem[] = [];
@@ -447,6 +448,10 @@ export function calculateProposalItems(data: ProposalData): { items: LineItem[];
   }
 
   const subtotal = items.reduce((s, i) => s + i.value, 0);
+  const laborItem = items.find(i => i.label === 'Mão de Obra');
+  const laborTotal = laborItem ? laborItem.value : 0;
+  const materialSubtotal = subtotal - laborTotal;
+
   let freight = getFreight(area);
   if (data.freightOverride !== undefined) {
     freight = data.freightOverride;
@@ -459,12 +464,12 @@ export function calculateProposalItems(data: ProposalData): { items: LineItem[];
 
   let discount = 0;
   if (data.discountType === 'percentage') {
-    discount = Math.round(subtotal * (data.discountValue / 100));
+    discount = Math.round(materialSubtotal * (data.discountValue / 100));
   } else if (data.discountType === 'fixed') {
-    discount = Math.min(data.discountValue, subtotal);
+    discount = Math.min(data.discountValue, materialSubtotal);
   }
 
   const total = subtotal - discount + freight + additionalFreight;
 
-  return { items, freight, additionalFreight, subtotal, total, discount };
+  return { items, freight, additionalFreight, subtotal, total, discount, materialSubtotal, laborTotal };
 }
