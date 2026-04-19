@@ -256,7 +256,7 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
     if (opts.project) items.push({ label: `Projeto Personalizado (${area}m² × R$ 25,00)`, value: Math.round(area * 25) });
   } else {
     // Standard kits (1-4) — use model prices
-    if (!state.model) return { items: [], freight: 0, total: 0 };
+    if (!state.model) return { items: [], freight: 0, total: 0, materialSubtotal: 0, laborTotal: 0 };
     const model = state.model;
 
     items.push({ label: 'Kit Madeiramento', value: model.kitPrice });
@@ -306,6 +306,7 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
     if (foundationValue > 0) items.push({ label: foundationLabel, value: foundationValue });
   }
 
+  const subtotal = items.reduce((sum, i) => sum + i.value, 0);
   const laborTotal = items.filter(i => i.label.includes('Mão de Obra')).reduce((sum, i) => sum + i.value, 0);
   const materialSubtotal = subtotal - laborTotal;
   const freight = getFreight(area);
