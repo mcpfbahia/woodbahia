@@ -6,7 +6,7 @@ import { ScrollReveal, StaggerContainer, StaggerItem } from '../common/ScrollRev
 
 export const TransparencySection = () => {
   const included = [
-    { icon: Hammer, text: "Construção do Radier e banheiro em alvenaria ou sapatas para modelos A-frame" },
+    { icon: Hammer, text: "Construção do Radier e banheiro em alvenaria ou sapatas para modelos A-frame. Obs: nos modelos com radier cliente fornece material." },
     { icon: Package, text: "Estrutura completa: montagem sobre radier ou sapatas" },
     { icon: Droplets, text: "Cobertura: telha ecológica + manta térmica" },
     { icon: Zap, text: "Elétrica: apenas passagem de eletroduto" },
