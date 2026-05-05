@@ -6,19 +6,24 @@ import { ScrollReveal, StaggerContainer, StaggerItem } from '../common/ScrollRev
 
 export const TransparencySection = () => {
   const included = [
-    { icon: Hammer, text: "Construção do Radier e banheiro em alvenaria ou sapatas para modelos A-frame. Obs: nos modelos com radier cliente fornece material." },
-    { icon: Package, text: "Estrutura completa: montagem sobre radier ou sapatas" },
-    { icon: Droplets, text: "Cobertura: telha ecológica + manta térmica" },
-    { icon: Zap, text: "Elétrica: apenas passagem de eletroduto" },
-    { icon: Droplets, text: "Hidráulica: básica banheiro e cozinha – sem caixa d'água" },
+    { icon: Package, text: "Toda a estrutura de madeira (em tamanhos para ajuste no local)" },
+    { icon: Ruler, text: "Projeto arquitetônico base e manual técnico" },
+    { icon: CheckCircle2, text: "Opcionais se contratados: kit cobertura, ferragens e esquadrias" },
+  ];
+
+  const montadorScope = [
+    { icon: Hammer, text: "Cortes precisos da madeira e ajustes finos de peças" },
+    { icon: Package, text: "Montagem completa da estrutura sobre a fundação" },
+    { icon: CheckCircle2, text: "Instalação dos opcionais adquiridos (portas, janelas, etc.)" },
+    { icon: Ruler, text: "Alterações de planta (combinadas diretamente com eles)" },
   ];
 
   const notIncluded = [
-    { text: "Piso cerâmico e revestimentos finais" },
-    { text: "Vidros, rufos, calhas" },
-    { text: "Terraplanagem e nivelamento" },
-    { text: "Paisagismo, muros, decoração" },
-    { text: "Luminárias, caixa d'água, biodigestor" },
+    { text: "Radier/sapatas (base e fundação)" },
+    { text: "Parte de alvenaria (ex: banheiros)" },
+    { text: "Instalações elétricas e hidráulicas" },
+    { text: "Piso, vidros, rufos e calhas" },
+    { text: "Pintura/verniz final e acabamentos" },
   ];
 
   return (
@@ -36,22 +41,46 @@ export const TransparencySection = () => {
           </p>
         </ScrollReveal>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
           {/* O Que Está Incluso */}
           <StaggerContainer>
             <div className="bg-white rounded-[2.5rem] p-8 md:p-10 shadow-sm border border-stone-100 h-full">
-              <h3 className="text-2xl font-bold text-[#4A2B1D] mb-8 flex items-center gap-3">
-                <CheckCircle2 className="text-green-500 w-8 h-8" />
-                O Que Está Incluso
+              <h3 className="text-xl font-bold text-[#4A2B1D] mb-8 flex items-center gap-3">
+                <CheckCircle2 className="text-emerald-500 w-8 h-8" />
+                Incluso (Wood Bahia)
               </h3>
               <ul className="space-y-6">
                 {included.map((item, index) => (
                   <StaggerItem key={index} index={index}>
                     <li className="flex items-start gap-4">
-                      <div className="mt-1 bg-primary/5 p-2 rounded-lg">
+                      <div className="mt-1 bg-primary/5 p-2 rounded-lg flex-shrink-0">
                         <item.icon className="w-5 h-5 text-primary" strokeWidth={1.5} />
                       </div>
-                      <span className="text-[#735F53] font-medium leading-relaxed">
+                      <span className="text-[#735F53] font-medium leading-relaxed text-sm">
+                        {item.text}
+                      </span>
+                    </li>
+                  </StaggerItem>
+                ))}
+              </ul>
+            </div>
+          </StaggerContainer>
+
+          {/* Escopo do Montador */}
+          <StaggerContainer>
+            <div className="bg-[#FAF6F0] rounded-[2.5rem] p-8 md:p-10 shadow-sm border border-amber-100 h-full">
+              <h3 className="text-xl font-bold text-[#4A2B1D] mb-8 flex items-center gap-3">
+                <Hammer className="text-amber-600 w-8 h-8" />
+                Escopo do Montador
+              </h3>
+              <ul className="space-y-6">
+                {montadorScope.map((item, index) => (
+                  <StaggerItem key={index} index={index}>
+                    <li className="flex items-start gap-4">
+                      <div className="mt-1 bg-amber-500/10 p-2 rounded-lg flex-shrink-0">
+                        <item.icon className="w-5 h-5 text-amber-600" strokeWidth={1.5} />
+                      </div>
+                      <span className="text-[#735F53] font-medium leading-relaxed text-sm">
                         {item.text}
                       </span>
                     </li>
@@ -63,23 +92,29 @@ export const TransparencySection = () => {
 
           {/* O Que Não Está Incluso */}
           <StaggerContainer>
-            <div className="bg-white rounded-[2.5rem] p-8 md:p-10 shadow-sm border border-stone-100 h-full">
-              <h3 className="text-2xl font-bold text-[#4A2B1D] mb-8 flex items-center gap-3">
+            <div className="bg-white rounded-[2.5rem] p-8 md:p-10 shadow-sm border border-stone-100 h-full flex flex-col">
+              <h3 className="text-xl font-bold text-[#4A2B1D] mb-8 flex items-center gap-3">
                 <XCircle className="text-red-400 w-8 h-8" />
-                O Que Não Está Incluso
+                Não Incluso no Kit
               </h3>
-              <ul className="space-y-5">
+              <ul className="space-y-5 mb-6">
                 {notIncluded.map((item, index) => (
                   <StaggerItem key={index} index={index}>
-                    <li className="flex items-center gap-4 group">
-                      <div className="h-1.5 w-1.5 rounded-full bg-red-400 group-hover:scale-150 transition-transform" />
-                      <span className="text-[#9C8F86] font-medium">
+                    <li className="flex items-start gap-4 group">
+                      <div className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-red-400 group-hover:scale-150 transition-transform" />
+                      <span className="text-[#9C8F86] font-medium text-sm">
                         {item.text}
                       </span>
                     </li>
                   </StaggerItem>
                 ))}
               </ul>
+              
+              <div className="mt-auto pt-4 border-t border-stone-100">
+                <p className="text-xs text-muted-foreground italic font-medium leading-relaxed">
+                  * Importante: A execução de todos esses itens não inclusos pode ser negociada e contratada diretamente com a equipe parceira de montadores.
+                </p>
+              </div>
             </div>
           </StaggerContainer>
         </div>

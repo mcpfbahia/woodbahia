@@ -14,6 +14,7 @@ import { FooterWoodBahia } from "~/components/layout/FooterWoodBahia";
 import { WhatsAppButton } from "~/components/common/WhatsAppButton";
 import { PaymentSection } from "~/components/sections/PaymentSection";
 import { SimulatorSection } from "~/components/sections/SimulatorSection";
+import { AnnouncementModal } from "~/components/common/AnnouncementModal";
 
 export default function Home() {
   return (
@@ -36,6 +37,7 @@ export default function Home() {
       </main>
       <FooterWoodBahia />
       <WhatsAppButton />
+      <AnnouncementModal />
     </div>
   );
 }

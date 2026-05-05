@@ -93,7 +93,7 @@ export const PaymentSection = () => {
                 </div>
 
                 <h3 className="text-2xl md:text-3xl font-extrabold text-[#111827] mb-8 pr-12">
-                  Pagamento Progressivo da Obra
+                  Pagamento do Kit Madeiramento
                 </h3>
 
                 {/* Timeline de Pagamento Progressivo */}
@@ -102,22 +102,15 @@ export const PaymentSection = () => {
                   {/* Passo 1 */}
                   <div className="relative group/step">
                     <div className="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-[#B06D46] border-4 border-white transition-transform group-hover/step:scale-125"></div>
-                    <h4 className="text-xl font-black text-[#B06D46] mb-1">30%</h4>
+                    <h4 className="text-xl font-black text-[#B06D46] mb-1">50%</h4>
                     <p className="text-[#57463A] font-medium text-sm">Sinal na assinatura do contrato</p>
                   </div>
 
                   {/* Passo 2 */}
                   <div className="relative group/step">
                     <div className="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-[#B06D46] border-4 border-white transition-transform group-hover/step:scale-125"></div>
-                    <h4 className="text-xl font-black text-[#B06D46] mb-1">20%</h4>
-                    <p className="text-[#57463A] font-medium text-sm">Na entrega do kit no local da obra</p>
-                  </div>
-
-                  {/* Passo 3 */}
-                  <div className="relative group/step">
-                    <div className="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-[#EFE8DF] border-4 border-white transition-transform group-hover/step:scale-125"></div>
-                    <h4 className="text-lg font-bold text-[#735F53] mb-1">Parcelas proporcionais</h4>
-                    <p className="text-[#8A6B5B] text-sm">Conforme o andamento da construção</p>
+                    <h4 className="text-xl font-black text-[#B06D46] mb-1">50%</h4>
+                    <p className="text-[#57463A] font-medium text-sm">24hs antes do embarque do kit (Saída da fábrica)</p>
                   </div>
 
                 </div>
@@ -127,17 +120,6 @@ export const PaymentSection = () => {
 
         </StaggerContainer>
 
-        {/* Citação / Transparência */}
-        <ScrollReveal className="relative w-full max-w-4xl bg-white p-8 md:p-10 rounded-3xl shadow-md border border-stone-100 text-center mb-12 group">
-          {/* Etiqueta Flutuante */}
-          <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#8A3A1B] text-white text-xs font-bold px-4 py-1.5 rounded-full tracking-widest uppercase shadow-sm group-hover:scale-110 transition-transform">
-            Transparência
-          </div>
-          
-          <p className="text-xl md:text-2xl italic font-medium text-[#4A2B1D] leading-relaxed">
-            "Nosso modelo de pagamento acompanha o avanço da obra, garantindo segurança e transparência para ambas as partes."
-          </p>
-        </ScrollReveal>
 
         {/* Botão WhatsApp */}
         <ScrollReveal>

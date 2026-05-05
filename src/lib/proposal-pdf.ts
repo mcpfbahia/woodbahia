@@ -401,23 +401,11 @@ export function generateProposalPDF(data: ProposalData): void {
     doc.text(` — ${desc}`, margin + 8 + boldW, lineY);
   };
 
-  if (hasLabor) {
-    // Kit 4: 30/20/50 com entrega das chaves
-    const sinal = baseParcelamento * 0.3;
-    const entregaKit = baseParcelamento * 0.2;
-    const saldo = baseParcelamento * 0.5;
-    drawPaymentLine('Sinal (30%):', fmt(sinal), 'Para iniciar o projeto', y);
-    y += 5;
-    drawPaymentLine('Entrega do Kit (20%):', fmt(entregaKit), 'Na chegada do material', y);
-    y += 5;
-    drawPaymentLine('Saldo Final (50%):', fmt(saldo), 'Até a entrega das chaves', y);
-  } else {
-    // Kits sem mão de obra: 50/50
-    const metade = baseParcelamento * 0.5;
-    drawPaymentLine('Sinal (50%):', fmt(metade), 'Na assinatura do contrato', y);
-    y += 5;
-    drawPaymentLine('Saldo (50%):', fmt(metade), '24h antes da saída do material', y);
-  }
+  // Novo modelo 50/50 (pagamento do material)
+  const metade = baseParcelamento * 0.5;
+  drawPaymentLine('Sinal (50%):', fmt(metade), 'Na assinatura do contrato', y);
+  y += 5;
+  drawPaymentLine('Saldo Final (50%):', fmt(metade), '24h antes do embarque do kit (Saída da fábrica)', y);
   y += 8;
 
   // ─── CREDIT CARD INSTALLMENT TABLE ───

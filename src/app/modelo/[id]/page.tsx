@@ -21,12 +21,14 @@ import {
   ZoomIn,
   Loader2,
   CreditCard,
+  Hammer,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import useEmblaCarousel from "embla-carousel-react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "~/lib/firebase";
-import { initialModels } from "~/lib/data";
+import { initialModels, applyModelOverrides } from "~/lib/data";
+import { getTilesStainPrice, getFixturesPrice } from "~/lib/pricing";
 import { Header } from "~/components/layout/Header";
 import { WhatsAppButton } from "~/components/common/WhatsAppButton";
 import { ScrollReveal } from "~/components/common/ScrollReveal";
@@ -83,6 +85,9 @@ export default function ModelDetailPage() {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
+  // Calculadora Opcionais Dinâmicos
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, boolean>>({});
+
   useEffect(() => {
     setMounted(true);
     const fetchModel = async () => {
@@ -102,7 +107,7 @@ export default function ModelDetailPage() {
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-          setModel({ id: docSnap.id, ...docSnap.data() });
+          setModel(applyModelOverrides({ id: docSnap.id, ...docSnap.data() }));
         } else {
           // Tentar no initialModels antes de desistir
           const staticModel = initialModels.find((m) => m.id === id);
@@ -121,7 +126,7 @@ export default function ModelDetailPage() {
               const fbFallbackRef = doc(db, "models", mappedId);
               const fbSnap = await getDoc(fbFallbackRef);
               if (fbSnap.exists()) {
-                setModel({ id, ...fbSnap.data() });
+                setModel(applyModelOverrides({ id, ...fbSnap.data() }));
               } else {
                 const staticFallback = initialModels.find(m => m.id === mappedId);
                 if (staticFallback) setModel({ ...staticFallback, id });
@@ -209,6 +214,120 @@ export default function ModelDetailPage() {
     "Foto Principal",
     ...(model.gallery || []).map(() => "Imagem da Galeria"),
   ];
+
+  // Cálculos Dinâmicos
+  // Corrige o bug da vírgula antes de limpar: '10,5m²' -> '10.5'
+  const numericArea = parseFloat((model.area || "0").toString().replace(',', '.').replace(/[^\d.]/g, ''));
+  
+  const parseCurrencyToNumber = (val: any) => {
+    if (typeof val === 'number') return val;
+    if (!val) return 0;
+    
+    let str = val.toString().replace(/[R$\s]/gi, ''); // Limpa 'R$' e espaços
+    
+    // Se não tiver vírgula (ex: 8906.00), usa parseFloat normal limpando R$
+    if (!str.includes(',')) {
+      return parseFloat(str.replace(/[^\d.-]/g, '')) || 0;
+    }
+    // Formato PT-BR (ex: 8.906,00)
+    return parseFloat(str.replace(/\./g, '').replace(',', '.')) || 0;
+  };
+
+  const kitBasePriceNum = model.kitPrice ? parseCurrencyToNumber(model.kitPrice) : parseCurrencyToNumber(model.price);
+
+  // ── Tabela de opcionais por modelo (hardcoded) ─────────────────────────────
+  type Addon = { id: string; name: string; price: number; note?: string };
+  const MODEL_ADDONS: Record<string, Addon[]> = {
+    // Camping Arembepe (sem portas e janelas)
+    arembepe: [
+      { id: 'cobertura', name: 'Kit Cobertura (telhas ecológicas e manta térmica)', price: 3500 },
+      { id: 'pintura',   name: 'Kit Pintura (Stain impregnante)',                   price: 1100 },
+      { id: 'ferragens', name: 'Kit Ferragens (parafusos, porcas, barras roscadas, etc...)', price: 900 },
+    ],
+    // Casa Jorge Amado (sem portas e janelas)
+    'jorge-amado': [
+      { id: 'cobertura', name: 'Kit Cobertura (telhas ecológicas e manta térmica)', price: 12900 },
+      { id: 'pintura',   name: 'Kit Pintura (Stain impregnante)',                   price: 3500  },
+      { id: 'ferragens', name: 'Kit Ferragens (parafusos, porcas, barras roscadas, etc...)', price: 2700  },
+    ],
+    // Chalé Baixios
+    baixios: [
+      { id: 'cobertura', name: 'Kit Cobertura (telhas ecológicas e manta térmica)', price: 9500  },
+      { id: 'pintura',   name: 'Kit Pintura (Stain impregnante)',                   price: 3000  },
+      { id: 'ferragens', name: 'Kit Ferragens (parafusos, porcas, barras roscadas, etc...)', price: 1900  },
+      { id: 'portas',    name: 'Kit Portas e Janelas em Madeira',                  price: 1500  },
+    ],
+    // Chalé Guarajuba
+    guarajuba: [
+      { id: 'cobertura', name: 'Kit Cobertura (telhas ecológicas e manta térmica)', price: 9500  },
+      { id: 'pintura',   name: 'Kit Pintura (Stain impregnante)',                   price: 3000  },
+      { id: 'ferragens', name: 'Kit Ferragens (parafusos, porcas, barras roscadas, etc...)', price: 2500  },
+      { id: 'portas',    name: 'Kit Portas e Janelas em Madeira',                  price: 2500  },
+    ],
+    // Chalé Itacimirim (com porta de correr)
+    itacimirim: [
+      { id: 'cobertura', name: 'Kit Cobertura (telhas ecológicas e manta térmica)', price: 9000  },
+      { id: 'pintura',   name: 'Kit Pintura (Stain impregnante)',                   price: 3000  },
+      { id: 'ferragens', name: 'Kit Ferragens (parafusos, porcas, barras roscadas, etc...)', price: 2000  },
+      { id: 'portas',    name: 'Kit Portas e Janelas em Madeira (porta de correr inclusa)', price: 4500, note: 'Porta de correr inclusa' },
+    ],
+    // Chalé Praia do Forte (com porta de correr)
+    'praia-do-forte': [
+      { id: 'cobertura', name: 'Kit Cobertura (telhas ecológicas e manta térmica)', price: 7500  },
+      { id: 'pintura',   name: 'Kit Pintura (Stain impregnante)',                   price: 2500  },
+      { id: 'ferragens', name: 'Kit Ferragens (parafusos, porcas, barras roscadas, etc...)', price: 1800  },
+      { id: 'portas',    name: 'Kit Portas e Janelas em Madeira (porta de correr inclusa)', price: 3500, note: 'Porta de correr inclusa' },
+    ],
+  };
+
+  // Normaliza o ID da URL para bater com as chaves do mapa
+  const normalizedId = id
+    .toLowerCase()
+    .replace(/^chale-/, '')       // remove prefixo 'chale-'
+    .replace(/^cabana-camping-/, '') // remove prefixo 'cabana-camping-'
+    .replace(/^camping-/, '');   // remove prefixo 'camping-'
+
+  // Determinar as opções disponíveis para o modelo
+  let availableOptions: Addon[] = [];
+
+  if (model.addOns && Array.isArray(model.addOns)) {
+    // Prioridade 1: dados do Firebase (campo addOns)
+    availableOptions = model.addOns;
+  } else {
+    // Procura no mapa de configuração — testa o ID normalizado e o nome do modelo
+    const matchedKey = Object.keys(MODEL_ADDONS).find(key =>
+      normalizedId.includes(key) || model.name?.toLowerCase().includes(key)
+    );
+
+    if (matchedKey) {
+      availableOptions = MODEL_ADDONS[matchedKey] ?? [];
+    } else {
+      // Fallback genérico: divisão percentual (75/25 Cobertura/Pintura — 30/70 Ferragens/Portas)
+      const tilesTotalNum = model.tilesStainPrice ? parseCurrencyToNumber(model.tilesStainPrice) : getTilesStainPrice(numericArea).total;
+      const fixturesTotalNum = model.fixturesPrice ? parseCurrencyToNumber(model.fixturesPrice) : getFixturesPrice(numericArea).base;
+      const coberturaPrice = Math.round(tilesTotalNum * 0.75);
+      const pinturaPrice = tilesTotalNum - coberturaPrice;
+      const ferragensPrice = Math.round(fixturesTotalNum * 0.30);
+      const portasPrice = fixturesTotalNum - ferragensPrice;
+
+      availableOptions = [
+        { id: 'cobertura', name: 'Kit Cobertura (telhas ecológicas e manta térmica)', price: coberturaPrice },
+        { id: 'pintura',   name: 'Kit Pintura (Stain impregnante)',                   price: pinturaPrice  },
+        { id: 'ferragens', name: 'Kit Ferragens (parafusos, porcas, barras roscadas, etc...)', price: ferragensPrice },
+        { id: 'portas',    name: 'Kit Portas e Janelas em Madeira',                  price: portasPrice   },
+      ];
+    }
+  }
+
+  const subtotalOptions = availableOptions.reduce((acc, opt) => {
+    return acc + (selectedOptions[opt.id] ? opt.price : 0);
+  }, 0);
+  
+  const totalKitPurchase = kitBasePriceNum + subtotalOptions;
+
+  const toggleOption = (optId: string) => {
+    setSelectedOptions(prev => ({ ...prev, [optId]: !prev[optId] }));
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -349,23 +468,69 @@ export default function ModelDetailPage() {
                   {model.description}
                 </p>
 
-                <div className="relative mb-8 flex flex-col gap-6 overflow-hidden rounded-3xl border border-border bg-card shadow-sm p-6 md:p-8 md:flex-row md:gap-8">
-                  <div className="relative z-10 flex-1 flex flex-col justify-center">
-                    <p className="mb-2 text-xs font-bold uppercase tracking-widest text-primary/80">
-                      Kit Completamente Montado
+                <div className="relative mb-8 flex flex-col gap-6 overflow-hidden rounded-3xl border border-border bg-card shadow-sm p-6 md:p-8 lg:flex-row lg:gap-8">
+                  {/* Bloco 1: Produto (Kit) */}
+                  <div className="relative z-10 flex-1 flex flex-col">
+                    <div className="mb-4">
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100/80 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-emerald-800">
+                        <Package className="h-3 w-3" />
+                        Nosso Produto
+                      </span>
+                    </div>
+                    <h3 className="text-xl font-bold text-[#4A2B1D] mb-1">Kit Madeiramento Premium</h3>
+                    <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                      Estrutura completa em pinus tratado. As peças são enviadas em tamanhos próximos para ajuste e corte na obra. Inclui manual técnico.
                     </p>
-                    {model.promoPrice ? (
-                       <div className="flex flex-col gap-1">
-                         <span className="text-lg text-muted-foreground line-through font-serif">{model.price}</span>
-                         <span className="font-serif text-3xl md:text-4xl font-bold" style={{ color: '#A67C00' }}>{model.promoPrice}</span>
-                       </div>
-                    ) : (
-                       <p className="text-[#4A2B1D] font-serif text-3xl md:text-4xl font-bold">
-                         {model.price}
-                       </p>
-                    )}
                     
-                    <div className="mt-4 border-t border-border/50 pt-4">
+                    <div className="mb-6 flex justify-between items-end border-b border-border/50 pb-4">
+                      <div>
+                        <p className="text-xs uppercase tracking-widest font-bold text-muted-foreground mb-1">
+                          Valor Base do Kit
+                        </p>
+                        <p className="text-[#4A2B1D] font-serif text-2xl font-bold">
+                          {kitBasePriceNum.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="mt-2">
+                      <p className="text-xs uppercase tracking-widest font-bold text-emerald-800 mb-3 flex items-center gap-2">
+                        + Opcionais Disponíveis no Kit:
+                      </p>
+                      <div className="space-y-3">
+                        {availableOptions.map((opt) => (
+                          <label key={opt.id} className="flex items-center justify-between cursor-pointer group hover:bg-emerald-50/50 p-2 -mx-2 rounded-lg transition-colors">
+                            <div className="flex items-center gap-3">
+                              <div className="relative flex items-center">
+                                <input 
+                                  type="checkbox" 
+                                  checked={!!selectedOptions[opt.id]}
+                                  onChange={() => toggleOption(opt.id)}
+                                  className="w-5 h-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                                />
+                              </div>
+                              <span className="text-sm text-[#735F53] font-medium group-hover:text-[#4A2B1D]">{opt.name}</span>
+                            </div>
+                            <span className="text-sm font-bold text-emerald-700">
+                              + {opt.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="mt-auto pt-6 border-t border-emerald-100">
+                      <div className="bg-emerald-50 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border border-emerald-100/50 shadow-sm">
+                        <p className="text-sm font-bold text-emerald-900 uppercase tracking-widest">
+                          Subtotal do Kit:
+                        </p>
+                        <p className="font-serif text-3xl font-bold text-emerald-700">
+                          {totalKitPurchase.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-6 pt-4">
                       <p className="text-xs uppercase tracking-widest font-bold text-muted-foreground mb-1">
                         Frete
                       </p>
@@ -379,8 +544,8 @@ export default function ModelDetailPage() {
                                   R$ {(parseFloat(model.freight_value.replace(/[^\d,]/g, '').replace(',', '.')) / 2).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                 </span>
                               </div>
-                              <p className="text-xs font-bold text-emerald-600 uppercase mt-1">
-                                Frete compartilhado (pagamos 50% do seu frete)
+                              <p className="text-[10px] font-bold text-emerald-600 uppercase mt-1">
+                                Frete compartilhado (pagamos 50%)
                               </p>
                             </div>
                           ) : (
@@ -390,29 +555,39 @@ export default function ModelDetailPage() {
                           )}
                         </div>
                       ) : (
-                        <p className="text-xs font-bold text-muted-foreground uppercase">
-                          Frete compartilhado (pagamos 50% do seu frete)
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase">
+                          Frete compartilhado por R$ 700,00
                         </p>
                       )}
                     </div>
                   </div>
 
-                  {model.kitPrice && (
-                    <div className="relative z-10 flex flex-1 flex-col justify-center border-t border-border/60 pt-6 md:border-l md:border-t-0 md:pt-0 md:pl-8">
-                      <div className="rounded-2xl bg-secondary/5 p-6 h-full flex flex-col justify-center">
-                        <p className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-emerald-600">
-                          <Package className="h-4 w-4" />
-                          Compre Apenas o Kit
-                        </p>
-                        <p className="font-serif text-3xl font-bold text-foreground">
-                          {model.kitPrice}
-                        </p>
-                        <p className="mt-2 text-sm text-muted-foreground">
-                          Ideal para auto-montagem
+                  {/* Bloco 2: Serviço Independente */}
+                  <div className="relative z-10 flex flex-1 flex-col border-t border-border/60 pt-6 lg:border-l lg:border-t-0 lg:pt-0 lg:pl-8">
+                    <div className="rounded-2xl bg-[#F8F9FA] border border-slate-200/60 p-6 h-full flex flex-col">
+                      <div className="mb-4">
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-200 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-700">
+                          <Hammer className="h-3 w-3" />
+                          Serviço Independente
+                        </span>
+                      </div>
+                      <h3 className="text-xl font-bold text-slate-800 mb-1">Montagem por Credenciados</h3>
+                      <p className="text-sm text-slate-600 mb-6 leading-relaxed">
+                        Conectamos você a carpinteiros especialistas. Contrato direto com o profissional, garantindo isenção de taxas ocultas. Eles realizam todos os cortes e ajustes sob medida no local.
+                      </p>
+
+                      <div className="mb-6">
+                        <p className="text-xs uppercase tracking-widest font-bold text-slate-500 mb-1">Custo Estimado (Mão de Obra)</p>
+                        <p className="font-serif text-2xl font-bold text-slate-800">
+                          A partir de R$ {(numericArea * 500).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                         </p>
                       </div>
+
+                      <div className="mt-auto text-xs text-slate-500 italic bg-white p-3 rounded-xl border border-slate-100">
+                        * O valor acima é uma estimativa. O pagamento da montagem é feito diretamente ao profissional escolhido, conforme andamento da obra.
+                      </div>
                     </div>
-                  )}
+                  </div>
                 </div>
 
                 <div className="flex flex-col gap-4">
@@ -472,7 +647,19 @@ export default function ModelDetailPage() {
                     <h3 className="font-serif text-lg font-semibold mb-2">
                       Conceito Arquitetônico
                     </h3>
-                    <p className="text-muted-foreground">{details.concept}</p>
+                    <p className="text-muted-foreground mb-4">{details.concept}</p>
+                    <div className="bg-amber-50/50 border border-amber-200/50 rounded-xl p-4 text-sm text-[#5C3317]">
+                      <p className="font-semibold mb-2 flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4 text-amber-600" />
+                        Atenção aos detalhes do Kit:
+                      </p>
+                      <p className="mb-2">
+                        As peças de madeira são fornecidas em tamanhos aproximados. O ajuste fino, os cortes precisos e o encaixe perfeito são realizados no local da obra por carpinteiros especializados.
+                      </p>
+                      <p>
+                        <strong>Quer alterar a posição de uma parede, porta ou janela?</strong> A personalização do layout pode ser combinada e executada diretamente com os carpinteiros parceiros durante a montagem.
+                      </p>
+                    </div>
                   </div>
                   <div>
                     <h3 className="font-serif text-lg font-semibold mb-2">Ideal para</h3>

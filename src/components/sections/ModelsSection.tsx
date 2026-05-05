@@ -1,21 +1,31 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ArrowRight, Maximize2, Layers, Pencil, Loader2 } from "lucide-react";
+import { ArrowRight, Maximize2, Truck, Pencil, Loader2, Package, Tag } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "~/lib/firebase";
-import { initialModels } from "~/lib/data";
-import { Button } from "../ui/button";
+import { initialModels, applyModelOverrides } from "~/lib/data";
 import {
   ScrollReveal,
   StaggerContainer,
   StaggerItem,
 } from "../common/ScrollReveal";
 import { cn } from "~/lib/utils";
-import { buttonVariants } from "../ui/button";
 
+// Utilitários de preço
+function parsePriceToBRL(val: any): number {
+  if (typeof val === "number") return val;
+  if (!val) return 0;
+  const str = val.toString().replace(/[R$\s]/gi, "");
+  if (str.includes(",")) return parseFloat(str.replace(/\./g, "").replace(",", ".")) || 0;
+  return parseFloat(str.replace(/[^\d.]/g, "")) || 0;
+}
+
+function formatBRL(val: number): string {
+  return val.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
 
 export const ModelsSection = () => {
   const [models, setModels] = useState<any[]>([]);
@@ -28,53 +38,38 @@ export const ModelsSection = () => {
         setIsLoading(false);
         return;
       }
-
       try {
         const querySnapshot = await getDocs(collection(db, "models"));
-        const modelsData = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        if (modelsData.length > 0) {
-          setModels(modelsData);
-        } else {
-          setModels(initialModels);
-        }
-      } catch (error) {
-        console.error("Error fetching models:", error);
+        const modelsData = querySnapshot.docs
+          .map((doc) => ({ id: doc.id, ...doc.data() }))
+          .map(applyModelOverrides);
+        setModels(modelsData.length > 0 ? modelsData : initialModels);
+      } catch {
         setModels(initialModels);
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchModels();
   }, []);
 
-
   return (
-    <section
-      id="modelos"
-      className="relative overflow-hidden bg-card py-20 md:py-32"
-    >
+    <section id="modelos" className="relative overflow-hidden bg-card py-20 md:py-32">
       <div className="absolute inset-0 bg-pattern opacity-30" />
 
       <div className="container relative z-10 mx-auto px-4">
-        <ScrollReveal className="mb-16 text-center">
-          <span className="mb-6 inline-block rounded-full bg-secondary/10 px-4 py-2 text-sm font-medium text-secondary">
-            Nossos Modelos
+        <ScrollReveal className="mb-12 text-center">
+          <span className="mb-4 inline-block rounded-full bg-secondary/10 px-4 py-2 text-sm font-medium text-secondary">
+            Nossos Modelos de Kits Pré-fabricados
           </span>
           <h2 className="section-title text-3xl font-bold md:text-5xl">
-            Escolha o chalé
+            Estruturas de alta precisão
             <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              {" "}
-              dos seus sonhos
+              {" "}prontas para o seu terreno
             </span>
           </h2>
-          <p className="mx-auto max-w-2xl text-base text-muted-foreground md:text-lg lg:text-xl mt-4">
-            Conheça nossos modelos exclusivos pensados para morar, investir ou
-            relaxar. Cada projeto é a combinação perfeita de design rústico e
-            conforto moderno.
+          <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground md:text-lg">
+            Fornecemos o kit completo em madeira pinus tratada, pronto para ser montado por especialistas credenciados no seu terreno.
           </p>
         </ScrollReveal>
 
@@ -83,121 +78,138 @@ export const ModelsSection = () => {
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
         ) : (
-          <StaggerContainer className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {models?.slice(0, 5).map((model, idx) => (
-              <StaggerItem
-                key={model.id}
-                index={idx}
-                className={idx >= 3 ? "hidden md:block" : ""}
-              >
-                <div className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-background p-6 shadow-sm transition-all duration-300 hover:border-primary/40 hover:shadow-lg">
-                  {/* Image Container */}
-                  <Link
-                    href={`/modelo/${model.id}`}
-                    className="relative -mx-6 -mt-6 mb-6 block h-48 overflow-hidden sm:h-52"
-                  >
-                    <Image
-                      src={model.image || "/placeholder.svg"}
-                      alt={`${model.name} - chalé de madeira ideal para investimento em Airbnb na Bahia`}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-110"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                    
-                    {model.promoBadge && (
-                      <div className="absolute top-4 right-4 z-10 rounded-full px-3 py-1 text-xs font-bold text-white shadow-lg" style={{ backgroundColor: '#B8860B' }}>
-                        {model.promoBadge}
+          <StaggerContainer className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+            {models?.slice(0, 6).map((model, idx) => {
+              const kitFull = parsePriceToBRL(model.kitPrice || model.price);
+              const kitDiscount = kitFull > 0 ? kitFull * 0.95 : 0;
+              const freightFull = parsePriceToBRL(model.freight_value);
+              const freightClient = model.freight_is_promo && freightFull > 0 ? freightFull / 2 : freightFull;
+
+              return (
+                <StaggerItem key={model.id} index={idx}>
+                  <div className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-sm transition-all duration-300 hover:border-primary/40 hover:shadow-xl">
+
+                    {/* Imagem */}
+                    <Link href={`/modelo/${model.id}`} className="relative block h-48 shrink-0 overflow-hidden sm:h-52">
+                      <Image
+                        src={model.image || "/placeholder.svg"}
+                        alt={`${model.name} - Kit pré-fabricado de madeira`}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-110"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/65 to-transparent" />
+
+                      {/* Badge */}
+                      <div className="absolute top-3 left-3 z-10">
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-700/90 backdrop-blur-sm px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-white shadow">
+                          <Package className="h-3 w-3" />
+                          Kit Premium
+                        </span>
                       </div>
-                    )}
 
-                    <div className="absolute bottom-3 left-3 right-3 md:bottom-4 md:left-4 md:right-4">
-                      <p className="font-serif text-lg font-bold text-white md:text-xl">
-                        {model.name}
-                      </p>
-                    </div>
-                  </Link>
-
-                  {/* Info */}
-                  <div className="flex flex-grow flex-col space-y-4">
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <span className="flex items-center gap-1.5">
-                        <Maximize2 className="h-4 w-4" />
-                        {model.area}
-                      </span>
-                      <span className="flex items-center gap-1.5">
-                        <Layers className="h-4 w-4" />
-                        {model.floors}
-                      </span>
-                    </div>
-
-                    <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
-                      {model.description}
-                    </p>
-
-                    <div className="mt-auto flex items-center justify-between border-t border-border pt-4">
-                      <div className="flex flex-col gap-1">
-                        <div>
-                          <p className="text-[10px] uppercase text-muted-foreground">
-                            Kit Montado
-                          </p>
-                          {model.promoPrice ? (
-                            <div className="flex flex-col">
-                              <span className="text-xs text-muted-foreground line-through">{model.price}</span>
-                              <span className="font-serif text-xl font-bold" style={{ color: '#A67C00' }}>{model.promoPrice}</span>
-                            </div>
-                          ) : (
-                            <p className="font-serif text-xl font-bold text-primary">
-                              {model.price}
-                            </p>
-                          )}
-                        </div>
-                        {model.kitPrice && (
-                          <div className="pt-1">
-                            <p className="text-[10px] uppercase text-emerald-600 font-semibold">
-                              Apenas o Kit
-                            </p>
-                            <p className="font-serif text-base font-bold text-foreground">
-                              {model.kitPrice}
-                            </p>
-                          </div>
-                        )}
-                        <p className="mt-1 flex items-center justify-between text-[10px] font-medium leading-tight text-secondary">
-                          Frete compartilhado (pagamos 50% do seu frete)
+                      {/* Nome */}
+                      <div className="absolute bottom-3 left-3 right-3">
+                        <p className="font-serif text-base font-bold text-white drop-shadow sm:text-lg">
+                          {model.name}
                         </p>
                       </div>
-                      <Link
-                        href={`/modelo/${model.id}`}
-                        className="group/btn inline-flex items-center gap-2 whitespace-nowrap rounded-xl bg-secondary/10 px-4 py-2.5 text-sm font-bold text-secondary transition-all hover:bg-secondary hover:text-white"
-                      >
-                        Conhecer Modelo
-                        <ArrowRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
-                      </Link>
+                    </Link>
+
+                    {/* Corpo */}
+                    <div className="flex flex-grow flex-col gap-3 p-4 sm:p-5">
+
+                      {/* Info área */}
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground sm:text-sm">
+                        <Maximize2 className="h-3.5 w-3.5 shrink-0" />
+                        <span>{model.infoLabel || model.area}</span>
+                      </div>
+
+                      {/* Descrição */}
+                      <p className="line-clamp-2 text-xs leading-relaxed text-muted-foreground sm:text-sm sm:line-clamp-3">
+                        {model.description}
+                      </p>
+
+                      {/* Bloco de preços */}
+                      <div className="mt-auto space-y-2.5 border-t border-border pt-3">
+
+                        {/* Preço cheio + desconto */}
+                        <div className="flex items-end justify-between gap-2">
+                          <div className="min-w-0">
+                            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                              Valor do Kit
+                            </p>
+                            {kitFull > 0 ? (
+                              <div className="flex flex-wrap items-baseline gap-1.5">
+                                <span className="text-xs text-muted-foreground line-through">
+                                  {formatBRL(kitFull)}
+                                </span>
+                                <span className="font-serif text-lg font-bold text-primary sm:text-xl">
+                                  {formatBRL(kitDiscount)}
+                                </span>
+                              </div>
+                            ) : (
+                              <p className="font-serif text-lg font-bold text-primary">Consulte</p>
+                            )}
+                          </div>
+                          {kitFull > 0 && (
+                            <div className="shrink-0 flex items-center gap-1 rounded-full bg-amber-100 px-2 py-1 text-[10px] font-bold text-amber-700">
+                              <Tag className="h-2.5 w-2.5" />
+                              5% à vista
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Frete */}
+                        {freightFull > 0 && (
+                          <div className="flex items-start gap-1.5">
+                            <Truck className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-600" />
+                            <div className="min-w-0">
+                              <span className="text-xs font-semibold text-emerald-700">
+                                Frete compartilhado: {formatBRL(freightClient)}
+                              </span>
+                              {model.freight_is_promo && (
+                                <span className="block text-[10px] text-emerald-600/80">
+                                  (pagamos 50% — total {formatBRL(freightFull)})
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Rodapé */}
+                      <div className="flex flex-col gap-2 pt-1 sm:flex-row sm:items-end sm:justify-between">
+                        <p className="text-[10px] italic leading-snug text-muted-foreground/70 sm:max-w-[170px]">
+                          * Montagem e opcionais: contratação direta com rede de carpinteiros parceiros.
+                        </p>
+                        <Link
+                          href={`/modelo/${model.id}`}
+                          className="group/btn inline-flex w-full items-center justify-center gap-2 rounded-xl bg-secondary/10 px-4 py-2.5 text-sm font-bold text-secondary transition-all hover:bg-secondary hover:text-white sm:w-auto sm:shrink-0"
+                        >
+                          Ver Kit
+                          <ArrowRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
+                        </Link>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </StaggerItem>
-            ))}
+                </StaggerItem>
+              );
+            })}
 
-            {/* Card Projeto Personalizado */}
-            <StaggerItem index={5} className="hidden md:block">
+            {/* Card Kit Personalizado */}
+            <StaggerItem index={6} className="hidden xl:block">
               <div className="group flex h-full flex-col justify-between overflow-hidden rounded-2xl border-2 border-dashed border-primary/30 bg-gradient-to-br from-primary/5 to-secondary/5 p-6 transition-all duration-300 hover:border-primary/50">
                 <div className="flex flex-grow flex-col items-center justify-center py-8 text-center">
                   <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-accent/10 transition-transform group-hover:scale-110">
                     <Pencil className="h-8 w-8 text-accent" />
                   </div>
-
-                  <h3 className="mb-4 font-serif text-2xl font-bold text-primary">
-                    Projeto Personalizado
-                  </h3>
-
+                  <h3 className="mb-4 font-serif text-2xl font-bold text-primary">Kit Personalizado</h3>
                   <p className="mb-6 max-w-xs text-sm leading-relaxed text-muted-foreground">
-                    Envie sua ideia e nossos arquitetos desenvolvem o modelo
-                    ideal para você
+                    Tem um projeto diferente em mente? Desenvolvemos kits sob medida para qualquer dimensão ou layout.
                   </p>
-
                   <a
-                    href="https://wa.me/5571992936290?text=Olá! Gostaria de mais informações sobre projetos personalizados."
+                    href="https://wa.me/5571992936290?text=Olá! Gostaria de informações sobre um kit personalizado."
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn-cta w-full"
@@ -205,8 +217,7 @@ export const ModelsSection = () => {
                     Solicitar Orçamento
                   </a>
                 </div>
-
-                <p className="border-t border-border pt-2 pb-4 text-center text-[10px] text-muted-foreground mt-4">
+                <p className="mt-4 border-t border-border pb-4 pt-2 text-center text-[10px] text-muted-foreground">
                   * Custo adicional para projetos personalizados
                 </p>
               </div>
@@ -214,21 +225,13 @@ export const ModelsSection = () => {
           </StaggerContainer>
         )}
 
-        {/* View All Button */}
-        <div className="mt-12 flex justify-center">
-          <Link
-            href="/modelos"
-            className={cn(
-              "btn-cta w-full sm:w-auto"
-            )}
-          >
-            Ver Todos os Modelos
+        {/* Ver todos */}
+        <div className="mt-10 flex justify-center">
+          <Link href="/modelos" className={cn("btn-cta w-full sm:w-auto")}>
+            Ver Todos os Kits
             <ArrowRight className="ml-2 h-5 w-5" />
           </Link>
         </div>
-
-
-
       </div>
     </section>
   );

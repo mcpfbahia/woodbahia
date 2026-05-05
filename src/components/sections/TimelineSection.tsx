@@ -8,32 +8,32 @@ const passos = [
   {
     numero: "01",
     titulo: "Escolha do Modelo",
-    descricao: "Selecione o chalé ideal entre nossos modelos exclusivos."
+    descricao: "Selecione o kit estrutural ideal entre nossos projetos."
   },
   {
     numero: "02",
-    titulo: "Contrato Fechado",
-    descricao: "Formalizamos o acordo com transparência e segurança."
+    titulo: "Compra do Kit",
+    descricao: "Fechamento do contrato de fornecimento dos materiais com a Wood Bahia."
   },
   {
     numero: "03",
-    titulo: "Produção do Kit",
-    descricao: "Fabricação do kit completo em nossa fábrica (~30 dias)."
+    titulo: "Produção e Logística",
+    descricao: "Encomendamos com a fábrica, que prepara e separa o seu kit de madeira (~30 dias)."
   },
   {
     numero: "04",
-    titulo: "Chegada no Terreno",
-    descricao: "Transporte e entrega de todos os materiais no local da obra."
+    titulo: "Entrega na Obra",
+    descricao: "Transporte seguro e entrega de todos os materiais pela fábrica direto no seu terreno."
   },
   {
     numero: "05",
-    titulo: "Montagem da Casa",
-    descricao: "Equipe especializada realiza a montagem completa (~30 dias)."
+    titulo: "Montagem Parceira",
+    descricao: "As peças chegam com tamanhos aproximados e nossos carpinteiros parceiros (ou sua equipe) fazem os cortes e ajustes finos no local para um encaixe perfeito."
   },
   {
     numero: "06",
     titulo: "Sonho Realizado",
-    descricao: "Entrega das chaves e início de uma nova história!"
+    descricao: "Seu chalé finalizado, pronto para curtir ou rentabilizar."
   }
 ];
 
