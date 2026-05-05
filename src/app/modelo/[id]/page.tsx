@@ -290,19 +290,19 @@ export default function ModelDetailPage() {
   // Determinar as opções disponíveis para o modelo
   let availableOptions: Addon[] = [];
 
-  if (model.addOns && Array.isArray(model.addOns)) {
-    // Prioridade 1: dados do Firebase (campo addOns)
+  // Procura primeiro no mapa de configuração local (MODEL_ADDONS)
+  const matchedKey = Object.keys(MODEL_ADDONS).find(key =>
+    normalizedId.includes(key) || model.name?.toLowerCase().includes(key)
+  );
+
+  if (matchedKey) {
+    // Prioridade 1: Nossa configuração local (garante que modelos como Jorge Amado sigam a regra nova)
+    availableOptions = MODEL_ADDONS[matchedKey] ?? [];
+  } else if (model.addOns && Array.isArray(model.addOns)) {
+    // Prioridade 2: dados do Firebase (campo addOns)
     availableOptions = model.addOns;
   } else {
-    // Procura no mapa de configuração — testa o ID normalizado e o nome do modelo
-    const matchedKey = Object.keys(MODEL_ADDONS).find(key =>
-      normalizedId.includes(key) || model.name?.toLowerCase().includes(key)
-    );
-
-    if (matchedKey) {
-      availableOptions = MODEL_ADDONS[matchedKey] ?? [];
-    } else {
-      // Fallback genérico: divisão percentual (75/25 Cobertura/Pintura — 30/70 Ferragens/Portas)
+    // Fallback genérico: divisão percentual (75/25 Cobertura/Pintura — 30/70 Ferragens/Portas)
       const tilesTotalNum = model.tilesStainPrice ? parseCurrencyToNumber(model.tilesStainPrice) : getTilesStainPrice(numericArea).total;
       const fixturesTotalNum = model.fixturesPrice ? parseCurrencyToNumber(model.fixturesPrice) : getFixturesPrice(numericArea).base;
       const coberturaPrice = Math.round(tilesTotalNum * 0.75);
@@ -317,7 +317,6 @@ export default function ModelDetailPage() {
         { id: 'portas',    name: 'Kit Portas e Janelas em Madeira',                  price: portasPrice   },
       ];
     }
-  }
 
   const subtotalOptions = availableOptions.reduce((acc, opt) => {
     return acc + (selectedOptions[opt.id] ? opt.price : 0);
