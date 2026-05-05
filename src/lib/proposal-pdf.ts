@@ -172,7 +172,7 @@ export function generateProposalPDF(data: ProposalData): void {
   const model = CABIN_MODELS.find(m => m.id === data.modelId);
   const area = data.customArea || model?.area || 0;
   const kitName = KIT_NAMES[data.kitType] || data.kitType;
-  const kitDesc = KIT_DESCRIPTIONS[data.kitType] || '';
+  const kitDesc = data.kitType === 'custom' && data.customModelDescription ? data.customModelDescription : (KIT_DESCRIPTIONS[data.kitType] || '');
   const modelName = model?.name || 'Kit Personalizado';
   const { items, freight, additionalFreight, subtotal, total: totalFinal, discount, materialSubtotal } = calculateProposalItems(data);
 

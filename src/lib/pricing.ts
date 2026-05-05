@@ -166,6 +166,7 @@ export interface ProposalData {
   workLocation: string;
   modelId: string;
   customArea?: number;
+  customModelDescription?: string;
   kitType: KitType;
   slidingDoor: boolean;
   includeGlass: boolean;

@@ -146,6 +146,7 @@ export default function PropostasPage() {
   const [modelId, setModelId] = useState('');
   const [kitType, setKitType] = useState<KitType>('kit4');
   const [customArea, setCustomArea] = useState(30);
+  const [customModelDescription, setCustomModelDescription] = useState('');
   const [slidingDoor, setSlidingDoor] = useState(false);
   const [includeGlass, setIncludeGlass] = useState(false);
   const [includeElectrical, setIncludeElectrical] = useState(false);
@@ -207,6 +208,7 @@ export default function PropostasPage() {
     workLocation: workLocation.trim(),
     modelId: kitType === 'custom' ? 'custom' : modelId,
     customArea: kitType === 'custom' ? customArea : undefined,
+    customModelDescription: kitType === 'custom' ? customModelDescription : undefined,
     kitType,
     slidingDoor,
     includeGlass,
@@ -497,6 +499,17 @@ export default function PropostasPage() {
                             value={customArea || ""}
                             onChange={e => setCustomArea(e.target.value === "" ? 0 : Number(e.target.value))}
                             className="h-12 recessed-input rounded-xl"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="customModelDescription" className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Descrição do Kit Personalizado</Label>
+                          <textarea
+                            id="customModelDescription"
+                            placeholder="Ex: Chalé com quarto e mezanino, sala e cozinha conjugados com 50m²..."
+                            value={customModelDescription}
+                            onChange={e => setCustomModelDescription(e.target.value)}
+                            className="w-full min-h-[80px] p-3 text-sm recessed-input rounded-xl border-primary/10 focus:ring-1 focus:ring-primary/20 bg-background resize-y"
                           />
                         </div>
                         
