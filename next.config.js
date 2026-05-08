@@ -20,6 +20,11 @@ const config = {
       },
       {
         protocol: "https",
+        hostname: "czeayphtvpirdfbzbpgc.supabase.co",
+        pathname: "/storage/v1/object/public/**",
+      },
+      {
+        protocol: "https",
         hostname: "i.pravatar.cc",
         pathname: "/**",
       },

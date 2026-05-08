@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { supabase } from "~/lib/supabase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "~/lib/firebase";
 import { UploadCloud, X, Loader2 } from "lucide-react";
@@ -18,7 +19,7 @@ export function MultiImageUpload({ onUploadComplete, folder = "uploads" }: Multi
   const [error, setError] = useState("");
 
   const executeUpload = async (uploadFiles: File[]) => {
-    if (uploadFiles.length === 0 || !storage) return;
+    if (uploadFiles.length === 0) return;
 
     setUploading(true);
     setError("");
@@ -27,15 +28,41 @@ export function MultiImageUpload({ onUploadComplete, folder = "uploads" }: Multi
     const fileProgresses = new Array(uploadFiles.length).fill(0);
 
     const uploadPromises = uploadFiles.map((file, index) => {
-      return new Promise<string>((resolve, reject) => {
+      return new Promise<string>(async (resolve, reject) => {
         const fileExtension = file.name.split(".").pop();
         const fileName = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${fileExtension}`;
-        const storageRef = ref(storage, `${folder}/${fileName}`);
-        
-        fileProgresses[index] = 50;
-        const totalProg = fileProgresses.reduce((a, b) => a + b, 0) / uploadFiles.length;
-        setProgress(totalProg);
+        const filePath = `${folder}/${fileName}`;
 
+        // Se Supabase estiver disponível, usa ele
+        if (supabase) {
+          try {
+            const { data, error: uploadError } = await supabase.storage
+              .from('woodbahia')
+              .upload(filePath, file);
+
+            if (uploadError) throw uploadError;
+
+            const { data: { publicUrl } } = supabase.storage
+              .from('woodbahia')
+              .getPublicUrl(filePath);
+
+            fileProgresses[index] = 100;
+            setProgress(fileProgresses.reduce((a, b) => a + b, 0) / uploadFiles.length);
+            resolve(publicUrl);
+          } catch (err: any) {
+            console.error("Erro no upload múltiplo Supabase:", err);
+            reject(err);
+          }
+          return;
+        }
+
+        // Fallback para Firebase
+        if (!storage) {
+          reject(new Error("Storage não configurado"));
+          return;
+        }
+
+        const storageRef = ref(storage, filePath);
         uploadBytes(storageRef, file)
           .then(async (snapshot) => {
             fileProgresses[index] = 100;
@@ -48,7 +75,7 @@ export function MultiImageUpload({ onUploadComplete, folder = "uploads" }: Multi
             }
           })
           .catch((err) => {
-            console.error("Erro no upload múltiplo:", err);
+            console.error("Erro no upload múltiplo Firebase:", err);
             reject(err);
           });
       });
