@@ -11,7 +11,7 @@ import { Separator } from '~/components/ui/separator';
 import { FileDown, User, Home, Settings2, Tag, LayoutDashboard, Plus, Trash2, Layers, Paintbrush } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { CABIN_MODELS, calculateProposalItems, type KitType, type ProposalData, type ExtraItem, type FoundationType, type PaintType } from '~/lib/pricing';
-import { generateProposalPDF } from '~/lib/proposal-pdf';
+import { generateProposalPDF, getIncludedItems, getNotIncludedItems } from '~/lib/proposal-pdf';
 import {
   Select,
   SelectContent,
@@ -175,6 +175,9 @@ export default function PropostasPage() {
   const [masonryBathroomPriceOverride, setMasonryBathroomPriceOverride] = useState<number | string | undefined>(undefined);
   const [paintType, setPaintType] = useState<PaintType>('none');
   const [paintPriceOverride, setPaintPriceOverride] = useState<number | string | undefined>(undefined);
+  
+  const [customIncludedItems, setCustomIncludedItems] = useState<string[] | undefined>(undefined);
+  const [customNotIncludedItems, setCustomNotIncludedItems] = useState<string[] | undefined>(undefined);
 
   // Limpar overrides ao mudar modelo ou área para evitar erros de cálculo entre modelos
   useEffect(() => {
@@ -235,6 +238,8 @@ export default function PropostasPage() {
     masonryBathroomPriceOverride: typeof masonryBathroomPriceOverride === 'number' ? masonryBathroomPriceOverride : undefined,
     paintType,
     paintPriceOverride: typeof paintPriceOverride === 'number' ? paintPriceOverride : undefined,
+    customIncludedItems,
+    customNotIncludedItems,
   });
 
   const handleShowSummary = () => {
@@ -250,6 +255,10 @@ export default function PropostasPage() {
       toast.error('Selecione um modelo de chalé.');
       return;
     }
+
+    const currentData = getProposalData();
+    setCustomIncludedItems(getIncludedItems(currentData));
+    setCustomNotIncludedItems(getNotIncludedItems(currentData));
 
     setView('summary');
     window.scrollTo(0, 0);
@@ -906,6 +915,68 @@ export default function PropostasPage() {
                                 <span className="font-bold text-amber-600">+{fmt(summary.additionalFreight)}</span>
                               </div>
                             )}
+                        </div>
+                      </div>
+
+                      <div className="space-y-6 pt-6 border-t border-primary/10">
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-green-700 border-l-4 border-green-700 pl-3">O Que Está Incluso</p>
+                            <Button variant="outline" size="sm" onClick={() => setCustomIncludedItems([...(customIncludedItems || []), ''])} className="h-7 text-[10px] uppercase font-bold">
+                              <Plus className="w-3 h-3 mr-1" /> Adicionar
+                            </Button>
+                          </div>
+                          <div className="space-y-2">
+                            {(customIncludedItems || []).map((item, index) => (
+                              <div key={`inc-${index}`} className="flex items-center gap-2">
+                                <Input 
+                                  value={item} 
+                                  onChange={(e) => {
+                                    const newItems = [...(customIncludedItems || [])];
+                                    newItems[index] = e.target.value;
+                                    setCustomIncludedItems(newItems);
+                                  }} 
+                                  className="h-8 text-xs recessed-input" 
+                                />
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0" onClick={() => {
+                                  const newItems = (customIncludedItems || []).filter((_, i) => i !== index);
+                                  setCustomIncludedItems(newItems);
+                                }}>
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-amber-700 border-l-4 border-amber-700 pl-3">O Que Não Está Incluso</p>
+                            <Button variant="outline" size="sm" onClick={() => setCustomNotIncludedItems([...(customNotIncludedItems || []), ''])} className="h-7 text-[10px] uppercase font-bold">
+                              <Plus className="w-3 h-3 mr-1" /> Adicionar
+                            </Button>
+                          </div>
+                          <div className="space-y-2">
+                            {(customNotIncludedItems || []).map((item, index) => (
+                              <div key={`ninc-${index}`} className="flex items-center gap-2">
+                                <Input 
+                                  value={item} 
+                                  onChange={(e) => {
+                                    const newItems = [...(customNotIncludedItems || [])];
+                                    newItems[index] = e.target.value;
+                                    setCustomNotIncludedItems(newItems);
+                                  }} 
+                                  className="h-8 text-xs recessed-input" 
+                                />
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0" onClick={() => {
+                                  const newItems = (customNotIncludedItems || []).filter((_, i) => i !== index);
+                                  setCustomNotIncludedItems(newItems);
+                                }}>
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     </div>

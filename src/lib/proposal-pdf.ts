@@ -43,7 +43,7 @@ function fmt(v: number): string {
   return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
-function getIncludedItems(data: ProposalData): string[] {
+export function getIncludedItems(data: ProposalData): string[] {
   const items: string[] = [
     'Estrutura completa em madeira Pinus autoclavada',
     'Paredes, forros e estrutura do telhado',
@@ -97,7 +97,7 @@ function getIncludedItems(data: ProposalData): string[] {
   return items;
 }
 
-function getNotIncludedItems(data: ProposalData): string[] {
+export function getNotIncludedItems(data: ProposalData): string[] {
   const items: string[] = [];
 
   const hasLabor = data.kitType === 'custom' ? data.includeLabor : data.kitType === 'kit4';
@@ -488,8 +488,8 @@ export function generateProposalPDF(data: ProposalData): void {
   y = checkPageBreak(doc, y, 60);
 
   // ─── INCLUDED / NOT INCLUDED ───
-  const included = getIncludedItems(data);
-  const notIncluded = getNotIncludedItems(data);
+  const included = data.customIncludedItems || getIncludedItems(data);
+  const notIncluded = data.customNotIncludedItems || getNotIncludedItems(data);
 
   const colWidth = (contentWidth - 6) / 2;
 

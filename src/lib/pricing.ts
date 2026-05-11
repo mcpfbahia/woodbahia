@@ -193,6 +193,8 @@ export interface ProposalData {
   masonryBathroomPriceOverride?: number;
   paintType?: PaintType;
   paintPriceOverride?: number;
+  customIncludedItems?: string[];
+  customNotIncludedItems?: string[];
 }
 
 /** Options available as add-ons for standard kits (1-4) */
