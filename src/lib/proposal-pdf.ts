@@ -23,18 +23,16 @@ const COLORS = {
 };
 
 const KIT_NAMES: Record<string, string> = {
-  kit1: 'Kit 1 — Essência Natural',
-  kit2: 'Kit 2 — Raízes do Projeto',
-  kit3: 'Kit 3 — Abrigo Natural',
-  kit4: 'Kit 4 — Refúgio Completo',
+  madeiramento: 'Modalidade 1 — Apenas o Kit Madeiramento',
+  parceira: 'Modalidade 2 — Kit + Montagem Parceira',
+  turnkey: 'Modalidade 3 — Wood Bahia Chave na Mão',
   custom: 'Kit Personalizado',
 };
 
 const KIT_DESCRIPTIONS: Record<string, string> = {
-  kit1: 'Madeiramento completo em Pinus tratado. A base estrutural em madeira tratada, pronta para dar vida ao seu projeto com segurança e durabilidade.',
-  kit2: 'Kit 1 + portas, janelas e ferragens, formando o início real do seu Chalé.',
-  kit3: 'Kit 2 + Telhas e Stain. Seu chalé protegido com cobertura completa, pronto para enfrentar o tempo com conforto e resistência.',
-  kit4: 'Kit 3 + mão-de-obra completa. Do projeto à realidade: entregamos seu chalé montado, pronto para viver, investir ou relaxar.',
+  madeiramento: 'Madeiramento estrutural completo em Pinus tratado em autoclave (pilares, vigas, paredes, forro, estrutura de telhado). A montagem e demais materiais são de responsabilidade do cliente.',
+  parceira: 'Madeiramento + esquadrias (portas/janelas/ferragens) + mão de obra de carpintaria credenciada, com isenção de taxas administrativas da Wood Bahia. A cobertura, vidros e elétrica são contratados à parte.',
+  turnkey: 'Estrutura de madeira montada e acabada com responsabilidade única da Wood Bahia. Inclui madeiramento, esquadrias, cobertura completa (telhas ecológicas e manta térmica), vidros de 8mm, pintura em Stain (protetor), mão de obra própria e coordenação/gestão técnica total.',
   custom: 'Kit personalizado montado sob medida para o seu projeto.',
 };
 
@@ -50,19 +48,19 @@ export function getIncludedItems(data: ProposalData): string[] {
     'Ripas, canaletas, rodapés, molduras',
   ];
   
-  const hasFixtures = data.kitType === 'custom' ? data.includeFixtures : ['kit2', 'kit3', 'kit4'].includes(data.kitType);
+  const hasFixtures = data.kitType === 'custom' ? data.includeFixtures : ['parceira', 'turnkey'].includes(data.kitType);
   if (hasFixtures) {
     items.push('Portas e janelas em madeira');
     items.push('Ferragens completas');
   }
   
-  const hasTiles = data.kitType === 'custom' ? data.includeTilesStain : ['kit3', 'kit4'].includes(data.kitType);
+  const hasTiles = data.kitType === 'custom' ? data.includeTilesStain : ['turnkey'].includes(data.kitType);
   if (hasTiles) {
-    items.push('Cobertura com telhas');
-    items.push('Stain protetor aplicado');
+    items.push('Cobertura com telhas ecológicas');
+    items.push('Manta térmica subcobertura');
   }
   
-  const hasLabor = data.kitType === 'custom' ? data.includeLabor : data.kitType === 'kit4';
+  const hasLabor = data.kitType === 'custom' ? data.includeLabor : ['parceira', 'turnkey'].includes(data.kitType);
   if (hasLabor) {
     items.push('Mão de obra completa de montagem');
   }
@@ -71,18 +69,26 @@ export function getIncludedItems(data: ProposalData): string[] {
     items.push('Instalações elétricas e hidráulicas (Básica)');
   }
 
-  if (data.includeGlass) {
-    items.push('Vidros inclusos');
+  // Vidros inclusos no Turnkey ou se selecionado
+  const hasGlass = data.includeGlass || data.kitType === 'turnkey';
+  if (hasGlass) {
+    items.push('Vidros temperados (8mm)');
   }
 
   if (data.kitType === 'custom' && data.includeProject) {
     items.push('Projeto Arquitetônico Personalizado');
   }
 
+  if (data.kitType === 'turnkey') {
+    items.push('Coordenação e Gestão Técnica Wood Bahia');
+  }
+
   if (data.foundationType && data.foundationType !== 'none') {
-    const fLabel = data.foundationType === 'eucalyptus' ? 'Sapatas de Eucalipto Tratado'
+    const fLabel = data.foundationType === 'wooden_eucalyptus' ? 'Base Estrutural de Madeira + Sapatas de Eucalipto'
+                 : data.foundationType === 'wooden_masonry' ? 'Base Estrutural de Madeira + Sapatas de Manilha'
+                 : data.foundationType === 'eucalyptus' ? 'Sapatas de Eucalipto Tratado'
                  : data.foundationType === 'masonry' ? 'Sapatas de Manilhas em Alvenaria'
-                 : 'Base Radier Completo';
+                 : 'Base Radier + Banheiro Alvenaria';
     items.push(fLabel);
   }
 
@@ -90,8 +96,9 @@ export function getIncludedItems(data: ProposalData): string[] {
     items.push(data.masonryBathroomCount === 1 ? '1 Banheiro em Alvenaria' : `${data.masonryBathroomCount} Banheiros em Alvenaria`);
   }
 
-  if (data.paintType && data.paintType !== 'none') {
-    items.push(data.paintType === '1cor' ? 'Pintura Completa com Stain (1 Cor)' : 'Pintura Completa com Stain (2 Cores)');
+  const effectivePaintType = data.paintType === 'none' && data.kitType === 'turnkey' ? '1cor' : data.paintType;
+  if (effectivePaintType && effectivePaintType !== 'none') {
+    items.push(effectivePaintType === '1cor' ? 'Pintura Completa com Stain (1 Cor)' : 'Pintura Completa com Stain (2 Cores)');
   }
 
   return items;
@@ -100,19 +107,19 @@ export function getIncludedItems(data: ProposalData): string[] {
 export function getNotIncludedItems(data: ProposalData): string[] {
   const items: string[] = [];
 
-  const hasLabor = data.kitType === 'custom' ? data.includeLabor : data.kitType === 'kit4';
+  const hasLabor = data.kitType === 'custom' ? data.includeLabor : ['parceira', 'turnkey'].includes(data.kitType);
   if (!hasLabor) {
     items.push('Mão de obra de montagem');
   }
 
-  const hasFixtures = data.kitType === 'custom' ? data.includeFixtures : ['kit2', 'kit3', 'kit4'].includes(data.kitType);
+  const hasFixtures = data.kitType === 'custom' ? data.includeFixtures : ['parceira', 'turnkey'].includes(data.kitType);
   if (!hasFixtures) {
     items.push('Portas, janelas e ferragens');
   }
 
-  const hasTiles = data.kitType === 'custom' ? data.includeTilesStain : ['kit3', 'kit4'].includes(data.kitType);
+  const hasTiles = data.kitType === 'custom' ? data.includeTilesStain : ['turnkey'].includes(data.kitType);
   if (!hasTiles) {
-    items.push('Cobertura e telhas');
+    items.push('Cobertura e telhas ecológicas');
   }
 
   if (!data.foundationType || data.foundationType === 'none') {
@@ -122,13 +129,21 @@ export function getNotIncludedItems(data: ProposalData): string[] {
   if (!data.includeElectrical) {
     items.push('Instalações elétricas e hidráulicas');
   }
-  if (!data.includeGlass) {
+
+  const hasGlass = data.includeGlass || data.kitType === 'turnkey';
+  if (!hasGlass) {
     items.push('Vidros e envidraçamento');
   }
 
-  if (!data.paintType || data.paintType === 'none') {
-    items.push('Pintura externa adicional');
+  const effectivePaintType = data.paintType === 'none' && data.kitType === 'turnkey' ? '1cor' : data.paintType;
+  if (!effectivePaintType || effectivePaintType === 'none') {
+    items.push('Pintura externa e Stain protetor');
   }
+
+  if (data.kitType !== 'turnkey') {
+    items.push('Coordenação e gestão técnica de obra');
+  }
+
   items.push('Frete (salvo combinado na proposta)');
   items.push('Licenças ou projetos legais');
   return items;
@@ -177,8 +192,11 @@ export function generateProposalPDF(data: ProposalData): void {
   const { items, freight, additionalFreight, subtotal, total: totalFinal, discount, materialSubtotal } = calculateProposalItems(data);
 
   const subtotalComDesconto = subtotal - discount;
-  const materialLiquido = materialSubtotal - discount;
-  const totalAVista = Math.round(totalFinal - (materialLiquido * 0.05));
+  const timberItem = items.find(i => i.label.toLowerCase().includes('madeiramento'));
+  const woodenBaseItem = items.find(i => i.label.toLowerCase().includes('base de madeira') || i.label.toLowerCase().includes('base estrutural'));
+  const discountableBase = (timberItem ? timberItem.value : 0) + (woodenBaseItem ? woodenBaseItem.value : 0);
+  const discountableBaseNet = Math.max(0, discountableBase - discount);
+  const totalAVista = Math.round(totalFinal - (discountableBaseNet * 0.05));
 
   let y = 0;
 
@@ -364,7 +382,7 @@ export function generateProposalPDF(data: ProposalData): void {
   y += totalsHeight + 4;
 
   // ─── PRAZOS BANNER (right below totals) ───
-  const hasLabor = data.kitType === 'kit4' || (data.kitType === 'custom' && data.includeLabor);
+  const hasLabor = ['parceira', 'turnkey'].includes(data.kitType) || (data.kitType === 'custom' && data.includeLabor);
   {
     const bannerH = hasLabor ? 18 : 12;
     doc.setFillColor(...COLORS.primary);
@@ -400,6 +418,16 @@ export function generateProposalPDF(data: ProposalData): void {
     doc.setFont('helvetica', 'normal');
     doc.text(` — ${desc}`, margin + 8 + boldW, lineY);
   };
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(...COLORS.accent);
+  doc.text('CONDIÇÕES DE PAGAMENTO (PIX / BOLETO)', margin, y);
+  y += 6;
+
+  // À vista com 5% de desconto no madeiramento e base
+  drawPaymentLine('À Vista (5% desc. no madeiramento/base):', fmt(totalAVista), 'No PIX ou Transferência Bancária', y);
+  y += 5;
 
   // Novo modelo 50/50 (pagamento do material)
   const metade = baseParcelamento * 0.5;

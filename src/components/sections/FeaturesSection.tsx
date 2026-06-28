@@ -13,7 +13,7 @@ const features = [
     icon: Hammer,
     title: "Sistema Construtivo Racional",
     description:
-      "Processo industrializado que reduz desperdícios e garante precisão milimétrica na montagem da sua casa.",
+      "Processo racionalizado que otimiza o uso de materiais e proporciona alta precisão na montagem da sua casa.",
   },
   {
     icon: Zap,

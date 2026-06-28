@@ -28,7 +28,8 @@ import useEmblaCarousel from "embla-carousel-react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "~/lib/firebase";
 import { initialModels, applyModelOverrides } from "~/lib/data";
-import { getTilesStainPrice, getFixturesPrice } from "~/lib/pricing";
+import { getTilesStainPrice, getFixturesPrice, getGlassPrice, getLaborCost, getEucalyptusFoundation, getElectricalKit, getFreight } from "~/lib/pricing";
+import { cn } from "~/lib/utils";
 import { Header } from "~/components/layout/Header";
 import { WhatsAppButton } from "~/components/common/WhatsAppButton";
 import { ScrollReveal } from "~/components/common/ScrollReveal";
@@ -87,6 +88,8 @@ export default function ModelDetailPage() {
 
   // Calculadora Opcionais Dinâmicos
   const [selectedOptions, setSelectedOptions] = useState<Record<string, boolean>>({});
+  const [simModalidade, setSimModalidade] = useState<'kit' | 'parceira' | 'turnkey'>('turnkey');
+  const [includeBaseInSim, setIncludeBaseInSim] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -328,6 +331,143 @@ export default function ModelDetailPage() {
     setSelectedOptions(prev => ({ ...prev, [optId]: !prev[optId] }));
   };
 
+  const getScopeItems = (modalidade: 'kit' | 'parceira' | 'turnkey') => {
+    // Definimos se a base/assoalho está inclusa na simulação atual
+    const hasBase = modalidade === 'turnkey' || includeBaseInSim;
+
+    if (modalidade === 'kit') {
+      return {
+        title: "Análise do Kit Madeiramento",
+        inclusionsTitle: "O que está Incluso no Kit:",
+        exclusionsTitle: "O que NÃO está Incluso no Kit:",
+        inclusions: [
+          "Pilares de sustentação em autoclave",
+          "Vigas de travamento",
+          "Linhas e caibros de telhado",
+          "Estrutura completa das paredes",
+          "Estrutura do telhado e forros",
+          "Madeira Pinus tratada sob pressão",
+          "Projeto estrutural e manual técnico",
+          ...(hasBase ? [
+            "Barrotes de sustentação de piso",
+            "Assoalho de madeira (Base estrutural)"
+          ] : [])
+        ],
+        exclusions: [
+          "Portas e janelas (esquadrias)",
+          "Ferragens, pregos e parafusos",
+          "Barras roscadas e fixadores",
+          "Telhas e manta térmica",
+          "Vidros temperados",
+          "Stain e pintura protetora",
+          "Fundação e base civil",
+          "Mão de obra de montagem",
+          "Instalações de elétrica/hidro",
+          "Frete de entrega na obra",
+          ...(!hasBase ? [
+            "Barrotes de sustentação de piso e assoalho"
+          ] : [])
+        ]
+      };
+    } else if (modalidade === 'parceira') {
+      return {
+        title: "Análise da Montagem Parceira",
+        inclusionsTitle: "O que está Incluso na Parceria:",
+        exclusionsTitle: "O que NÃO está Incluso na Parceria:",
+        inclusions: [
+          "Pilares de sustentação em autoclave",
+          "Vigas de travamento",
+          "Linhas e caibros de telhado",
+          "Estrutura completa das paredes",
+          "Estrutura do telhado e forros",
+          "Madeira Pinus tratada sob pressão",
+          "Projeto estrutural e manual técnico",
+          "Portas e janelas (esquadrias)",
+          "Ferragens, pregos e parafusos",
+          "Barras roscadas e fixadores",
+          "Mão de obra de montagem credenciada",
+          "Fundação estimada (Sapatas Eucalipto)",
+          ...(hasBase ? [
+            "Barrotes de sustentação de piso",
+            "Assoalho de madeira (Base estrutural)"
+          ] : [])
+        ],
+        exclusions: [
+          "Telhas e manta térmica (cobertura)",
+          "Vidros temperados (8mm)",
+          "Stain e pintura protetora",
+          "Instalações de elétrica/hidro",
+          "Base civil / Laje radier",
+          "Frete de entrega na obra",
+          "Taxa de gestão/coordenação (Isento!)",
+          ...(!hasBase ? [
+            "Barrotes de sustentação de piso e assoalho"
+          ] : [])
+        ]
+      };
+    } else {
+      return {
+        title: "Análise do Chave na Mão",
+        inclusionsTitle: "O que está Incluso no Chave na Mão:",
+        exclusionsTitle: "O que NÃO está Incluso no Chave na Mão:",
+        inclusions: [
+          "Pilares de sustentação em autoclave",
+          "Vigas de travamento",
+          "Linhas e caibros de telhado",
+          "Estrutura completa das paredes",
+          "Estrutura do telhado e forros",
+          "Madeira Pinus tratada sob pressão",
+          "Projeto estrutural e manual técnico",
+          "Portas e janelas (esquadrias)",
+          "Ferragens, pregos e parafusos",
+          "Barras roscadas e fixadores",
+          "Mão de obra própria e montagem",
+          "Fundação de sapatas eucalipto",
+          "Telhas ecológicas e manta térmica",
+          "Vidros temperados (8mm)",
+          "Pintura protetora em Stain (1 cor)",
+          "Instalações de elétrica/hidráulica básica",
+          "Gestão, coordenação e garantia Wood Bahia",
+          "Barrotes de sustentação de piso",
+          "Assoalho de madeira (Base estrutural)"
+        ],
+        exclusions: [
+          "Base civil / Laje radier",
+          "Frete de entrega na obra",
+          "Louças, metais e pisos cerâmicos"
+        ]
+      };
+    }
+  };
+
+  // Cálculos das Modalidades Comerciais
+  const formatBRL = (val: number) => {
+    return val.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  };
+
+  const staticModel = initialModels.find(m => m.id === id || id.includes(m.id) || m.id.includes(id));
+  const purposes = model.purposes || staticModel?.purposes || [];
+
+  const laborCost = getLaborCost(numericArea);
+  const modelFixturesPrice = model.fixturesPrice ? parseCurrencyToNumber(model.fixturesPrice) : getFixturesPrice(numericArea).base;
+  const modelTilesPrice = model.tilesStainPrice ? parseCurrencyToNumber(model.tilesStainPrice) : getTilesStainPrice(numericArea).total;
+  const modelGlassPrice = getGlassPrice(numericArea);
+  const adminCost = Math.round(laborCost * 0.25); // 25% de coordenação
+
+  // Kit Madeiramento (Completo com Frete)
+  const kitEstimation = kitBasePriceNum + getFreight(numericArea);
+  const kitPriceDiscounted = kitEstimation - (kitBasePriceNum * 0.05);
+
+  // Montagem Parceira (Completo com Frete + Fundação Eucalipto + Portas/Janelas)
+  const partnerEstimation = kitBasePriceNum + modelFixturesPrice + laborCost + getEucalyptusFoundation(numericArea) + getFreight(numericArea);
+  const partnerEstimationDiscounted = partnerEstimation - (kitBasePriceNum * 0.05);
+
+  // Chave na Mão (Obra Completa)
+  const paintCost = numericArea <= 25 ? 2000 : numericArea <= 55 ? 3000 : 4500;
+  const basePrice = numericArea * 150;
+  const turnkeyEstimation = kitBasePriceNum + basePrice + laborCost + adminCost + getEucalyptusFoundation(numericArea) + modelTilesPrice + modelFixturesPrice + modelGlassPrice + paintCost + getElectricalKit(numericArea) + getFreight(numericArea);
+  const turnkeyEstimationDiscounted = turnkeyEstimation - ((kitBasePriceNum + basePrice) * 0.05);
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -447,144 +587,120 @@ export default function ModelDetailPage() {
                   {model.name}
                 </h1>
 
-                <div className="mb-6 flex flex-wrap gap-4">
-                  <span className="flex items-center gap-2 rounded-full bg-muted px-4 py-2 text-sm">
+                <div className="mb-4 flex flex-wrap gap-4">
+                  <span className="flex items-center gap-2 rounded-full bg-muted px-4 py-2 text-sm font-semibold text-stone-700">
                     <Maximize2 className="h-4 w-4 text-primary" />
                     {model.area}
                   </span>
-                  <span className="flex items-center gap-2 rounded-full bg-muted px-4 py-2 text-sm">
+                  <span className="flex items-center gap-2 rounded-full bg-muted px-4 py-2 text-sm font-semibold text-stone-700">
                     <Layers className="h-4 w-4 text-primary" />
                     {model.floors}
                   </span>
-                  <span className="flex items-center gap-2 rounded-full bg-muted px-4 py-2 text-sm">
+                  <span className="flex items-center gap-2 rounded-full bg-muted px-4 py-2 text-sm font-semibold text-stone-700">
                     <Bed className="h-4 w-4 text-primary" />
                     {model.bedrooms}{" "}
                     {model.bedrooms === 1 ? "Quarto" : "Quartos"}
                   </span>
                 </div>
 
-                <p className="mb-8 text-lg leading-relaxed text-muted-foreground">
+                {/* Finalidades do Modelo */}
+                {purposes && purposes.length > 0 && (
+                  <div className="mb-6 flex flex-wrap gap-2 items-center">
+                    <span className="text-xs font-bold text-stone-400 uppercase tracking-wider mr-1">Ideal para:</span>
+                    {purposes.map((p: string) => {
+                      const labels: Record<string, string> = {
+                        airbnb: "Airbnb",
+                        moradia: "Moradia",
+                        campo: "Campo",
+                        praia: "Praia",
+                      };
+                      return (
+                        <span 
+                          key={p} 
+                          className="inline-flex items-center rounded-full bg-amber-50 px-3 py-1 text-xs font-bold text-[#B06D46] border border-amber-100"
+                        >
+                          {labels[p] || p}
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
+
+                <p className="mb-8 text-base leading-relaxed text-muted-foreground">
                   {model.description}
                 </p>
 
-                <div className="relative mb-8 flex flex-col gap-6 overflow-hidden rounded-3xl border border-border bg-card shadow-sm p-6 md:p-8 lg:flex-row lg:gap-8">
-                  {/* Bloco 1: Produto (Kit) */}
-                  <div className="relative z-10 flex-1 flex flex-col">
-                    <div className="mb-4">
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100/80 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-emerald-800">
-                        <Package className="h-3 w-3" />
-                        Nosso Produto
+                {/* Cards de Preços por Modalidade */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+                  {/* Card 1: Kit Madeiramento */}
+                  <div className="bg-white p-5 rounded-3xl border border-stone-200 flex flex-col justify-between hover:border-stone-400 transition-colors">
+                    <div>
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1 text-[9px] font-bold uppercase tracking-wider text-stone-600 mb-3">
+                        <Package className="h-3.5 w-3.5" />
+                        1. Kit Madeiramento
                       </span>
-                    </div>
-                    <h3 className="text-xl font-bold text-[#4A2B1D] mb-1">Kit Madeiramento Premium</h3>
-                    <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
-                      Estrutura completa em pinus tratado. As peças são enviadas em tamanhos próximos para ajuste e corte na obra. Inclui manual técnico.
-                    </p>
-                    
-                    <div className="mb-6 flex justify-between items-end border-b border-border/50 pb-4">
-                      <div>
-                        <p className="text-xs uppercase tracking-widest font-bold text-muted-foreground mb-1">
-                          Valor Base do Kit
-                        </p>
-                        <p className="text-[#4A2B1D] font-serif text-2xl font-bold">
-                          {kitBasePriceNum.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="mt-2">
-                      <p className="text-xs uppercase tracking-widest font-bold text-emerald-800 mb-3 flex items-center gap-2">
-                        + Opcionais Disponíveis no Kit:
+                      <p className="text-[11px] text-gray-400 leading-normal mb-3">
+                        Estrutura completa em madeira tratada de autoclave para montagem própria.
                       </p>
-                      <div className="space-y-3">
-                        {availableOptions.map((opt) => (
-                          <label key={opt.id} className="flex items-center justify-between cursor-pointer group hover:bg-emerald-50/50 p-2 -mx-2 rounded-lg transition-colors">
-                            <div className="flex items-center gap-3">
-                              <div className="relative flex items-center">
-                                <input 
-                                  type="checkbox" 
-                                  checked={!!selectedOptions[opt.id]}
-                                  onChange={() => toggleOption(opt.id)}
-                                  className="w-5 h-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
-                                />
-                              </div>
-                              <span className="text-sm text-[#735F53] font-medium group-hover:text-[#4A2B1D]">{opt.name}</span>
-                            </div>
-                            <span className="text-sm font-bold text-emerald-700">
-                              + {opt.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                            </span>
-                          </label>
-                        ))}
-                      </div>
                     </div>
-
-                    <div className="mt-auto pt-6 border-t border-emerald-100">
-                      <div className="bg-emerald-50 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border border-emerald-100/50 shadow-sm">
-                        <p className="text-sm font-bold text-emerald-900 uppercase tracking-widest">
-                          Subtotal do Kit:
-                        </p>
-                        <p className="font-serif text-3xl font-bold text-emerald-700">
-                          {totalKitPurchase.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                        </p>
+                    <div className="mt-4 pt-3 border-t border-stone-50">
+                      <span className="text-[9px] text-gray-400 block uppercase font-bold">Investimento Estimado</span>
+                      <div className="flex flex-wrap items-baseline gap-1.5 mt-0.5">
+                        <span className="text-[11px] text-muted-foreground line-through">{formatBRL(kitEstimation)}</span>
+                        <span className="font-serif text-xl font-bold text-primary">{formatBRL(kitPriceDiscounted)}</span>
                       </div>
-                    </div>
-                    
-                    <div className="mt-6 pt-4">
-                      <p className="text-xs uppercase tracking-widest font-bold text-muted-foreground mb-1">
-                        Frete
-                      </p>
-                      {model.freight_value ? (
-                        <div>
-                          {model.freight_is_promo ? (
-                            <div className="flex flex-col gap-1">
-                              <div className="flex items-center gap-3">
-                                <span className="text-base text-muted-foreground line-through font-serif">{model.freight_value}</span>
-                                <span className="font-serif text-xl font-bold text-emerald-600">
-                                  R$ {(parseFloat(model.freight_value.replace(/[^\d,]/g, '').replace(',', '.')) / 2).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                                </span>
-                              </div>
-                              <p className="text-[10px] font-bold text-emerald-600 uppercase mt-1">
-                                Frete compartilhado (pagamos 50%)
-                              </p>
-                            </div>
-                          ) : (
-                            <p className="text-[#4A2B1D] font-serif text-xl font-bold">
-                              {model.freight_value}
-                            </p>
-                          )}
-                        </div>
-                      ) : (
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase">
-                          Frete compartilhado por R$ 700,00
-                        </p>
-                      )}
+                      <span className="text-[9px] text-emerald-600 font-bold block mt-0.5">5% de desc. à vista no madeiramento</span>
+                      <div className="text-[10px] text-[#8C6239] font-bold bg-[#E8DCCF]/20 px-2 py-1 rounded-lg border border-[#E8DCCF]/45 mt-2.5 self-start inline-block">
+                        🪵 Opcional Kit Base + Assoalho: {formatBRL(numericArea * 150)}
+                      </div>
+                      <span className="text-[9px] text-stone-500 block mt-2.5 font-medium italic">*Inclui frete. Solicite proposta para valores reais.</span>
                     </div>
                   </div>
 
-                  {/* Bloco 2: Serviço Independente */}
-                  <div className="relative z-10 flex flex-1 flex-col border-t border-border/60 pt-6 lg:border-l lg:border-t-0 lg:pt-0 lg:pl-8">
-                    <div className="rounded-2xl bg-[#F8F9FA] border border-slate-200/60 p-6 h-full flex flex-col">
-                      <div className="mb-4">
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-200 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-700">
-                          <Hammer className="h-3 w-3" />
-                          Serviço Independente
-                        </span>
-                      </div>
-                      <h3 className="text-xl font-bold text-slate-800 mb-1">Montagem por Credenciados</h3>
-                      <p className="text-sm text-slate-600 mb-6 leading-relaxed">
-                        Conectamos você a carpinteiros especialistas. Contrato direto com o profissional, garantindo isenção de taxas ocultas. Eles realizam todos os cortes e ajustes sob medida no local.
+                  {/* Card 2: Kit + Montagem Parceira */}
+                  <div className="bg-white p-5 rounded-3xl border border-stone-200 flex flex-col justify-between hover:border-[#B06D46] transition-colors">
+                    <div>
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-[9px] font-bold uppercase tracking-wider text-[#B06D46] mb-3">
+                        <Hammer className="h-3.5 w-3.5" />
+                        2. Montagem Parceira
+                      </span>
+                      <p className="text-[11px] text-gray-400 leading-normal mb-3">
+                        Compra do kit estrutural montado por carpinteiros homologados indicados.
                       </p>
-
-                      <div className="mb-6">
-                        <p className="text-xs uppercase tracking-widest font-bold text-slate-500 mb-1">Custo Estimado (Mão de Obra)</p>
-                        <p className="font-serif text-2xl font-bold text-slate-800">
-                          A partir de R$ {(numericArea * 500).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                        </p>
+                    </div>
+                    <div className="mt-4 pt-3 border-t border-stone-50">
+                      <span className="text-[9px] text-gray-400 block uppercase font-bold">Investimento Estimado</span>
+                      <div className="flex flex-wrap items-baseline gap-1.5 mt-0.5">
+                        <span className="text-[11px] text-muted-foreground line-through">{formatBRL(partnerEstimation)}</span>
+                        <span className="font-serif text-xl font-bold text-[#B06D46]">{formatBRL(partnerEstimationDiscounted)}</span>
                       </div>
+                      <span className="text-[9px] text-emerald-600 font-bold block mt-0.5">5% de desc. à vista no madeiramento</span>
+                      <span className="text-[9px] text-stone-550 block mt-2.5 font-medium italic">*Inclui frete e fundação. Solicite proposta para valores reais.</span>
+                    </div>
+                  </div>
 
-                      <div className="mt-auto text-xs text-slate-500 italic bg-white p-3 rounded-xl border border-slate-100">
-                        * O valor acima é uma estimativa. O pagamento da montagem é feito diretamente ao profissional escolhido, conforme andamento da obra.
+                  {/* Card 3: Chave na Mão */}
+                  <div className="bg-[#FAF8F5] p-5 rounded-3xl border border-[#E8DCCF] flex flex-col justify-between hover:border-[#8A3A1B] transition-colors shadow-[0_8px_30px_rgba(138,58,27,0.03)] relative">
+                    <div className="absolute -top-2.5 right-4 rounded-full bg-[#8A3A1B] text-white text-[8px] font-bold tracking-widest uppercase px-2.5 py-0.5">
+                      Pronto
+                    </div>
+                    <div>
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-[9px] font-bold uppercase tracking-wider text-[#8A3A1B] mb-3 shadow-sm">
+                        <Home className="h-3.5 w-3.5" />
+                        3. Chave na Mão
+                      </span>
+                      <p className="text-[11px] text-gray-400 leading-normal mb-3">
+                        Estrutura pronta, coberta, pintada, com portas, janelas e vidros instalados.
+                      </p>
+                    </div>
+                    <div className="mt-4 pt-3 border-t border-[#E8DCCF]/60">
+                      <span className="text-[9px] text-gray-400 block uppercase font-bold">Investimento Estimado</span>
+                      <div className="flex flex-wrap items-baseline gap-1.5 mt-0.5">
+                        <span className="text-[11px] text-muted-foreground line-through">{formatBRL(turnkeyEstimation)}</span>
+                        <span className="font-serif text-xl font-bold text-[#8A3A1B]">{formatBRL(turnkeyEstimationDiscounted)}</span>
                       </div>
+                      <span className="text-[9px] text-emerald-600 font-bold block mt-0.5">5% de desc. à vista no madeiramento/base</span>
+                      <span className="text-[9px] text-stone-550 block mt-2.5 font-medium italic">*Obra Completa. Solicite proposta para valores reais do frete/fundação no seu terreno.</span>
                     </div>
                   </div>
                 </div>
@@ -592,13 +708,13 @@ export default function ModelDetailPage() {
                 <div className="flex flex-col gap-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <a
-                      href={`https://wa.me/5571992936290?text=Olá! Tenho interesse no ${model.name}.`}
+                      href={`https://wa.me/5571992936290?text=Olá! Tenho interesse no modelo ${model.name}.`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn-cta bg-primary !shadow-lg px-6 py-4 text-base flex items-center justify-center gap-2 rounded-xl font-bold"
                     >
                       <Phone className="h-5 w-5" />
-                      Pedir Proposta
+                      Pedir Proposta Comercial
                     </a>
                     
                     <Link
@@ -606,7 +722,7 @@ export default function ModelDetailPage() {
                       className="inline-flex items-center justify-center gap-2 border-2 border-primary/20 bg-transparent px-6 py-4 font-bold text-primary rounded-xl hover:bg-primary/5 hover:-translate-y-1 transition-all text-center text-base"
                     >
                       <Layers className="h-5 w-5" />
-                      Planta Baixa
+                      Visualizar Planta Baixa
                     </Link>
                   </div>
 
@@ -619,8 +735,8 @@ export default function ModelDetailPage() {
                         <CreditCard className="h-4 w-4" />
                       </div>
                       <div className="text-left">
-                        <p className="text-sm font-bold text-[#B06D46] leading-none">Simular Parcela</p>
-                        <p className="text-[10px] text-[#B06D46]/70 font-medium uppercase mt-1 tracking-wider">cartão credito até 18X</p>
+                        <p className="text-sm font-bold text-[#B06D46] leading-none">Simular Parcelas</p>
+                        <p className="text-[10px] text-[#B06D46]/70 font-medium uppercase mt-1 tracking-wider">No cartão de crédito em até 18x</p>
                       </div>
                     </div>
                     <ChevronRight className="h-4 w-4 text-[#B06D46]/40 group-hover:text-[#B06D46] transition-colors" />
@@ -707,6 +823,317 @@ export default function ModelDetailPage() {
           </div>
         </section>
 
+        {/* O que está incluso e Simulação de Investimento */}
+        <section className="bg-[#FAF8F5] py-20 lg:py-28 border-t border-stone-200">
+          <div className="container mx-auto px-4">
+            <div className="grid gap-12 lg:grid-cols-2">
+              
+              {/* O que está Incluso / Não Incluso */}
+              {(() => {
+                const scope = getScopeItems(simModalidade);
+                return (
+                  <ScrollReveal>
+                    <h3 className="text-2xl font-bold text-[#4A2B1D] font-serif mb-8 flex items-center gap-2">
+                      {scope.title}
+                    </h3>
+                    
+                    <div className="space-y-8">
+                      {/* Incluso */}
+                      <div className="bg-white p-6 rounded-[2rem] border border-stone-150 shadow-sm">
+                        <h4 className="text-base font-bold text-emerald-700 mb-4 flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                          {scope.inclusionsTitle}
+                        </h4>
+                        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-gray-500">
+                          {scope.inclusions.map((item) => (
+                            <li key={item} className="flex items-center gap-2">
+                              <Check className="w-4 h-4 text-emerald-600 shrink-0" strokeWidth={3} />
+                              <span>{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* Não Incluso */}
+                      <div className="bg-white p-6 rounded-[2rem] border border-stone-150 shadow-sm">
+                        <h4 className="text-base font-bold text-red-650 mb-4 flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-red-500" />
+                          {scope.exclusionsTitle}
+                        </h4>
+                        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-gray-400">
+                          {scope.exclusions.map((item) => (
+                            <li key={item} className="flex items-center gap-2">
+                              <X className="w-3.5 h-3.5 text-red-400 shrink-0" strokeWidth={2.5} />
+                              <span className="line-through">{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </ScrollReveal>
+                );
+              })()}
+
+              {/* Simulação de Investimento */}
+              <ScrollReveal delay={0.2}>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                  <h3 className="text-2xl font-bold text-[#4A2B1D] font-serif flex items-center gap-2">
+                    Simulação de Investimento Detalhada
+                  </h3>
+                  
+                  {/* Seletor de Modalidade da Simulação */}
+                  <div className="inline-flex rounded-xl bg-stone-100 p-1 border border-stone-200">
+                    {[
+                      { id: 'kit', label: '1. Kit', emoji: '🪵' },
+                      { id: 'parceira', label: '2. Parceira', emoji: '🔨' },
+                      { id: 'turnkey', label: '3. Chave na Mão', emoji: '🔑' },
+                    ].map((tab) => (
+                      <button
+                        key={tab.id}
+                        onClick={() => setSimModalidade(tab.id as any)}
+                        className={cn(
+                          "inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold rounded-lg transition-all",
+                          simModalidade === tab.id
+                            ? "bg-white text-primary shadow-sm"
+                            : "text-stone-500 hover:text-stone-800"
+                        )}
+                      >
+                        <span>{tab.emoji}</span>
+                        <span>{tab.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-[2rem] border border-stone-200 p-6 md:p-8 shadow-sm">
+                  <span className="text-xs uppercase tracking-wider font-bold text-gray-400 block mb-4">
+                    Estimativa detalhada — Modalidade {simModalidade === 'kit' ? 'Kit Madeiramento' : simModalidade === 'parceira' ? 'Montagem Parceira' : 'Chave na Mão'}
+                  </span>
+
+                  <div className="space-y-4 text-sm mb-6">
+                    {/* Item 1: Kit Madeiramento */}
+                    <div className="flex justify-between pb-3 border-b border-stone-100">
+                      <span className="text-stone-700 font-medium">1. Kit Madeiramento Estrutural:</span>
+                      <span className="font-bold text-stone-850">{formatBRL(kitBasePriceNum)}</span>
+                    </div>
+
+                    {/* Item 2: Kit Base + Assoalho de Madeira */}
+                    {simModalidade === 'turnkey' ? (
+                      <div className="flex justify-between pb-3 border-b border-stone-100">
+                        <span className="text-stone-700 font-medium">2. Kit Base + Assoalho de Madeira (Incluso):</span>
+                        <span className="font-bold text-stone-850">{formatBRL(numericArea * 150)}</span>
+                      </div>
+                    ) : (
+                      <div className="flex justify-between pb-3 border-b border-stone-100 items-center">
+                        <label className="flex items-center gap-2 cursor-pointer select-none text-stone-700 font-medium">
+                          <input 
+                            type="checkbox"
+                            checked={includeBaseInSim}
+                            onChange={(e) => setIncludeBaseInSim(e.target.checked)}
+                            className="rounded border-stone-300 text-primary focus:ring-primary h-4 w-4"
+                          />
+                          <span>2. Kit Base + Assoalho de Madeira (Opcional):</span>
+                        </label>
+                        <span className={cn("font-bold transition-colors", includeBaseInSim ? "text-stone-850" : "text-stone-400")}>
+                          {includeBaseInSim ? formatBRL(numericArea * 150) : `+ ${formatBRL(numericArea * 150)}`}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Item 3: Mão de Obra de Montagem */}
+                    {simModalidade !== 'kit' ? (
+                      <div className="flex justify-between pb-3 border-b border-stone-100">
+                        <span className="text-stone-700 font-medium">3. Mão de Obra de Montagem (Incluso no Parceira/Chave na Mão):</span>
+                        <span className="font-bold text-stone-850">{formatBRL(laborCost)}</span>
+                      </div>
+                    ) : (
+                      <div className="flex justify-between pb-3 border-b border-stone-100 text-stone-300">
+                        <span className="font-medium">3. Mão de Obra de Montagem:</span>
+                        <span className="italic text-xs font-semibold">Não Incluso (Por conta do cliente nesta modalidade)</span>
+                      </div>
+                    )}
+
+                    {/* Item 4: Gestão e Coordenação Obra */}
+                    {simModalidade === 'turnkey' ? (
+                      <div className="flex justify-between pb-3 border-b border-stone-100">
+                        <span className="text-[#8A3A1B] font-medium">4. Gestão e Coordenação Obra (Incluso no Chave na Mão):</span>
+                        <span className="font-bold text-[#8A3A1B]">{formatBRL(adminCost)}</span>
+                      </div>
+                    ) : (
+                      <div className="flex justify-between pb-3 border-b border-stone-100 text-stone-300">
+                        <span className="font-medium">4. Gestão e Coordenação Obra:</span>
+                        <span className="italic text-xs font-semibold">Não Incluso (Isento nesta modalidade)</span>
+                      </div>
+                    )}
+
+                    {/* Item 5: Fundação Estimada (Sapatas Eucalipto) */}
+                    {simModalidade !== 'kit' ? (
+                      <div className="flex justify-between pb-3 border-b border-stone-100">
+                        <span className="text-stone-700 font-medium">
+                          5. Fundação Estimada (Incluso no Parceira/Chave na Mão):
+                        </span>
+                        <span className="font-bold text-stone-850">{formatBRL(getEucalyptusFoundation(numericArea))}</span>
+                      </div>
+                    ) : (
+                      <div className="flex justify-between pb-3 border-b border-stone-100 text-stone-300">
+                        <span className="font-medium">5. Fundação Estimada (Sapatas Eucalipto):</span>
+                        <span className="italic text-xs font-semibold">Não Incluso (Por conta do cliente nesta modalidade)</span>
+                      </div>
+                    )}
+
+                    {/* Item 6: Cobertura (Telhas/Manta) */}
+                    {simModalidade === 'turnkey' ? (
+                      <div className="flex justify-between pb-3 border-b border-stone-100">
+                        <span className="text-stone-700 font-medium">6. Cobertura Premium (Incluso apenas no Chave na Mão):</span>
+                        <span className="font-bold text-stone-850">{formatBRL(modelTilesPrice)}</span>
+                      </div>
+                    ) : (
+                      <div className="flex justify-between pb-3 border-b border-stone-100 text-stone-300">
+                        <span className="font-medium">6. Cobertura Premium (Telhas e Manta):</span>
+                        <span className="italic text-xs font-semibold">Não Incluso (Por conta do cliente nesta modalidade)</span>
+                      </div>
+                    )}
+
+                    {/* Item 7: Portas e Janelas */}
+                    {simModalidade === 'turnkey' || simModalidade === 'parceira' ? (
+                      <div className="flex justify-between pb-3 border-b border-stone-100">
+                        <span className="text-stone-700 font-medium">7. Portas, Janelas e Ferragens (Incluso no Parceira/Chave na Mão):</span>
+                        <span className="font-bold text-stone-850">{formatBRL(modelFixturesPrice)}</span>
+                      </div>
+                    ) : (
+                      <div className="flex justify-between pb-3 border-b border-stone-100 text-stone-300">
+                        <span className="font-medium">7. Portas, Janelas e Ferragens:</span>
+                        <span className="italic text-xs font-semibold">Não Incluso (Por conta do cliente nesta modalidade)</span>
+                      </div>
+                    )}
+
+                    {/* Item 8: Vidros Temperados */}
+                    {simModalidade === 'turnkey' ? (
+                      <div className="flex justify-between pb-3 border-b border-stone-100">
+                        <span className="text-stone-700 font-medium">8. Vidros Temperados (Incluso apenas no Chave na Mão):</span>
+                        <span className="font-bold text-stone-850">{formatBRL(modelGlassPrice)}</span>
+                      </div>
+                    ) : (
+                      <div className="flex justify-between pb-3 border-b border-stone-100 text-stone-300">
+                        <span className="font-medium">8. Vidros Temperados (8mm):</span>
+                        <span className="italic text-xs font-semibold">Não Incluso (Por conta do cliente nesta modalidade)</span>
+                      </div>
+                    )}
+
+                    {/* Item 9: Pintura completa */}
+                    {simModalidade === 'turnkey' ? (
+                      <div className="flex justify-between pb-3 border-b border-stone-100">
+                        <span className="text-stone-700 font-medium">9. Pintura Completa Stain (Incluso apenas no Chave na Mão):</span>
+                        <span className="font-bold text-stone-850">{formatBRL(numericArea <= 25 ? 2000 : numericArea <= 55 ? 3000 : 4500)}</span>
+                      </div>
+                    ) : (
+                      <div className="flex justify-between pb-3 border-b border-stone-100 text-stone-300">
+                        <span className="font-medium">9. Pintura Completa com Stain:</span>
+                        <span className="italic text-xs font-semibold">Não Incluso (Por conta do cliente nesta modalidade)</span>
+                      </div>
+                    )}
+
+                    {/* Item 10: Elétrica/Hidráulica */}
+                    {simModalidade === 'turnkey' ? (
+                      <div className="flex justify-between pb-3 border-b border-stone-100">
+                        <span className="text-stone-700 font-medium">10. Instalações Elétrica/Hidro (Incluso apenas no Chave na Mão):</span>
+                        <span className="font-bold text-stone-850">{formatBRL(getElectricalKit(numericArea))}</span>
+                      </div>
+                    ) : (
+                      <div className="flex justify-between pb-3 border-b border-stone-100 text-stone-300">
+                        <span className="font-medium">10. Instalações de Elétrica/Hidráulica Básica:</span>
+                        <span className="italic text-xs font-semibold">Não Incluso (Por conta do cliente nesta modalidade)</span>
+                      </div>
+                    )}
+
+                    {/* Item 11: Frete Estimado */}
+                    <div className="flex justify-between pb-3 border-b border-stone-100">
+                      <span className="text-stone-700 font-medium">Frete Estimado (Litoral/Região Metropolitana):</span>
+                      <span className="font-bold text-stone-850">{formatBRL(getFreight(numericArea))}</span>
+                    </div>
+                  </div>
+                    
+                  {/* Totais de investimento com base de cálculo rigorosa */}
+                    {(() => {
+                      const basePrice = numericArea * 150;
+                      
+                      // 1. Kit
+                      const kitAPrazo = kitBasePriceNum + getFreight(numericArea) + (includeBaseInSim ? basePrice : 0);
+                      const kitDiscountable = kitBasePriceNum + (includeBaseInSim ? basePrice : 0);
+                      const kitDesconto = Math.round(kitDiscountable * 0.05);
+                      const kitAVista = kitAPrazo - kitDesconto;
+                      
+                      // 2. Parceira
+                      const partnerAPrazo = kitBasePriceNum + laborCost + getEucalyptusFoundation(numericArea) + getFreight(numericArea) + (includeBaseInSim ? basePrice : 0);
+                      const partnerDiscountable = kitBasePriceNum + (includeBaseInSim ? basePrice : 0);
+                      const partnerDesconto = Math.round(partnerDiscountable * 0.05);
+                      const partnerAVista = partnerAPrazo - partnerDesconto;
+                      
+                      // 3. Chave na mão (base está inclusa por padrão)
+                      const turnkeyAPrazo = kitBasePriceNum + basePrice + laborCost + adminCost + getEucalyptusFoundation(numericArea) + modelTilesPrice + modelFixturesPrice + modelGlassPrice + (numericArea <= 25 ? 2000 : numericArea <= 55 ? 3000 : 4500) + getElectricalKit(numericArea) + getFreight(numericArea);
+                      const turnkeyDiscountable = kitBasePriceNum + basePrice;
+                      const turnkeyDesconto = Math.round(turnkeyDiscountable * 0.05);
+                      const turnkeyAVista = turnkeyAPrazo - turnkeyDesconto;
+                      
+                      const totalAPrazo = simModalidade === 'kit' ? kitAPrazo : simModalidade === 'parceira' ? partnerAPrazo : turnkeyAPrazo;
+                      const totalAVista = simModalidade === 'kit' ? kitAVista : simModalidade === 'parceira' ? partnerAVista : turnkeyAVista;
+                      const descontoAVista = simModalidade === 'kit' ? kitDesconto : simModalidade === 'parceira' ? partnerDesconto : turnkeyDesconto;
+
+                      return (
+                        <div className="space-y-4">
+                          <div className="flex justify-between pb-3 border-b border-stone-100 text-emerald-700 bg-emerald-50/50 p-2 rounded-lg text-xs font-semibold">
+                            <span>Desconto de 5% (Aplicado à Vista no Madeiramento {includeBaseInSim || simModalidade === 'turnkey' ? "+ Base" : ""}):</span>
+                            <span>- {formatBRL(descontoAVista)}</span>
+                          </div>
+
+                          <div className="bg-[#FAF8F5] p-5 rounded-2xl border border-stone-200 mb-6 space-y-4">
+                            <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                              <div>
+                                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">Investimento Parcelado (A Prazo)</span>
+                                <span className="text-[11px] text-stone-500 italic mt-0.5 block">
+                                  {simModalidade === 'kit' && "Apenas compra do material estrutural + frete"}
+                                  {simModalidade === 'parceira' && "Kit, frete, montagem e fundação estimados"}
+                                  {simModalidade === 'turnkey' && "Obra completa coordenada pela Wood Bahia (inclui base de madeira, pintura e elétrica)"}
+                                </span>
+                              </div>
+                              <span className="font-serif font-black text-2xl text-stone-800">
+                                {formatBRL(totalAPrazo)}
+                              </span>
+                            </div>
+
+                            <div className="w-full h-[1px] bg-stone-200"></div>
+
+                            <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 bg-emerald-50/50 p-3 rounded-xl border border-emerald-100">
+                              <div>
+                                <span className="text-[10px] text-emerald-800 font-bold uppercase tracking-wider block">Investimento à Vista (PIX/Boleto)</span>
+                                <span className="text-[11px] text-emerald-700 italic mt-0.5 block">
+                                  Com desconto de 5% aplicado sobre o madeiramento {includeBaseInSim || simModalidade === 'turnkey' ? "e base estrutural" : ""}
+                                </span>
+                              </div>
+                              <div className="text-right">
+                                <span className="font-serif font-black text-2xl text-emerald-800">
+                                  {formatBRL(totalAVista)}
+                                </span>
+                                <span className="block text-[10px] text-emerald-600 font-semibold mt-0.5">
+                                  Economia de {formatBRL(descontoAVista)}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
+
+                  <p className="text-[10px] text-gray-400 leading-relaxed italic">
+                    *Valores estimativos baseados no m² do projeto. Podem variar conforme a topografia do lote, logística de frete e padrão de acabamento civil escolhido.
+                  </p>
+                </div>
+              </ScrollReveal>
+
+            </div>
+          </div>
+        </section>
+
         {/* Transparência Total */}
         <TransparencySection />
 
@@ -726,7 +1153,7 @@ export default function ModelDetailPage() {
                   </div>
                 </div>
                 <h3 className="font-serif mb-3 text-2xl font-bold text-white md:text-3xl">
-                  Mais de <span className="text-amber-400">45 mil pessoas</span>{" "}
+                  Mais de <span className="text-amber-400">47 mil pessoas</span>{" "}
                   acompanham a Wood Bahia.
                 </h3>
                 <p className="mx-auto mb-6 max-w-lg text-white/70">

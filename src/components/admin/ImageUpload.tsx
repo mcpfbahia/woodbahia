@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import { supabase } from "~/lib/supabase";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { storage } from "~/lib/firebase";
 import { UploadCloud, X, Loader2, CheckCircle2 } from "lucide-react";
 import Image from "next/image";
 
@@ -21,7 +19,6 @@ export function ImageUpload({ onUploadComplete, folder = "uploads", defaultImage
   const [error, setError] = useState("");
 
   const executeUpload = async (uploadFile: File) => {
-    // Prioridade para Supabase
     if (supabase) {
       setUploading(true);
       setError("");
@@ -58,41 +55,9 @@ export function ImageUpload({ onUploadComplete, folder = "uploads", defaultImage
         setUploading(false);
         setFile(null);
       }
-      return;
+    } else {
+      setError("Supabase não configurado. Por favor, pare o terminal (Ctrl+C) e inicie o npm run dev novamente.");
     }
-
-    // Fallback para Firebase se Supabase não configurado
-    if (!storage) return;
-
-    setUploading(true);
-    setError("");
-    setProgress(0);
-
-    const fileExtension = uploadFile.name.split('.').pop();
-    const fileName = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${fileExtension}`;
-    const storageRef = ref(storage, `${folder}/${fileName}`);
-    
-    setProgress(50);
-    
-    uploadBytes(storageRef, uploadFile)
-      .then(async (snapshot) => {
-        setProgress(100);
-        try {
-          const downloadURL = await getDownloadURL(snapshot.ref);
-          onUploadComplete(downloadURL);
-          setUploading(false);
-        } catch (err: any) {
-          setError("Erro ao obter o link da imagem.");
-          setUploading(false);
-          setFile(null);
-        }
-      })
-      .catch((err: any) => {
-        console.error("Erro no upload Firebase:", err);
-        setError(`Falha Firebase: ${err.message || 'Desconhecida'}`);
-        setUploading(false);
-        setFile(null);
-      });
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {

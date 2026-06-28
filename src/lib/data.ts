@@ -11,6 +11,7 @@ export const initialModels = [
     kitPrice: "R$ 8.334,09",
     freight_value: "R$ 1.800,00",
     freight_is_promo: true,
+    purposes: ["airbnb", "praia", "campo"],
   },
   {
     id: "casa-jorge-amado",
@@ -24,6 +25,7 @@ export const initialModels = [
     kitPrice: "R$ 52.000,00",
     freight_value: "R$ 11.500,00",
     freight_is_promo: true,
+    purposes: ["moradia", "campo", "praia"],
   },
   {
     id: "chale-baixios",
@@ -37,6 +39,7 @@ export const initialModels = [
     kitPrice: "R$ 20.800,00",
     freight_value: "R$ 8.500,00",
     freight_is_promo: true,
+    purposes: ["airbnb", "campo", "praia"],
   },
   {
     id: "chale-guarajuba",
@@ -50,6 +53,7 @@ export const initialModels = [
     kitPrice: "R$ 33.800,00",
     freight_value: "R$ 11.500,00",
     freight_is_promo: true,
+    purposes: ["airbnb", "moradia", "campo", "praia"],
   },
   {
     id: "chale-itacimirim",
@@ -63,6 +67,7 @@ export const initialModels = [
     kitPrice: "R$ 22.750,00",
     freight_value: "R$ 8.000,00",
     freight_is_promo: true,
+    purposes: ["airbnb", "praia", "campo"],
   },
   {
     id: "chale-praia-do-forte",
@@ -76,6 +81,7 @@ export const initialModels = [
     kitPrice: "R$ 12.675,00",
     freight_value: "R$ 6.500,00",
     freight_is_promo: true,
+    purposes: ["airbnb", "praia"],
   },
 ];
 
@@ -257,54 +263,53 @@ export const steps = [
 
 export const faqItems = [
   {
-    question: "01 — Qual o prazo de fabricação e montagem?",
+    question: "01 — Qual o prazo de fabricação, entrega e montagem?",
     answer:
-      "A fabricação e separação do seu kit na Wood Bahia leva em média 30 a 45 dias após a assinatura do contrato e pagamento do sinal. Já a montagem do chalé no terreno (feita pelos parceiros credenciados ou sua equipe) leva em média de 30 a 60 dias adicionais, variando conforme o tamanho do modelo escolhido.",
+      "A fabricação e entrega do Kit Madeiramento estrutural levam em média de 15 a 60 dias úteis, a depender da complexidade do projeto. Para os projetos que incluem a montagem (Modalidades Parceira ou Chave na Mão), o prazo de montagem no local da obra segue o padrão de 1 dia útil por m² de área construída (por exemplo, um chalé de 35m² leva aproximadamente 35 dias úteis para ser montado).",
   },
   {
-    question: "02 — A madeira Pinus tratada é resistente?",
+    question: "02 — A madeira Pinus tratada é durável?",
     answer:
-      "Sim. Utilizamos madeira Pinus tratada em autoclave, um processo industrial que protege a madeira contra cupins, fungos e umidade. Esse tratamento aumenta significativamente a durabilidade da estrutura, tornando os chalés de madeira e casas pré-fabricadas resistentes e seguros para uso em regiões de praia, campo ou cidade.",
+      "Sim, é extremamente resistente. Toda a estrutura e acabamentos em Pinus passam por tratamento industrial em autoclave sob pressão, o que imuniza a madeira contra pragas (cupins), fungos e umidade. Graças a esse processo, a Wood Bahia oferece garantia de até 15 anos na madeira contra deterioração biológica, sendo ideal tanto para o litoral quanto para o campo.",
   },
   {
-    question: "03 — Vocês entregam em todo o Brasil?",
+    question: "03 — Vocês realizam a montagem em qualquer estado?",
     answer:
-      "Sim, os kits de chalés de madeira são enviados para todo o Brasil. O frete é terceirizado e, para grande parte dos nossos projetos, a Wood Bahia oferece a modalidade de frete compartilhado subsidiando 50% do custo de transporte até a sua obra.",
+      "Nós enviamos os Kits de Madeiramento para todo o Brasil. Contudo, os serviços que envolvem montagem de obra (Modalidade Kit + Montagem Parceira e Modalidade Chave na Mão) são prestados de forma exclusiva nos estados da Bahia (BA) e Sergipe (SE). Caso você esteja em outro estado, poderá comprar o kit estrutural e realizar a montagem com profissionais locais de sua confiança.",
   },
   {
-    question: "04 — O que preciso ter pronto no terreno?",
+    question: "04 — Quais são as modalidades de contratação da Wood Bahia?",
     answer:
-      "O terreno deve estar limpo e nivelado. A construção da fundação (radier de concreto ou sapatas) é o primeiro passo prático da obra. Esse serviço não vem da fábrica e pode ser negociado diretamente com a equipe de montadores parceiros ou executado por profissionais de sua confiança antes da chegada da madeira.",
+      "Oferecemos três modalidades principais de contratação: 1) Apenas o Kit Madeiramento: a fábrica fornece o madeiramento estrutural completo e manual, e a montagem/insumos são de responsabilidade do cliente. 2) Kit + Montagem Parceira: inclui madeiramento, portas/janelas e mão de obra de carpintaria credenciada, com isenção de taxas administrativas da Wood Bahia. 3) Wood Bahia Chave na Mão: assumimos responsabilidade total de ponta a ponta, entregando o chalé montado, coberto, pintado no Stain, com esquadrias e vidros temperados instalados.",
   },
   {
-    question: "05 — Posso personalizar o projeto?",
+    question: "05 — Como funciona a taxa de gestão na modalidade Chave na Mão?",
     answer:
-      "Sim! Como as peças de madeira são fornecidas em tamanhos aproximados para corte no local da obra, a personalização de layout (como alterar a posição de uma parede interna, porta ou janela) é totalmente flexível. Isso é combinado e executado diretamente com os carpinteiros parceiros durante a montagem.",
+      "Na modalidade Wood Bahia Chave na Mão, nós assumimos a coordenação civil e técnica total da obra. Para isso, é aplicada uma taxa de Gestão e Coordenação de Obra equivalente a 25% calculados sobre o valor da mão de obra de montagem. Essa taxa cobre todo o suporte operacional, gerenciamento de equipe técnica própria e garantia unificada da construtora.",
   },
   {
-    question: "06 — Como funciona o pagamento?",
+    question: "06 — Como funciona a política de descontos e pagamentos?",
     answer:
-      "Trabalhamos com diferentes formas de pagamento: parcelamento em até 6x sem juros, parcelamento em até 18x no cartão com juros ou 5% de desconto para pagamento à vista. O parcelamento do kit é feito em duas etapas: 50% de sinal na assinatura do contrato e o saldo final de 50% pago 24hs antes do embarque do kit (saída da fábrica).",
+      "Oferecemos 5% de desconto para pagamento à vista. Importante destacar que esse desconto incide exclusivamente sobre o valor dos materiais (Kit Madeiramento e base estrutural de madeira), não sendo aplicado sobre fretes ou mão de obra de terceiros. Também facilitamos o pagamento aceitando cartões de crédito em até 3x sem juros ou em até 18x com juros.",
   },
   {
-    question: "07 — A casa vem com instalação elétrica e hidráulica?",
+    question: "07 — O que preciso preparar no terreno antes da obra?",
     answer:
-      "O kit estrutural de madeira não possui fiações ou tubulações embutidas de fábrica. A passagem de eletrodutos e a instalação de pontos básicos de água e esgoto são executadas no local da obra, geralmente pela própria equipe parceira de montadores durante a construção.",
+      "O cliente deve providenciar a limpeza e o nivelamento do terreno. A fundação de concreto (laje radier ou sapatas de sustentação) deve estar pronta para o início da montagem de madeira. Na modalidade Chave na Mão, a Wood Bahia pode coordenar a base do chalé de acordo com a simulação do cliente. Nas demais modalidades, a execução da base civil é contratada à parte pelo cliente.",
   },
   {
-    question: "08 — Qual a garantia dos produtos?",
+    question: "08 — Os chalés vêm com instalações elétricas e hidráulicas?",
     answer:
-      "Nossos chalés utilizam madeira Pinus tratada em autoclave, o que permite oferecer garantia estrutural de até 15 anos contra pragas e deterioração da madeira, desde que sejam realizados os cuidados básicos de manutenção.",
+      "As peças de madeira do kit saem de fábrica sem cortes ou tubulações embutidas. A instalação da fiação elétrica e pontos básicos de hidráulica é executada no canteiro de obras por profissionais especializados. O kit elétrico/hidráulico básico de materiais e a respectiva mão de obra podem ser incluídos como opcional na simulação do seu projeto.",
   },
   {
-    question: "09 — Vocês constroem no modelo \"Chave na Mão\"?",
+    question: "09 — O que são esquadrias e vidros opcionais nos simuladores?",
     answer:
-      "Nós atuamos exclusivamente como fabricantes e fornecedores do Kit Madeiramento Premium (produto). Não atuamos como construtora \"chave na mão\". No entanto, conectamos você a uma rede de carpinteiros e montadores credenciados e experientes que realizarão toda a montagem através de um contrato de prestação de serviço totalmente independente, com total transparência.",
+      "Nas modalidades Apenas Kit e Montagem Parceira, você pode optar por adicionar o kit de portas, janelas e ferragens padrão. A porta de correr em eucalipto de 1.8m é opcional e concede 5% de desconto no total de portas e janelas. Já a modalidade Chave na Mão já traz todos os vidros temperados de 8mm e pintura Stain protetora inclusos no pacote padrão.",
   },
   {
-    question: "10 — Quem fará a montagem do meu kit?",
+    question: "10 — Posso realizar modificações personalizadas no layout do chalé?",
     answer:
-      "Você tem total liberdade de escolha. Pode contratar um dos nossos carpinteiros especialistas credenciados (garantindo isenção de taxas ocultas) ou utilizar uma equipe de construtores de sua própria confiança. O nosso kit acompanha um manual técnico e projeto arquitetônico para guiar todo o processo.",
+      "Sim! Pelo fato de as peças de madeira serem ajustadas e cortadas sob medida diretamente no local de montagem, você tem total flexibilidade para propor pequenos ajustes de layout (como alterar a posição interna de portas, janelas ou paredes) em comum acordo com a equipe de montagem, ou configurar um 'Kit Personalizado' na simulação.",
   },
 ];
-

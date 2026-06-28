@@ -13,8 +13,8 @@ interface DiferencialProps {
 const diferencialData: DiferencialProps[] = [
   {
     icon: Hammer,
-    title: "Sistema Construtivo Industrializado",
-    description: "Precisão milimétrica e desperdício zero de material. Mais eficiência estrutural para sua casa de campo."
+    title: "Sistema Construtivo Racionalizado",
+    description: "Componentes modulados que proporcionam uma obra mais limpa, montagem simplificada e menor desperdício de materiais no canteiro."
   },
   {
     icon: Zap,

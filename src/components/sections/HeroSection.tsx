@@ -127,7 +127,7 @@ export const HeroSection = () => {
               ))}
             </div>
             <p className="text-sm font-medium tracking-wide">
-              Mais de <span className="text-amber-400 font-bold">45 mil pessoas</span> acompanham nossos projetos no Instagram
+              Mais de <span className="text-amber-400 font-bold">47 mil pessoas</span> acompanham nossos projetos no Instagram
             </p>
           </motion.div>
 

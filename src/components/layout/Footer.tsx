@@ -47,7 +47,7 @@ export const Footer = () => {
             </div>
 
             <h3 className="mb-3 font-serif text-xl font-bold text-primary-foreground md:text-2xl lg:text-3xl">
-              Mais de <span className="font-extrabold text-white">45 mil pessoas</span> acompanham a Wood Bahia no Instagram.
+              Mais de <span className="font-extrabold text-white">47 mil pessoas</span> acompanham a Wood Bahia no Instagram.
             </h3>
 
             <p className="mx-auto mb-6 max-w-lg text-sm text-primary-foreground/60 md:text-base">
@@ -180,7 +180,7 @@ export const Footer = () => {
                   <a href="https://www.instagram.com/woodbahiacasasprefabricadas/" target="_blank" rel="noopener noreferrer" className="font-medium transition-colors hover:text-white">
                     @woodbahia
                   </a>
-                  <span className="mt-1 block text-sm text-primary-foreground/50">+40 mil seguidores</span>
+                  <span className="mt-1 block text-sm text-primary-foreground/50">+47 mil seguidores</span>
                 </div>
               </li>
             </ul>

@@ -22,10 +22,9 @@ import {
 import { toast } from 'sonner';
 
 const KIT_OPTIONS: { value: KitType; label: string; emoji: string }[] = [
-  { value: 'kit1', label: 'Kit 1 — Essência Natural', emoji: '🪵' },
-  { value: 'kit2', label: 'Kit 2 — Raízes do Projeto', emoji: '🔩' },
-  { value: 'kit3', label: 'Kit 3 — Abrigo Natural', emoji: '🛖' },
-  { value: 'kit4', label: 'Kit 4 — Refúgio Completo', emoji: '🏕️' },
+  { value: 'madeiramento', label: '1. Apenas o Kit Madeiramento', emoji: '🪵' },
+  { value: 'parceira', label: '2. Kit + Montagem Parceira', emoji: '🔨' },
+  { value: 'turnkey', label: '3. Wood Bahia Chave na Mão', emoji: '🔑' },
   { value: 'custom', label: 'Kit Personalizado', emoji: '⚙️' },
 ];
 
@@ -144,7 +143,7 @@ export default function PropostasPage() {
   const [clientName, setClientName] = useState('');
   const [workLocation, setWorkLocation] = useState('');
   const [modelId, setModelId] = useState('');
-  const [kitType, setKitType] = useState<KitType>('kit4');
+  const [kitType, setKitType] = useState<KitType>('turnkey');
   const [customArea, setCustomArea] = useState(30);
   const [customModelDescription, setCustomModelDescription] = useState('');
   const [slidingDoor, setSlidingDoor] = useState(false);
@@ -194,6 +193,29 @@ export default function PropostasPage() {
     setMasonryBathroomPriceOverride(undefined);
     setPaintPriceOverride(undefined);
   }, [modelId, kitType, customArea]);
+
+  // Seleção automática dos opcionais padrão ao alterar modalidade
+  useEffect(() => {
+    if (kitType === 'turnkey') {
+      setIncludeFixtures(true);
+      setIncludeTilesStain(true);
+      setIncludeLabor(true);
+      setIncludeGlass(true);
+      setPaintType('1cor');
+    } else if (kitType === 'parceira') {
+      setIncludeFixtures(true);
+      setIncludeTilesStain(false);
+      setIncludeLabor(true);
+      setIncludeGlass(false);
+      setPaintType('none');
+    } else if (kitType === 'madeiramento') {
+      setIncludeFixtures(false);
+      setIncludeTilesStain(false);
+      setIncludeLabor(false);
+      setIncludeGlass(false);
+      setPaintType('none');
+    }
+  }, [kitType]);
 
   const addExtraItem = () => setExtraItems([...extraItems, { description: '', value: 0 }]);
   const removeExtraItem = (index: number) => {
@@ -290,6 +312,10 @@ export default function PropostasPage() {
     electricalPriceOverride: undefined,
     glassPriceOverride: undefined,
     projectPriceOverride: undefined,
+    foundationPriceOverride: undefined,
+    masonryBathroomPriceOverride: undefined,
+    paintPriceOverride: undefined,
+    freightOverride: undefined,
   });
 
   const getSugg = (label: string) => suggested.items.find(i => i.label.toLowerCase().includes(label.toLowerCase()))?.value ?? 0;
@@ -585,7 +611,7 @@ export default function PropostasPage() {
                         </div>
                         <Switch checked={slidingDoor} onCheckedChange={setSlidingDoor} className="toggle-glow data-[state=checked]:bg-primary" />
                       </div>
-                      {slidingDoor && !(['kit2', 'kit3', 'kit4'].includes(kitType)) && (
+                      {slidingDoor && !(['parceira', 'turnkey'].includes(kitType)) && (
                         <EditablePrice 
                           label="Porta de Correr" 
                           suggested={getSugg('Porta de Correr')} 
@@ -594,7 +620,7 @@ export default function PropostasPage() {
                         />
                       )}
 
-                      {(kitType === 'kit4' || (kitType === 'custom' && includeLabor)) && (
+                      {( (['parceira', 'turnkey'].includes(kitType)) || (kitType === 'custom' && includeLabor)) && (
                         <>
                           <div className="pt-2">
                             <div className="flex items-center justify-between group">
@@ -652,9 +678,11 @@ export default function PropostasPage() {
                              </SelectTrigger>
                              <SelectContent className="rounded-xl border-primary/20">
                                <SelectItem value="none">Sem Fundação Inclusa</SelectItem>
-                               <SelectItem value="eucalyptus">Sapatas de Eucalipto Tratado</SelectItem>
-                               <SelectItem value="masonry">Sapatas de Manilhas em Alvenaria</SelectItem>
-                               <SelectItem value="radier">Base Radier</SelectItem>
+                               <SelectItem value="wooden_eucalyptus">Base Estrutural de Madeira + Eucalipto</SelectItem>
+                               <SelectItem value="wooden_masonry">Base Estrutural de Madeira + Alvenaria</SelectItem>
+                               <SelectItem value="radier">Base Radier + Banheiro Alvenaria</SelectItem>
+                               <SelectItem value="eucalyptus">Sapatas de Eucalipto Tratado (Legado)</SelectItem>
+                               <SelectItem value="masonry">Sapatas de Manilhas em Alvenaria (Legado)</SelectItem>
                              </SelectContent>
                            </Select>
                         </div>
@@ -662,9 +690,11 @@ export default function PropostasPage() {
                           <EditablePrice 
                             label="Valor da Base"
                             suggested={
-                              foundationType === 'eucalyptus' ? getSugg('Eucalipto') :
-                              foundationType === 'masonry' ? getSugg('Manilhas') :
-                              getSugg('Radier')
+                              foundationType === 'eucalyptus' || foundationType === 'wooden_eucalyptus'
+                                ? getSugg('Eucalipto') + getSugg('Estrutural')
+                                : foundationType === 'masonry' || foundationType === 'wooden_masonry'
+                                ? getSugg('Manilhas') + getSugg('Estrutural')
+                                : getSugg('Radier')
                             }
                             value={foundationPriceOverride} 
                             onChange={setFoundationPriceOverride} 

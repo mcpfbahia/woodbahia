@@ -83,11 +83,11 @@ export default function MigrateImagesPage() {
     try {
       addLog("info", "Iniciando busca de modelos...");
       const modelsSnapshot = await getDocs(collection(db, "models"));
-      const models = modelsSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      const models = modelsSnapshot.docs.map(d => ({ id: d.id, ...d.data() }) as any);
       
       addLog("info", "Iniciando busca de portfólio...");
       const portfolioSnapshot = await getDocs(collection(db, "portfolio"));
-      const portfolios = portfolioSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      const portfolios = portfolioSnapshot.docs.map(d => ({ id: d.id, ...d.data() }) as any);
 
       const totalItems = models.length + portfolios.length;
       setProgress({ current: 0, total: totalItems });

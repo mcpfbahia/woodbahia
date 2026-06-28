@@ -8,10 +8,9 @@ import { Slider } from '@/components/ui/slider';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 const KIT_OPTIONS: { id: Exclude<KitType, 'custom'>; name: string; desc: string; highlight?: boolean }[] = [
-  { id: 'kit1', name: '🪵 Kit 1 — Essência Natural', desc: 'Madeiramento completo em Pinus tratado. A base estrutural em madeira tratada, pronta para dar vida ao seu projeto com segurança e durabilidade.' },
-  { id: 'kit2', name: '🔩 Kit 2 — Raízes do Projeto', desc: 'Kit 1 + portas, janelas e ferragens, formando o início real do seu Chalé.' },
-  { id: 'kit3', name: '🛖 Kit 3 — Abrigo Natural', desc: 'Kit 2 + Telhas e Stain. Seu chalé protegido com cobertura completa, pronto para enfrentar o tempo com conforto e resistência.' },
-  { id: 'kit4', name: '🏕️ Kit 4 — Refúgio Completo', desc: 'Kit 3 + mao-de-obra completa. Do projeto à realidade: entregamos seu chalé montado, pronto para viver, investir ou relaxar.', highlight: true },
+  { id: 'madeiramento', name: '🪵 1. Apenas o Kit Madeiramento', desc: 'Madeiramento estrutural completo em Pinus tratado em autoclave (pilares, vigas, paredes, forro, estrutura de telhado). A montagem e demais materiais são de responsabilidade do cliente.' },
+  { id: 'parceira', name: '🔨 2. Kit + Montagem Parceira', desc: 'Madeiramento + esquadrias (portas/janelas/ferragens) + mão de obra de carpintaria credenciada, com isenção de taxas administrativas da Wood Bahia. A cobertura, vidros e elétrica são contratados à parte.' },
+  { id: 'turnkey', name: '🔑 3. Wood Bahia Chave na Mão', desc: 'Estrutura de madeira montada e acabada com responsabilidade única da Wood Bahia. Inclui madeiramento, esquadrias, cobertura completa (telhas ecológicas e manta térmica), vidros de 8mm, pintura em Stain (protetor), mão de obra própria e coordenação/gestão técnica total.', highlight: true },
 ];
 
 const CUSTOM_ADDONS: { key: keyof CustomOptions; label: string }[] = [
@@ -68,7 +67,7 @@ export function StepKitSelect(props: Props) {
 }
 
 function StandardMode({ isEligibleForFull, model, kitType, kitAddons, slidingDoor, onKitSelect, onKitAddonsChange, onSlidingDoorChange, onBack, onNext }: StandardProps) {
-  const showSlidingDoor = kitType === 'kit2' || kitType === 'kit3' || kitType === 'kit4';
+  const showSlidingDoor = kitType === 'parceira' || kitType === 'turnkey';
   return (
     <motion.div
       initial={{ opacity: 0, x: 40 }}
@@ -78,7 +77,7 @@ function StandardMode({ isEligibleForFull, model, kitType, kitAddons, slidingDoo
     >
       <div className="text-center mb-10">
         <h2 className="text-3xl md:text-4xl font-bold font-display mb-3">
-          Escolha o <span className="text-gradient-warm italic">Tipo de Kit</span>
+          Escolha a <span className="text-gradient-warm italic">Modalidade de Obra</span>
         </h2>
         <p className="text-muted-foreground">Modelo selecionado: <strong className="text-foreground">{model.name}</strong> ({model.area}m²)</p>
       </div>
@@ -91,7 +90,7 @@ function StandardMode({ isEligibleForFull, model, kitType, kitAddons, slidingDoo
       >
         {KIT_OPTIONS.map((opt) => {
           const isSelected = kitType === opt.id;
-          const isDisabled = !isEligibleForFull && opt.id === 'kit4';
+          const isDisabled = !isEligibleForFull && (opt.id === 'parceira' || opt.id === 'turnkey');
           return (
             <motion.button
               key={opt.id}
@@ -123,14 +122,14 @@ function StandardMode({ isEligibleForFull, model, kitType, kitAddons, slidingDoo
                     }}
                   >
                     <span>🔥</span>
-                    <span>Mais simulado</span>
+                    <span>Recomendado</span>
                   </motion.span>
                 )}
               </div>
               <span className="text-sm text-muted-foreground mt-1">{opt.desc}</span>
               {isDisabled && (
                 <span className="text-xs text-destructive font-medium mt-2 block">
-                  * Indisponível para o seu estado (Kit completo com montagem apenas para Bahia e Sergipe).
+                  * Indisponível para o seu estado (Kit com montagem apenas para Bahia e Sergipe).
                 </span>
               )}
             </motion.button>
@@ -138,11 +137,11 @@ function StandardMode({ isEligibleForFull, model, kitType, kitAddons, slidingDoo
         })}
       </motion.div>
 
-      {kitType === 'kit4' && (
+      {(kitType === 'parceira' || kitType === 'turnkey') && (
         <div className="max-w-xl mx-auto glass-card rounded-2xl p-6 mb-8">
-          <p className="text-sm font-semibold mb-4 font-display">Opcionais:</p>
+          <p className="text-sm font-semibold mb-4 font-display">Opcionais de Obra:</p>
           <div className="flex flex-col gap-3">
-            {STANDARD_ADDONS.map((addon) => (
+            {STANDARD_ADDONS.filter(addon => !(kitType === 'turnkey' && addon.key === 'glass')).map((addon) => (
               <div key={addon.key} className="flex items-center gap-3">
                 <Checkbox
                   id={`std-${addon.key}`}
@@ -156,6 +155,14 @@ function StandardMode({ isEligibleForFull, model, kitType, kitAddons, slidingDoo
                 </Label>
               </div>
             ))}
+            {kitType === 'turnkey' && (
+              <div className="flex items-center gap-3 opacity-80">
+                <Checkbox id="std-glass-turnkey" checked disabled />
+                <Label htmlFor="std-glass-turnkey" className="text-sm text-muted-foreground cursor-not-allowed">
+                  Vidros Temperados (Já inclusos no pacote)
+                </Label>
+              </div>
+            )}
           </div>
         </div>
       )}

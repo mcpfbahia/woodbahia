@@ -6,17 +6,17 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 const FOUNDATION_OPTIONS: { id: FoundationType; name: string; desc: string }[] = [
-  { id: 'eucalyptus', name: 'Sapatas em Eucalipto', desc: 'Base econômica em eucalipto tratado' },
-  { id: 'masonry', name: 'Sapatas Manilhas de Alvenaria', desc: 'Base em manilhas de alvenaria — maior durabilidade' },
-  { id: 'radier', name: 'Radier + Banheiro Alvenaria', desc: 'Laje radier com banheiro em alvenaria rebocado' },
-  { id: 'none', name: 'Sem Base (já possuo)', desc: 'Não incluir base na simulação' },
+  { id: 'radier', name: 'Base Radier + Banheiro Alvenaria', desc: 'Laje radier de concreto com banheiro em alvenaria (piso cimentado)' },
+  { id: 'wooden_eucalyptus', name: 'Base Estrutural de Madeira + Pilares de Eucalipto', desc: 'Estrutura elevada de madeira com assoalho, sustentada por sapatas de eucalipto tratado' },
+  { id: 'wooden_masonry', name: 'Base Estrutural de Madeira + Pilares de Alvenaria', desc: 'Estrutura elevada de madeira com assoalho, sustentada por sapatas de manilha de alvenaria' },
+  { id: 'none', name: 'Sem Base (já possuo)', desc: 'Não incluir base ou fundação civil na simulação' },
 ];
 
 function getPrice(id: FoundationType, area: number): number | null {
   switch (id) {
-    case 'eucalyptus': return getEucalyptusFoundation(area);
-    case 'masonry': return getMasonryFoundation(area);
     case 'radier': return getRadierFoundation(area);
+    case 'wooden_eucalyptus': return (area * 150) + getEucalyptusFoundation(area);
+    case 'wooden_masonry': return (area * 150) + getMasonryFoundation(area);
     default: return null;
   }
 }

@@ -72,7 +72,7 @@ export const FooterWoodBahia = () => {
               </div>
             </div>
             <h3 className="mb-3 font-serif text-xl font-bold md:text-2xl lg:text-3xl">
-              Mais de <span className="font-extrabold text-white">45 mil pessoas</span> acompanham <br className="hidden lg:block" />
+              Mais de <span className="font-extrabold text-white">47 mil pessoas</span> acompanham <br className="hidden lg:block" />
               a Wood Bahia no Instagram.
             </h3>
             <a

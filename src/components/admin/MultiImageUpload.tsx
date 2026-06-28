@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import { supabase } from "~/lib/supabase";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { storage } from "~/lib/firebase";
 import { UploadCloud, X, Loader2 } from "lucide-react";
 import Image from "next/image";
 
@@ -53,31 +51,9 @@ export function MultiImageUpload({ onUploadComplete, folder = "uploads" }: Multi
             console.error("Erro no upload múltiplo Supabase:", err);
             reject(err);
           }
-          return;
+        } else {
+          reject(new Error("Supabase não configurado. Por favor, pare o terminal (Ctrl+C) e inicie o npm run dev novamente."));
         }
-
-        // Fallback para Firebase
-        if (!storage) {
-          reject(new Error("Storage não configurado"));
-          return;
-        }
-
-        const storageRef = ref(storage, filePath);
-        uploadBytes(storageRef, file)
-          .then(async (snapshot) => {
-            fileProgresses[index] = 100;
-            setProgress(fileProgresses.reduce((a, b) => a + b, 0) / uploadFiles.length);
-            try {
-              const downloadURL = await getDownloadURL(snapshot.ref);
-              resolve(downloadURL);
-            } catch (err) {
-              reject(err);
-            }
-          })
-          .catch((err) => {
-            console.error("Erro no upload múltiplo Firebase:", err);
-            reject(err);
-          });
       });
     });
 

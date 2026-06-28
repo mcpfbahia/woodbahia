@@ -17,10 +17,9 @@ function fmt(v: number) {
 }
 
 const KIT_NAMES: Record<string, string> = {
-  kit1: 'Kit 1 — Essência Natural',
-  kit2: 'Kit 2 — Raízes do Projeto',
-  kit3: 'Kit 3 — Abrigo Natural',
-  kit4: 'Kit 4 — Refúgio Completo',
+  madeiramento: 'Modalidade 1 — Apenas o Kit Madeiramento',
+  parceira: 'Modalidade 2 — Kit + Montagem Parceira',
+  turnkey: 'Modalidade 3 — Wood Bahia Chave na Mão',
   custom: 'Kit Personalizado',
 };
 
@@ -33,8 +32,14 @@ export function StepSummary({ state, onBack, onReset }: Props) {
     : `${state.model!.name} — ${state.model!.area}m²`;
   const kitLabel = state.kitType ? KIT_NAMES[state.kitType] || state.kitType : '';
 
+  // O desconto de 5% incide apenas sobre o Kit Madeiramento e a base estrutural de madeira se houver.
+  const timberItem = items.find(i => i.label.toLowerCase().includes('kit madeiramento'));
+  const woodenBaseItem = items.find(i => i.label.toLowerCase().includes('base de madeira') || i.label.toLowerCase().includes('base estrutural'));
+  const discountableBase = (timberItem ? timberItem.value : 0) + (woodenBaseItem ? woodenBaseItem.value : 0);
+
   const CASH_DISCOUNT = 0.05;
-  const totalAVista = Math.round(total - (materialSubtotal * CASH_DISCOUNT));
+  const discountValue = Math.round(discountableBase * CASH_DISCOUNT);
+  const totalAVista = Math.round(total - discountValue);
   const sinal = total * 0.3;
   const entrega = total * 0.2;
   const saldo = total * 0.5;
@@ -50,10 +55,10 @@ export function StepSummary({ state, onBack, onReset }: Props) {
     ``,
     `📊 *Detalhamento:*`,
     ...items.map((item: LineItem) => `• ${item.label}: ${fmt(item.value)}`),
-    `• Frete Estimado (${area}m² × R$ 90): ${fmt(freight)}`,
+    `• Frete Estimado (${area}m² × R$ 95): ${fmt(freight)}`,
     ``,
     `💰 *Total do Investimento: ${fmt(total)}*`,
-    `💚 *À Vista (5% desc.): ${fmt(totalAVista)}*`,
+    `💚 *À Vista (5% desc. no madeiramento/base): ${fmt(totalAVista)}*`,
     ``,
     `📅 *Condições de Pagamento:*`,
     `• Sinal (30%): ${fmt(sinal)}`,
@@ -106,7 +111,7 @@ export function StepSummary({ state, onBack, onReset }: Props) {
                   </motion.div>
                 ))}
                 <div className="flex justify-between items-center text-sm py-1">
-                  <span className="text-muted-foreground">Frete Estimado ({area}m² × R$ 90)</span>
+                  <span className="text-muted-foreground">Frete Estimado ({area}m² × R$ 95)</span>
                   <span className="font-semibold tabular-nums">{fmt(freight)}</span>
                 </div>
               </div>
@@ -131,8 +136,8 @@ export function StepSummary({ state, onBack, onReset }: Props) {
                 className="flex justify-between items-center bg-green-500/10 border border-green-500/20 rounded-xl p-4 -mx-1 mt-3"
               >
                 <div>
-                  <span className="text-sm font-bold font-display text-green-700 dark:text-green-400">💰 À Vista (5% de desconto)</span>
-                  <p className="text-xs text-muted-foreground mt-0.5">Pagamento integral antecipado</p>
+                  <span className="text-sm font-bold font-display text-green-700 dark:text-green-400">💰 À Vista (5% de desconto no madeiramento)</span>
+                  <p className="text-xs text-muted-foreground mt-0.5">Aplicado sobre o madeiramento e base de madeira</p>
                 </div>
                 <span className="text-xl md:text-2xl font-bold text-green-700 dark:text-green-400 font-display">{fmt(totalAVista)}</span>
               </motion.div>

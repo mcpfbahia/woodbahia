@@ -16,13 +16,13 @@ const steps = [
   },
   {
     icon: SlidersHorizontal,
-    title: '2. Configure o Kit',
-    desc: 'Escolha o nível de acabamento (Kit 1 a 4). Adicione opcionais como elétrica, vidros e porta de correr.',
+    title: '2. Modalidade Comercial',
+    desc: 'Escolha a forma de contratação (Apenas Kit Madeiramento, Kit + Montagem Parceira ou Wood Bahia Chave na Mão).',
   },
   {
     icon: FileText,
     title: '3. Base / Fundação',
-    desc: 'Quando a mão de obra está inclusa, selecione o tipo de fundação desejado (radier, sapata ou estaca).',
+    desc: 'Nas modalidades com montagem, selecione o tipo de base civil ou fundação de madeira elevada para o terreno.',
   },
   {
     icon: BookOpen,

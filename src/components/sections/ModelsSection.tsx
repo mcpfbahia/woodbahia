@@ -7,6 +7,7 @@ import Link from "next/link";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "~/lib/firebase";
 import { initialModels, applyModelOverrides } from "~/lib/data";
+import { getTilesStainPrice, getFixturesPrice, getGlassPrice, getLaborCost, getEucalyptusFoundation, getElectricalKit, getFreight } from "~/lib/pricing";
 import {
   ScrollReveal,
   StaggerContainer,
@@ -30,6 +31,7 @@ function formatBRL(val: number): string {
 export const ModelsSection = () => {
   const [models, setModels] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedModalidade, setSelectedModalidade] = useState<'kit' | 'parceira' | 'turnkey'>('kit');
 
   useEffect(() => {
     const fetchModels = async () => {
@@ -69,8 +71,38 @@ export const ModelsSection = () => {
             </span>
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground md:text-lg">
-            Fornecemos o kit completo em madeira pinus tratada, pronto para ser montado por especialistas credenciados no seu terreno.
+            Fornecemos o kit completo em madeira pinus tratada e oferecemos total flexibilidade de investimento de acordo com a modalidade de obra desejada.
           </p>
+
+          {/* Seletor de Modalidade Dinâmico */}
+          <div className="mt-8 flex justify-center">
+            <div className="inline-flex flex-col sm:flex-row rounded-2xl bg-muted/65 p-1.5 border border-border/50 gap-1.5 shadow-inner backdrop-blur-sm">
+              {[
+                { id: 'kit', label: '1. Kit Madeiramento', emoji: '🪵', desc: 'Apenas a estrutura' },
+                { id: 'parceira', label: '2. Kit + Montagem Parceira', emoji: '🔨', desc: 'Indicação credenciada' },
+                { id: 'turnkey', label: '3. Wood Bahia Chave na Mão', emoji: '🔑', desc: 'Obra 100% coordenada' },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setSelectedModalidade(tab.id as any)}
+                  className={cn(
+                    "flex flex-col items-center sm:items-start rounded-xl px-4 py-2.5 text-center sm:text-left transition-all duration-300 min-w-[150px] md:min-w-[190px]",
+                    selectedModalidade === tab.id
+                      ? "bg-white text-primary shadow-md scale-105 border border-primary/5 font-bold"
+                      : "text-muted-foreground hover:text-foreground hover:bg-white/30 font-medium"
+                  )}
+                >
+                  <div className="flex items-center gap-1.5 text-xs md:text-sm">
+                    <span>{tab.emoji}</span>
+                    <span>{tab.label}</span>
+                  </div>
+                  <span className="hidden sm:inline text-[9px] opacity-70 mt-0.5 font-medium">
+                    {tab.desc}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
         </ScrollReveal>
 
         {isLoading ? (
@@ -81,9 +113,30 @@ export const ModelsSection = () => {
           <StaggerContainer className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
             {models?.slice(0, 6).map((model, idx) => {
               const kitFull = parsePriceToBRL(model.kitPrice || model.price);
-              const kitDiscount = kitFull > 0 ? kitFull * 0.95 : 0;
-              const freightFull = parsePriceToBRL(model.freight_value);
-              const freightClient = model.freight_is_promo && freightFull > 0 ? freightFull / 2 : freightFull;
+              
+              // Metragem e cálculos dinâmicos correspondentes
+              const areaStr = model.area || '';
+              const numericArea = parseFloat(areaStr.toString().replace(',', '.').replace(/[^\d.]/g, '')) || 0;
+
+              const laborCost = getLaborCost(numericArea);
+              const modelFixturesPrice = model.fixturesPrice ? parsePriceToBRL(model.fixturesPrice) : getFixturesPrice(numericArea).base;
+              const modelTilesPrice = model.tilesStainPrice ? parsePriceToBRL(model.tilesStainPrice) : getTilesStainPrice(numericArea).total;
+              const modelGlassPrice = getGlassPrice(numericArea);
+              const adminCost = Math.round(laborCost * 0.25); // 25% de coordenação
+
+              // 1. Kit Madeiramento (Completo com Frete)
+              const kitEstimation = kitFull + getFreight(numericArea);
+              const kitPriceDiscounted = kitEstimation - (kitFull * 0.05);
+
+              // 2. Montagem Parceira (Completo com Frete + Fundação Eucalipto)
+              const partnerEstimation = kitFull + laborCost + getEucalyptusFoundation(numericArea) + getFreight(numericArea);
+              const partnerEstimationDiscounted = partnerEstimation - (kitFull * 0.05);
+
+              // 3. Chave na Mão (Obra Completa)
+              const paintCost = numericArea <= 25 ? 2000 : numericArea <= 55 ? 3000 : 4500;
+              const basePrice = numericArea * 150;
+              const turnkeyEstimation = kitFull + basePrice + laborCost + adminCost + getEucalyptusFoundation(numericArea) + modelTilesPrice + modelFixturesPrice + modelGlassPrice + paintCost + getElectricalKit(numericArea) + getFreight(numericArea);
+              const turnkeyEstimationDiscounted = turnkeyEstimation - ((kitFull + basePrice) * 0.05);
 
               return (
                 <StaggerItem key={model.id} index={idx}>
@@ -121,76 +174,153 @@ export const ModelsSection = () => {
 
                       {/* Info área */}
                       <div className="flex items-center gap-2 text-xs text-muted-foreground sm:text-sm">
-                        <Maximize2 className="h-3.5 w-3.5 shrink-0" />
+                        <Maximize2 className="h-3.5 w-3.5 shrink-0 text-primary" />
                         <span>{model.infoLabel || model.area}</span>
                       </div>
+
+                      {/* Badges de Finalidades */}
+                      {(() => {
+                        const staticModel = initialModels.find(
+                          (m) => m.id === model.id || model.id.includes(m.id) || m.id.includes(model.id)
+                        );
+                        const purposes = model.purposes || staticModel?.purposes || [];
+
+                        if (purposes.length === 0) return null;
+
+                        const labels: Record<string, string> = {
+                          airbnb: "Airbnb",
+                          moradia: "Moradia",
+                          campo: "Campo",
+                          praia: "Praia",
+                        };
+
+                        return (
+                          <div className="flex flex-wrap gap-1.5">
+                            {purposes.map((p: string) => (
+                              <span 
+                                key={p} 
+                                className="inline-flex items-center rounded-md bg-[#FAF8F5] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[#B06D46] border border-[#E8DCCF]/60"
+                              >
+                                {labels[p] || p}
+                              </span>
+                            ))}
+                          </div>
+                        );
+                      })()}
 
                       {/* Descrição */}
                       <p className="line-clamp-2 text-xs leading-relaxed text-muted-foreground sm:text-sm sm:line-clamp-3">
                         {model.description}
                       </p>
 
-                      {/* Bloco de preços */}
+                      {/* Bloco de preços dinâmico por modalidade */}
                       <div className="mt-auto space-y-2.5 border-t border-border pt-3">
 
-                        {/* Preço cheio + desconto */}
-                        <div className="flex items-end justify-between gap-2">
-                          <div className="min-w-0">
-                            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-                              Valor do Kit
-                            </p>
-                            {kitFull > 0 ? (
-                              <div className="flex flex-wrap items-baseline gap-1.5">
-                                <span className="text-xs text-muted-foreground line-through">
-                                  {formatBRL(kitFull)}
-                                </span>
-                                <span className="font-serif text-lg font-bold text-primary sm:text-xl">
-                                  {formatBRL(kitDiscount)}
-                                </span>
+                        {selectedModalidade === 'kit' && (
+                          <div className="flex flex-col gap-1.5">
+                            <div className="flex items-end justify-between gap-2">
+                              <div className="min-w-0">
+                                <p className="text-[9px] font-black uppercase tracking-widest text-primary/60">
+                                  Kit Madeiramento Estrutural
+                                </p>
+                                {kitFull > 0 ? (
+                                  <div className="flex flex-wrap items-baseline gap-1.5">
+                                    <span className="text-xs text-muted-foreground line-through">
+                                      {formatBRL(kitEstimation)}
+                                    </span>
+                                    <span className="font-serif text-lg font-bold text-primary sm:text-xl">
+                                      {formatBRL(kitPriceDiscounted)}
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <p className="font-serif text-lg font-bold text-primary">Consulte</p>
+                                )}
                               </div>
-                            ) : (
-                              <p className="font-serif text-lg font-bold text-primary">Consulte</p>
+                              {kitFull > 0 && (
+                                <div className="shrink-0 flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-1 text-[10px] font-bold text-emerald-700">
+                                  5% desc. à vista
+                                </div>
+                              )}
+                            </div>
+                            {kitFull > 0 && (
+                              <div className="text-[10px] text-[#8C6239] font-bold bg-[#E8DCCF]/20 px-2 py-1 rounded-lg border border-[#E8DCCF]/45 self-start">
+                                🪵 Opcional Kit Base + Assoalho: {formatBRL(numericArea * 150)}
+                              </div>
                             )}
                           </div>
-                          {kitFull > 0 && (
-                            <div className="shrink-0 flex items-center gap-1 rounded-full bg-amber-100 px-2 py-1 text-[10px] font-bold text-amber-700">
-                              <Tag className="h-2.5 w-2.5" />
-                              5% à vista
-                            </div>
-                          )}
-                        </div>
+                        )}
 
-                        {/* Frete */}
-                        {freightFull > 0 && (
-                          <div className="flex items-start gap-1.5">
-                            <Truck className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-600" />
-                            <div className="min-w-0">
-                              <span className="text-xs font-semibold text-emerald-700">
-                                Frete compartilhado: {formatBRL(freightClient)}
-                              </span>
-                              {model.freight_is_promo && (
-                                <span className="block text-[10px] text-emerald-600/80">
-                                  (pagamos 50% — total {formatBRL(freightFull)})
-                                </span>
-                              )}
+                        {selectedModalidade === 'parceira' && (
+                          <div className="flex flex-col gap-1.5">
+                            <div className="flex items-end justify-between gap-2">
+                              <div className="min-w-0">
+                                <p className="text-[9px] font-black uppercase tracking-widest text-[#8C6239]">
+                                  Kit + Montagem Parceira
+                                </p>
+                                {kitFull > 0 ? (
+                                  <div className="flex flex-wrap items-baseline gap-1.5">
+                                    <span className="text-xs text-muted-foreground line-through">
+                                      {formatBRL(partnerEstimation)}
+                                    </span>
+                                    <span className="font-serif text-lg font-bold text-[#8C6239] sm:text-xl">
+                                      {formatBRL(partnerEstimationDiscounted)}
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <p className="font-serif text-lg font-bold text-primary">Consulte</p>
+                                )}
+                              </div>
+                              <div className="shrink-0 flex items-center gap-1 rounded-full bg-[#E8DCCF]/50 px-2 py-1 text-[10px] font-bold text-[#8C6239]">
+                                🔨 5% desc. à vista
+                              </div>
                             </div>
                           </div>
                         )}
-                      </div>
 
-                      {/* Rodapé */}
-                      <div className="flex flex-col gap-2 pt-1 sm:flex-row sm:items-end sm:justify-between">
-                        <p className="text-[10px] italic leading-snug text-muted-foreground/70 sm:max-w-[170px]">
-                          * Montagem e opcionais: contratação direta com rede de carpinteiros parceiros.
-                        </p>
-                        <Link
-                          href={`/modelo/${model.id}`}
-                          className="group/btn inline-flex w-full items-center justify-center gap-2 rounded-xl bg-secondary/10 px-4 py-2.5 text-sm font-bold text-secondary transition-all hover:bg-secondary hover:text-white sm:w-auto sm:shrink-0"
-                        >
-                          Ver Kit
-                          <ArrowRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
-                        </Link>
+                        {selectedModalidade === 'turnkey' && (
+                          <div className="flex flex-col gap-1.5">
+                            <div className="flex items-end justify-between gap-2">
+                              <div className="min-w-0">
+                                <p className="text-[9px] font-black uppercase tracking-widest text-emerald-700">
+                                  Obra Turnkey Chave na Mão
+                                </p>
+                                {kitFull > 0 ? (
+                                  <div className="flex flex-wrap items-baseline gap-1.5">
+                                    <span className="text-xs text-muted-foreground line-through">
+                                      {formatBRL(turnkeyEstimation)}
+                                    </span>
+                                    <span className="font-serif text-lg font-bold text-emerald-700 sm:text-xl">
+                                      {formatBRL(turnkeyEstimationDiscounted)}
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <p className="font-serif text-lg font-bold text-primary">Consulte</p>
+                                )}
+                              </div>
+                              <div className="shrink-0 flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-1 text-[10px] font-bold text-emerald-700">
+                                🔑 5% desc. à vista
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
                       </div>
+                    </div>
+
+                    {/* Rodapé */}
+                    <div className="mt-auto flex flex-col gap-2 p-4 pt-1 sm:flex-row sm:items-end sm:justify-between border-t border-stone-50">
+                      <p className="text-[9px] italic leading-snug text-muted-foreground/70 sm:max-w-[200px]">
+                        {selectedModalidade === 'kit' && "*Valores estimativos. Inclui frete. Solicite uma proposta para valores reais do frete e fundação para o seu terreno."}
+                        {selectedModalidade === 'parceira' && "*Valores estimativos. Inclui frete e fundação. Solicite uma proposta para obter valores reais."}
+                        {selectedModalidade === 'turnkey' && "*Valores estimativos. Obra completa. Solicite uma proposta para obter valores reais de frete e fundação no seu terreno."}
+                      </p>
+                      <Link
+                        href={`/modelo/${model.id}`}
+                        className="group/btn inline-flex w-full items-center justify-center gap-2 rounded-xl bg-secondary/10 px-4 py-2.5 text-sm font-bold text-secondary transition-all hover:bg-secondary hover:text-white sm:w-auto sm:shrink-0"
+                      >
+                        Simular
+                        <ArrowRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
+                      </Link>
                     </div>
                   </div>
                 </StaggerItem>

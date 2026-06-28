@@ -8,12 +8,12 @@ export interface CabinModel {
 }
 
 export const CABIN_MODELS: CabinModel[] = [
-  { id: 'guarajuba', name: 'Chalé Guarajuba', area: 52, kitPrice: 33800, tilesStainPrice: 18000, fixturesPrice: 5200 },
-  { id: 'itacimirim', name: 'Chalé Itacimirim', area: 32, kitPrice: 20800, tilesStainPrice: 13900, fixturesPrice: 3200 },
+  { id: 'guarajuba', name: 'Chalé Guarajuba', area: 52, kitPrice: 33800, tilesStainPrice: 12210, fixturesPrice: 5200 },
+  { id: 'itacimirim', name: 'Chalé Itacimirim', area: 35, kitPrice: 22750, tilesStainPrice: 10250, fixturesPrice: 3500 },
   { id: 'curralinho', name: 'Cabana Camping Curralinho', area: 6.5, kitPrice: 5122, tilesStainPrice: 0, fixturesPrice: 650 },
-  { id: 'praia-do-forte', name: 'Chalé Praia do Forte', area: 19.5, kitPrice: 12675, tilesStainPrice: 12840, fixturesPrice: 1950 },
-  { id: 'arembepe', name: 'Cabana Camping Arembepe', area: 10.5, kitPrice: 8274, tilesStainPrice: 0, fixturesPrice: 1050 },
-  { id: 'baixios', name: 'Chalé Baixios', area: 35, kitPrice: 22750, tilesStainPrice: 14000, fixturesPrice: 3500 },
+  { id: 'praia-do-forte', name: 'Chalé Praia do Forte', area: 21, kitPrice: 12675, tilesStainPrice: 6875, fixturesPrice: 2100 },
+  { id: 'arembepe', name: 'Cabana Camping Arembepe', area: 10.5, kitPrice: 8334, tilesStainPrice: 0, fixturesPrice: 1050 },
+  { id: 'baixios', name: 'Chalé Baixios', area: 32, kitPrice: 20800, tilesStainPrice: 9650, fixturesPrice: 3200 },
 ];
 
 export const CARD_RATES: [number, number][] = [
@@ -48,9 +48,9 @@ export function getTimberRate(area: number): number {
   return 600;
 }
 /** Telhas e Stain — precificação progressiva em 3 faixas */
-export const TILES_BASE = 3000;
-export const TILES_RATE_1 = 400;   // até 25m²
-export const TILES_RATE_2 = 230;   // 25–40m²
+export const TILES_BASE = 2000;
+export const TILES_RATE_1 = 250;   // até 25m²
+export const TILES_RATE_2 = 200;   // 25–40m²
 export const TILES_RATE_3 = 80;    // acima de 40m²
 export const TILES_TIER_1 = 25;
 export const TILES_TIER_2 = 40;
@@ -93,17 +93,17 @@ export function getFixturesPrice(area: number): { base: number; withSlidingDoor:
 }
 /** Vidros — fixo até 32m², acima cobra excedente a R$ 150/m² */
 export function getGlassPrice(area: number): number {
-  if (area <= 32) return 8000;
-  return 8000 + Math.round((area - 32) * 150);
+  if (area <= 32) return 7000;
+  return 7000 + Math.round((area - 32) * 150);
 }
 
 /** Kit Elétrica/Hidráulica — preço por faixa de m² (não é por m²) */
 export function getElectricalKit(area: number): number {
-  if (area <= 14) return 500;
-  if (area <= 25) return 1500;
-  if (area <= 35) return 2000;
-  if (area <= 55) return 3000;
-  return 4000;
+  if (area <= 14) return 1000;
+  if (area <= 25) return 2200;
+  if (area <= 35) return 2700;
+  if (area <= 55) return 3500;
+  return 3700;
 }
 
 export function getLaborRate(area: number): number {
@@ -140,11 +140,11 @@ export function getRadierFoundation(area: number): number {
 }
 
 export function getFreight(area: number): number {
-  return area * 90;
+  return area * 95;
 }
 
-export type KitType = 'kit1' | 'kit2' | 'kit3' | 'kit4' | 'custom';
-export type FoundationType = 'eucalyptus' | 'masonry' | 'radier' | 'none';
+export type KitType = 'madeiramento' | 'parceira' | 'turnkey' | 'custom';
+export type FoundationType = 'eucalyptus' | 'masonry' | 'radier' | 'wooden_base' | 'wooden_eucalyptus' | 'wooden_masonry' | 'none';
 export type PaintType = 'none' | '1cor' | '2cores';
 
 export interface ExtraItem {
@@ -215,7 +215,7 @@ export interface SimulationState {
 }
 
 export function needsFoundationStep(state: SimulationState): boolean {
-  if (state.kitType === 'kit4') return true;
+  if (state.kitType === 'parceira' || state.kitType === 'turnkey') return true;
   if (state.kitType === 'custom' && state.customOptions.labor) return true;
   return false;
 }
@@ -253,64 +253,63 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
       const ts = getTilesStainPrice(area);
       items.push({ label: `Telhas e Stain (${area}m² — R$ ${ts.perM2.toLocaleString('pt-BR')}/m²)`, value: ts.total });
     }
-    if (opts.labor) items.push({ label: `Mão de Obra (${area}m² × R$ ${getLaborRate(area).toLocaleString('pt-BR')})`, value: getLaborCost(area) });
+    if (opts.labor) {
+      items.push({ label: `Mão de Obra (${area}m² × R$ ${getLaborRate(area).toLocaleString('pt-BR')})`, value: getLaborCost(area) });
+    }
     if (opts.electrical) items.push({ label: `Kit Elétrica/Hidráulica`, value: getElectricalKit(area) });
     if (opts.glass) items.push({ label: `Vidros`, value: getGlassPrice(area) });
     if (opts.project) items.push({ label: `Projeto Personalizado (${area}m² × R$ 25,00)`, value: Math.round(area * 25) });
   } else {
-    // Standard kits (1-4) — use model prices
+    // Standard modalities — use model prices
     if (!state.model) return { items: [], freight: 0, total: 0, materialSubtotal: 0, laborTotal: 0 };
     const model = state.model;
 
     items.push({ label: 'Kit Madeiramento', value: model.kitPrice });
 
-    if (kit === 'kit2' || kit === 'kit3' || kit === 'kit4') {
+    if (kit === 'parceira' || kit === 'turnkey') {
       const fp = getFixturesPrice(model.area);
       if (state.slidingDoor) {
         items.push({ label: `Portas, Janelas e Ferragens + Porta de Correr (c/ 5% desc.)`, value: fp.withSlidingDoor });
       } else {
         items.push({ label: 'Portas, Janelas e Ferragens', value: fp.base });
       }
-    } else if (state.slidingDoor) {
-      items.push({ label: 'Porta de Correr (1.8m eucalipto)', value: SLIDING_DOOR_PRICE });
-    }
-    if (kit === 'kit3' || kit === 'kit4') {
-      const ts = getTilesStainPrice(model.area);
-      items.push({ label: `Telhas e Stain (${model.area}m² — R$ ${ts.perM2.toLocaleString('pt-BR')}/m²)`, value: ts.total });
-    }
-    if (kit === 'kit4') {
+      
       items.push({ label: `Mão de Obra (${model.area}m² × R$ ${getLaborRate(model.area).toLocaleString('pt-BR')})`, value: getLaborCost(model.area) });
     }
 
-    // Kit add-ons (electrical / glass) available for all standard kits
+    if (kit === 'turnkey') {
+      const ts = getTilesStainPrice(model.area);
+      items.push({ label: `Telhas e Stain (${model.area}m² — R$ ${ts.perM2.toLocaleString('pt-BR')}/m²)`, value: ts.total });
+      items.push({ label: 'Vidros', value: getGlassPrice(model.area) });
+      
+      const paintCost = model.area <= 25 ? 2000 : model.area <= 55 ? 3000 : 4500;
+      items.push({ label: 'Pintura e Tratamento (Stain)', value: paintCost });
+      
+      // Taxa administrativa de 25% sobre a mão de obra
+      items.push({ label: 'Gestão e Coordenação Obra', value: Math.round(getLaborCost(model.area) * 0.25) });
+    }
+
+    // Kit add-ons (electrical / glass)
     const addons = state.kitAddons;
     if (addons.electrical) items.push({ label: `Kit Elétrica/Hidráulica`, value: getElectricalKit(model.area) });
-    if (addons.glass) items.push({ label: `Vidros`, value: getGlassPrice(model.area) });
+    if (addons.glass && kit !== 'turnkey') items.push({ label: `Vidros`, value: getGlassPrice(model.area) }); // turnkey já inclui vidros
   }
 
   // Foundation
   if (needsFoundationStep(state) && state.foundationType && state.foundationType !== 'none') {
-    let foundationValue = 0;
-    let foundationLabel = '';
-    switch (state.foundationType) {
-      case 'eucalyptus':
-        foundationValue = getEucalyptusFoundation(area);
-        foundationLabel = 'Base Sapatas em Eucalipto';
-        break;
-      case 'masonry':
-        foundationValue = getMasonryFoundation(area);
-        foundationLabel = 'Base Sapatas Manilhas de Alvenaria';
-        break;
-      case 'radier':
-        foundationValue = getRadierFoundation(area);
-        foundationLabel = 'Base Radier + Banheiro Alvenaria';
-        break;
+    if (state.foundationType === 'radier') {
+      items.push({ label: 'Base Radier + Banheiro Alvenaria', value: getRadierFoundation(area) });
+    } else if (state.foundationType === 'wooden_eucalyptus') {
+      items.push({ label: 'Base Estrutural de Madeira + Assoalho', value: area * 150 });
+      items.push({ label: 'Fundação Sapatas em Eucalipto', value: getEucalyptusFoundation(area) });
+    } else if (state.foundationType === 'wooden_masonry') {
+      items.push({ label: 'Base Estrutural de Madeira + Assoalho', value: area * 150 });
+      items.push({ label: 'Fundação Sapatas Manilhas de Alvenaria', value: getMasonryFoundation(area) });
     }
-    if (foundationValue > 0) items.push({ label: foundationLabel, value: foundationValue });
   }
 
   const subtotal = items.reduce((sum, i) => sum + i.value, 0);
-  const laborTotal = items.filter(i => i.label.includes('Mão de Obra')).reduce((sum, i) => sum + i.value, 0);
+  const laborTotal = items.filter(i => i.label.includes('Mão de Obra') || i.label.includes('Gestão e Coordenação')).reduce((sum, i) => sum + i.value, 0);
   const materialSubtotal = subtotal - laborTotal;
   const freight = getFreight(area);
   const total = subtotal + freight;
@@ -335,7 +334,7 @@ export function calculateProposalItems(data: ProposalData): { items: LineItem[];
   items.push({ label: data.kitType === 'custom' ? `Kit Madeiramento (${area}m²)` : 'Kit Madeiramento', value: kitPrice });
 
   // 2. Fixtures
-  const hasFixtures = data.kitType === 'custom' ? data.includeFixtures : ['kit2', 'kit3', 'kit4'].includes(data.kitType);
+  const hasFixtures = data.kitType === 'custom' ? data.includeFixtures : ['parceira', 'turnkey'].includes(data.kitType);
   if (hasFixtures) {
     let fpValue = 0;
     const fp = getFixturesPrice(area);
@@ -356,7 +355,7 @@ export function calculateProposalItems(data: ProposalData): { items: LineItem[];
   }
 
   // 3. Tiles & Stain
-  const hasTiles = data.kitType === 'custom' ? data.includeTilesStain : ['kit3', 'kit4'].includes(data.kitType);
+  const hasTiles = data.kitType === 'custom' ? data.includeTilesStain : ['turnkey'].includes(data.kitType);
   if (hasTiles) {
     let tsValue = getTilesStainPrice(area).total;
     if (data.tilesStainPriceOverride !== undefined) tsValue = data.tilesStainPriceOverride;
@@ -364,11 +363,17 @@ export function calculateProposalItems(data: ProposalData): { items: LineItem[];
   }
 
   // 4. Labor
-  const hasLabor = data.kitType === 'custom' ? data.includeLabor : data.kitType === 'kit4';
+  const hasLabor = data.kitType === 'custom' ? data.includeLabor : ['parceira', 'turnkey'].includes(data.kitType);
   if (hasLabor) {
     let laborValue = getLaborCost(area);
     if (data.laborPriceOverride !== undefined) laborValue = data.laborPriceOverride;
     items.push({ label: 'Mão de Obra', value: laborValue });
+
+    // Se for turnkey, adiciona a taxa administrativa e de coordenação (25% sobre a mão de obra)
+    if (data.kitType === 'turnkey') {
+      const adminValue = Math.round(laborValue * 0.25);
+      items.push({ label: 'Gestão e Coordenação Obra', value: adminValue });
+    }
   }
 
   // 5. Electrical
@@ -379,7 +384,9 @@ export function calculateProposalItems(data: ProposalData): { items: LineItem[];
   }
 
   // 6. Glass
-  if (data.includeGlass) {
+  // Vidros inclusos por padrão no turnkey
+  const hasGlass = data.includeGlass || data.kitType === 'turnkey';
+  if (hasGlass) {
     let glassValue = getGlassPrice(area);
     if (data.glassPriceOverride !== undefined) glassValue = data.glassPriceOverride;
     items.push({ label: 'Vidros', value: glassValue });
@@ -394,26 +401,27 @@ export function calculateProposalItems(data: ProposalData): { items: LineItem[];
 
   // 8. Foundation
   if (data.foundationType && data.foundationType !== 'none') {
-    let foundationValue = 0;
-    let foundationLabel = '';
-    switch (data.foundationType) {
-      case 'eucalyptus':
-        foundationValue = getEucalyptusFoundation(area);
-        foundationLabel = 'Sapatas de Eucalipto Tratado';
-        break;
-      case 'masonry':
-        foundationValue = getMasonryFoundation(area);
-        foundationLabel = 'Sapatas de Manilhas em Alvenaria';
-        break;
-      case 'radier':
-        foundationValue = getRadierFoundation(area); // We preserve the base radier value
-        foundationLabel = 'Base Radier';
-        break;
+    if (data.foundationType === 'radier') {
+      let foundationValue = getRadierFoundation(area);
+      if (data.foundationPriceOverride !== undefined) {
+        foundationValue = data.foundationPriceOverride;
+      }
+      items.push({ label: 'Base Radier', value: foundationValue });
+    } else if (data.foundationType === 'wooden_eucalyptus') {
+      items.push({ label: 'Base Estrutural de Madeira + Assoalho', value: area * 150 });
+      let foundationValue = getEucalyptusFoundation(area);
+      if (data.foundationPriceOverride !== undefined) {
+        foundationValue = data.foundationPriceOverride;
+      }
+      items.push({ label: 'Sapatas de Eucalipto Tratado', value: foundationValue });
+    } else if (data.foundationType === 'wooden_masonry') {
+      items.push({ label: 'Base Estrutural de Madeira + Assoalho', value: area * 150 });
+      let foundationValue = getMasonryFoundation(area);
+      if (data.foundationPriceOverride !== undefined) {
+        foundationValue = data.foundationPriceOverride;
+      }
+      items.push({ label: 'Sapatas de Manilhas em Alvenaria', value: foundationValue });
     }
-    if (data.foundationPriceOverride !== undefined) {
-      foundationValue = data.foundationPriceOverride;
-    }
-    if (foundationValue > 0) items.push({ label: foundationLabel, value: foundationValue });
   }
 
   // 9. Masonry Bathroom
@@ -431,12 +439,14 @@ export function calculateProposalItems(data: ProposalData): { items: LineItem[];
   }
 
   // 10. Pintura Completa
-  if (data.paintType && data.paintType !== 'none') {
-    let paintValue = data.paintType === '1cor' ? 2500 : 3500;
+  // Pintura inclusa por padrão no turnkey (1 cor se nenhuma especificada)
+  const effectivePaintType = data.paintType === 'none' && data.kitType === 'turnkey' ? '1cor' : data.paintType;
+  if (effectivePaintType && effectivePaintType !== 'none') {
+    let paintValue = effectivePaintType === '1cor' ? 2500 : 3500;
     if (data.paintPriceOverride !== undefined) {
       paintValue = data.paintPriceOverride;
     }
-    const paintLabel = data.paintType === '1cor' 
+    const paintLabel = effectivePaintType === '1cor' 
       ? 'Pintura Completa com Stain (1 Cor)' 
       : 'Pintura Completa com Stain (2 Cores)';
     items.push({ label: paintLabel, value: paintValue });
@@ -453,7 +463,8 @@ export function calculateProposalItems(data: ProposalData): { items: LineItem[];
 
   const subtotal = items.reduce((s, i) => s + i.value, 0);
   const laborItem = items.find(i => i.label === 'Mão de Obra');
-  const laborTotal = laborItem ? laborItem.value : 0;
+  const adminItem = items.find(i => i.label.includes('Gestão e Coordenação'));
+  const laborTotal = (laborItem ? laborItem.value : 0) + (adminItem ? adminItem.value : 0);
   const materialSubtotal = subtotal - laborTotal;
 
   let freight = getFreight(area);
