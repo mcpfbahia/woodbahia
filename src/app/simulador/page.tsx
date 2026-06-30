@@ -25,7 +25,7 @@ const INITIAL_ADDONS: KitAddons = { electrical: false, glass: false };
 
 export default function Index() {
   const [step, setStep] = useState(0); // 0 = hero, 1 = location, 2+ = wizard
-  const [clientData, setClientData] = useState({ name: '', city: '', state: '' });
+  const [clientData, setClientData] = useState<{ name: string; city: string; state: string; distance?: number }>({ name: '', city: '', state: '' });
   const [model, setModel] = useState<CabinModel | null>(null);
   const [isCustomPath, setIsCustomPath] = useState(false);
   const [kitType, setKitType] = useState<KitType | null>(null);
@@ -63,7 +63,7 @@ export default function Index() {
     return step;
   }, [step, showFoundation]);
 
-  const handleLocationNext = useCallback((data: { name: string; city: string; state: string }) => {
+  const handleLocationNext = useCallback((data: { name: string; city: string; state: string; distance?: number }) => {
     setClientData(data);
     setStep(2);
   }, []);
@@ -91,7 +91,7 @@ export default function Index() {
 
   const handleReset = useCallback(() => {
     setStep(0);
-    setClientData({ name: '', city: '', state: '' });
+    setClientData({ name: '', city: '', state: '', distance: undefined });
     setModel(null);
     setIsCustomPath(false);
     setKitType(null);

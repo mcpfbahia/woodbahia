@@ -43,8 +43,8 @@ const BRAZIL_STATES = [
 ];
 
 interface StepLocationProps {
-  initialData: { name: string; city: string; state: string };
-  onNext: (data: { name: string; city: string; state: string }) => void;
+  initialData: { name: string; city: string; state: string; distance?: number };
+  onNext: (data: { name: string; city: string; state: string; distance?: number }) => void;
   onBack: () => void;
 }
 
@@ -52,6 +52,7 @@ export function StepLocation({ initialData, onNext, onBack }: StepLocationProps)
   const [name, setName] = useState(initialData.name || '');
   const [city, setCity] = useState(initialData.city || '');
   const [stateCode, setStateCode] = useState(initialData.state || '');
+  const [distance, setDistance] = useState<number | string>(initialData.distance || '');
 
   const isValid = name.trim().length > 2 && city.trim().length > 2 && stateCode !== '';
 
@@ -114,6 +115,25 @@ export function StepLocation({ initialData, onNext, onBack }: StepLocationProps)
             </Select>
           </div>
         </div>
+
+        {/* Distância Adicional (Logística) */}
+        <div className="space-y-2 pt-4 border-t border-border/30">
+          <div className="flex justify-between items-center">
+            <Label htmlFor="clientDistance" className="text-sm font-semibold">Distância de Lauro de Freitas (em km)</Label>
+            <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider bg-muted px-2 py-0.5 rounded">Opcional</span>
+          </div>
+          <Input 
+            id="clientDistance" 
+            type="number"
+            placeholder="Ex: 250 (Deixe em branco se for Salvador ou Região Metropolitana)" 
+            value={distance}
+            onChange={(e) => setDistance(e.target.value === '' ? '' : Number(e.target.value))}
+            className="bg-background/50 h-12"
+          />
+          <p className="text-[11px] text-muted-foreground italic leading-relaxed">
+            *Caso a distância da obra seja maior que 200 km da fábrica, cobramos frete e deslocamento adicionais regulamentados por km.
+          </p>
+        </div>
       </div>
 
       <div className="flex justify-between">
@@ -121,7 +141,7 @@ export function StepLocation({ initialData, onNext, onBack }: StepLocationProps)
           Cancelar
         </Button>
         <Button 
-          onClick={() => onNext({ name, city, state: stateCode })} 
+          onClick={() => onNext({ name, city, state: stateCode, distance: distance !== '' ? Number(distance) : undefined })} 
           disabled={!isValid} 
           className="gap-2 bg-accent hover:bg-accent/90 text-accent-foreground rounded-xl premium-shadow"
         >

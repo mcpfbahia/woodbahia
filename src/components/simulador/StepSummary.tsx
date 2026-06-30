@@ -24,7 +24,7 @@ const KIT_NAMES: Record<string, string> = {
 };
 
 export function StepSummary({ state, onBack, onReset }: Props) {
-  const { items, freight, total, materialSubtotal } = calculateSummary(state);
+  const { items, freight, additionalFreight, additionalTravelCost, total, materialSubtotal } = calculateSummary(state);
   const area = getEffectiveArea(state);
   const isCustom = state.kitType === 'custom';
   const modelLabel = isCustom
@@ -50,12 +50,15 @@ export function StepSummary({ state, onBack, onReset }: Props) {
     ``,
     `📋 *RELATÓRIO DA SIMULAÇÃO*`,
     `👤 Cliente: ${state.clientData?.name || 'Não informado'} - ${state.clientData?.city || '-'}/${state.clientData?.state || '-'}`,
+    state.clientData?.distance ? `📍 Distância: ${state.clientData.distance} km` : ``,
     `🏡 Modelo: ${modelLabel}`,
     `📦 Kit: ${kitLabel}`,
     ``,
     `📊 *Detalhamento:*`,
     ...items.map((item: LineItem) => `• ${item.label}: ${fmt(item.value)}`),
-    `• Frete Estimado (${area}m² × R$ 95): ${fmt(freight)}`,
+    `• Frete Estimado: ${fmt(freight)}`,
+    additionalFreight > 0 ? `• Frete Adicional (> 200km): ${fmt(additionalFreight)}` : ``,
+    additionalTravelCost > 0 ? `• Deslocamento Adicional Chave na Mão (> 200km): ${fmt(additionalTravelCost)}` : ``,
     ``,
     `💰 *Total do Investimento: ${fmt(total)}*`,
     `💚 *À Vista (5% desc. no madeiramento/base): ${fmt(totalAVista)}*`,
@@ -64,7 +67,7 @@ export function StepSummary({ state, onBack, onReset }: Props) {
     `• Sinal (30%): ${fmt(sinal)}`,
     `• Entrega do Kit (20%): ${fmt(entrega)}`,
     `• Saldo Final (50%): ${fmt(saldo)}`,
-  ].join('\n');
+  ].filter(Boolean).join('\n');
 
   const whatsappUrl = `https://wa.me/5571992936290?text=${encodeURIComponent(whatsappMessage)}`;
 
@@ -110,10 +113,30 @@ export function StepSummary({ state, onBack, onReset }: Props) {
                     <span className="font-semibold tabular-nums">{fmt(item.value)}</span>
                   </motion.div>
                 ))}
-                <div className="flex justify-between items-center text-sm py-1">
+                 <div className="flex justify-between items-center text-sm py-1">
                   <span className="text-muted-foreground">Frete Estimado ({area}m² × R$ 95)</span>
                   <span className="font-semibold tabular-nums">{fmt(freight)}</span>
                 </div>
+                {additionalFreight > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="flex justify-between items-center text-sm py-1 text-amber-600 font-semibold"
+                  >
+                    <span>Frete Adicional (&gt; 200km)</span>
+                    <span className="tabular-nums">+{fmt(additionalFreight)}</span>
+                  </motion.div>
+                )}
+                {additionalTravelCost > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="flex justify-between items-center text-sm py-1 text-amber-600 font-semibold"
+                  >
+                    <span>Deslocamento Adicional Chave na Mão (&gt; 200km)</span>
+                    <span className="tabular-nums">+{fmt(additionalTravelCost)}</span>
+                  </motion.div>
+                )}
               </div>
 
               <Separator className="my-6" />

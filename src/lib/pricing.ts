@@ -211,7 +211,7 @@ export interface KitAddons {
 }
 
 export interface SimulationState {
-  clientData: { name: string; city: string; state: string; };
+  clientData: { name: string; city: string; state: string; distance?: number; };
   model: CabinModel | null;
   kitType: KitType | null;
   customOptions: CustomOptions;
@@ -237,7 +237,7 @@ export function getEffectiveArea(state: SimulationState): number {
   return state.model?.area ?? 0;
 }
 
-export function calculateSummary(state: SimulationState): { items: LineItem[]; freight: number; total: number; materialSubtotal: number; laborTotal: number } {
+export function calculateSummary(state: SimulationState): { items: LineItem[]; freight: number; additionalFreight: number; additionalTravelCost: number; total: number; materialSubtotal: number; laborTotal: number } {
   const items: LineItem[] = [];
   const kit = state.kitType;
   const area = getEffectiveArea(state);
@@ -268,7 +268,7 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
     if (opts.project) items.push({ label: `Projeto Personalizado (${area}m² × R$ 25,00)`, value: Math.round(area * 25) });
   } else {
     // Standard modalities — use model prices
-    if (!state.model) return { items: [], freight: 0, total: 0, materialSubtotal: 0, laborTotal: 0 };
+    if (!state.model) return { items: [], freight: 0, additionalFreight: 0, additionalTravelCost: 0, total: 0, materialSubtotal: 0, laborTotal: 0 };
     const model = state.model;
 
     items.push({ label: 'Kit Madeiramento', value: model.kitPrice });
@@ -319,9 +319,20 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
   const laborTotal = items.filter(i => i.label.includes('Mão de Obra') || i.label.includes('Gestão e Coordenação')).reduce((sum, i) => sum + i.value, 0);
   const materialSubtotal = subtotal - laborTotal;
   const freight = getFreight(area);
-  const total = subtotal + freight;
 
-  return { items, freight, total, materialSubtotal, laborTotal };
+  let additionalFreight = 0;
+  if (state.clientData?.distance && state.clientData.distance > 200) {
+    additionalFreight = (state.clientData.distance - 200) * 5;
+  }
+
+  let additionalTravelCost = 0;
+  if (state.kitType === 'turnkey' && state.clientData?.distance && state.clientData.distance > 200) {
+    additionalTravelCost = (state.clientData.distance - 200) * 7.5;
+  }
+
+  const total = subtotal + freight + additionalFreight + additionalTravelCost;
+
+  return { items, freight, additionalFreight, additionalTravelCost, total, materialSubtotal, laborTotal };
 }
 
 export function calculateProposalItems(
