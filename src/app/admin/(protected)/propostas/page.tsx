@@ -10,7 +10,9 @@ import { Switch } from '~/components/ui/switch';
 import { Separator } from '~/components/ui/separator';
 import { FileDown, User, Home, Settings2, Tag, LayoutDashboard, Plus, Trash2, Layers, Paintbrush } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { CABIN_MODELS, calculateProposalItems, type KitType, type ProposalData, type ExtraItem, type FoundationType, type PaintType } from '~/lib/pricing';
+import { db } from "~/lib/firebase";
+import { collection, getDocs } from "firebase/firestore";
+import { CABIN_MODELS, calculateProposalItems, calculateInstallmentValue, getTilesStainPrice, getFixturesPrice, type KitType, type ProposalData, type ExtraItem, type FoundationType, type PaintType, type CabinModel } from '~/lib/pricing';
 import { generateProposalPDF, getIncludedItems, getNotIncludedItems } from '~/lib/proposal-pdf';
 import {
   Select,
@@ -23,7 +25,7 @@ import { toast } from 'sonner';
 
 const KIT_OPTIONS: { value: KitType; label: string; emoji: string }[] = [
   { value: 'madeiramento', label: '1. Apenas o Kit Madeiramento', emoji: '🪵' },
-  { value: 'parceira', label: '2. Kit + Montagem Parceira', emoji: '🔨' },
+  { value: 'parceira', label: '2. Kit + Montagem Parceira (Melhor Custo-Benefício)', emoji: '🔨' },
   { value: 'turnkey', label: '3. Wood Bahia Chave na Mão', emoji: '🔑' },
   { value: 'custom', label: 'Kit Personalizado', emoji: '⚙️' },
 ];
@@ -139,6 +141,7 @@ const InlineEditablePrice = ({
 
 export default function PropostasPage() {
   const router = useRouter();
+  const [cabinModels, setCabinModels] = useState<CabinModel[]>(CABIN_MODELS);
   const [view, setView] = useState<'form' | 'summary'>('form');
   const [clientName, setClientName] = useState('');
   const [workLocation, setWorkLocation] = useState('');
@@ -177,6 +180,49 @@ export default function PropostasPage() {
   
   const [customIncludedItems, setCustomIncludedItems] = useState<string[] | undefined>(undefined);
   const [customNotIncludedItems, setCustomNotIncludedItems] = useState<string[] | undefined>(undefined);
+
+  // Parsers de área e preço
+  const parsePriceToBRL = (val: any): number => {
+    if (typeof val === "number") return val;
+    if (!val) return 0;
+    const str = val.toString().replace(/[R$\s]/gi, "");
+    if (str.includes(",")) return parseFloat(str.replace(/\./g, "").replace(",", ".")) || 0;
+    return parseFloat(str.replace(/[^\d.]/g, "")) || 0;
+  };
+
+  const parseArea = (val: any): number => {
+    if (typeof val === "number") return val;
+    if (!val) return 0;
+    return parseFloat(val.toString().replace(',', '.').replace(/[^\d.]/g, '')) || 0;
+  };
+
+  useEffect(() => {
+    const fetchModels = async () => {
+      if (!db) return;
+      try {
+        const querySnapshot = await getDocs(collection(db, "models"));
+        const modelsData = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          const areaNum = parseArea(data.area);
+          return {
+            id: doc.id,
+            name: data.name || data.title || doc.id,
+            area: areaNum,
+            kitPrice: parsePriceToBRL(data.kitPrice || data.price),
+            tilesStainPrice: parsePriceToBRL(data.tilesStainPrice || getTilesStainPrice(areaNum).total),
+            fixturesPrice: parsePriceToBRL(data.fixturesPrice || getFixturesPrice(areaNum).base),
+          } as CabinModel;
+        });
+        
+        if (modelsData.length > 0) {
+          setCabinModels(modelsData);
+        }
+      } catch (err) {
+        console.error("Erro ao carregar modelos do Firestore:", err);
+      }
+    };
+    fetchModels();
+  }, []);
 
   // Limpar overrides ao mudar modelo ou área para evitar erros de cálculo entre modelos
   useEffect(() => {
@@ -289,7 +335,7 @@ export default function PropostasPage() {
   const handleGenerate = async () => {
     const toastId = toast.loading('Gerando proposta em PDF...');
     try {
-      await generateProposalPDF(getProposalData());
+      await generateProposalPDF(getProposalData(), cabinModels);
       toast.success('Proposta gerada com sucesso!', { id: toastId });
     } catch (err) {
       toast.error('Erro ao gerar proposta. Verifique os dados.', { id: toastId });
@@ -299,8 +345,8 @@ export default function PropostasPage() {
 
   const fmt = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   const proposalData = getProposalData();
-  const summary = calculateProposalItems(proposalData);
-  const selectedModel = CABIN_MODELS.find(m => m.id === modelId);
+  const summary = calculateProposalItems(proposalData, cabinModels);
+  const selectedModel = cabinModels.find(m => m.id === modelId);
 
   // Suggested values (without overrides)
   const suggested = calculateProposalItems({
@@ -316,7 +362,7 @@ export default function PropostasPage() {
     masonryBathroomPriceOverride: undefined,
     paintPriceOverride: undefined,
     freightOverride: undefined,
-  });
+  }, cabinModels);
 
   const getSugg = (label: string) => suggested.items.find(i => i.label.toLowerCase().includes(label.toLowerCase()))?.value ?? 0;
 
@@ -504,7 +550,7 @@ export default function PropostasPage() {
                               <SelectValue placeholder="Selecione um modelo" />
                             </SelectTrigger>
                             <SelectContent className="rounded-xl border-primary/20 max-h-[500px]">
-                              {CABIN_MODELS.map(m => (
+                              {cabinModels.map(m => (
                                 <SelectItem key={m.id} value={m.id} className="focus:bg-primary focus:text-white">
                                   {m.name} — {m.area}m²
                                 </SelectItem>
@@ -945,6 +991,12 @@ export default function PropostasPage() {
                                 <span className="font-bold text-amber-600">+{fmt(summary.additionalFreight)}</span>
                               </div>
                             )}
+                            {summary.additionalTravelCost > 0 && (
+                              <div className="flex justify-between text-sm py-2 border-b border-primary/5">
+                                <span className="text-muted-foreground font-medium text-amber-600">Deslocamento Adicional Chave na Mão (&gt; 200km)</span>
+                                <span className="font-bold text-amber-600">+{fmt(summary.additionalTravelCost)}</span>
+                              </div>
+                            )}
                         </div>
                       </div>
 
@@ -1054,7 +1106,7 @@ export default function PropostasPage() {
                                 <span className="inline-block w-2 h-2 bg-white rounded-full animate-pulse" />
                                 Condição Facilitada
                              </p>
-                             <p className="text-xs md:text-sm font-bold">💳 <span className="opacity-80">Parcele em 18x de</span> <span className="text-lg md:text-2xl font-black">{fmt(Math.round(summary.total / (1 - 0.1877) / 18 * 100) / 100)}</span></p>
+                             <p className="text-xs md:text-sm font-bold">💳 <span className="opacity-80">Parcele em 18x de</span> <span className="text-lg md:text-2xl font-black">{fmt(calculateInstallmentValue(summary.total, 18, summary.discount > 0).installment)}</span></p>
                           </div>
                           
                           <p className="text-[10px] text-center text-muted-foreground italic px-4">Valores sujeitos a alteração conforme tributação regional e prazos de operadora.</p>

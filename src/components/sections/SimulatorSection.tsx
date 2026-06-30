@@ -251,12 +251,17 @@ export const SimulatorSection = () => {
                       key={m.id}
                       type="button"
                       onClick={() => handleSelectModalidade(m.id as any)}
-                      className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all duration-300 ${
+                      className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all duration-300 relative ${
                         modalidade === m.id
                           ? "bg-[#8A3A1B] border-[#8A3A1B] text-white shadow-md scale-[1.02] font-bold"
                           : "bg-white border-stone-200 text-stone-700 hover:bg-stone-50 hover:border-stone-300"
                       }`}
                     >
+                      {m.id === "parceira" && (
+                        <span className="absolute -top-2.5 right-2 rounded-full bg-emerald-600 text-white text-[8px] font-black tracking-wider uppercase px-2 py-0.5 shadow-sm border border-emerald-500/20">
+                          Custo-Benefício
+                        </span>
+                      )}
                       <span className="text-xs block font-bold tracking-tight">{m.name}</span>
                       <span className={`text-[9px] block mt-0.5 font-medium ${modalidade === m.id ? "text-amber-100" : "text-stone-400"}`}>
                         {m.desc}

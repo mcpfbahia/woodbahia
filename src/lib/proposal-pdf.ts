@@ -8,6 +8,7 @@ import {
   calculateInstallmentValue,
   type ProposalData,
   type KitType,
+  type CabinModel,
 } from './pricing';
 
 // Colors from the design system (HSL converted to RGB)
@@ -176,7 +177,10 @@ function checkPageBreak(doc: jsPDF, y: number, needed: number): number {
   return y;
 }
 
-export function generateProposalPDF(data: ProposalData): void {
+export function generateProposalPDF(
+  data: ProposalData,
+  modelsList: CabinModel[] = CABIN_MODELS
+): void {
   const doc = new jsPDF('p', 'mm', 'a4');
   const pageWidth = 210;
   const margin = 18;
@@ -184,12 +188,12 @@ export function generateProposalPDF(data: ProposalData): void {
   const today = new Date();
   const dateStr = today.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
 
-  const model = CABIN_MODELS.find(m => m.id === data.modelId);
+  const model = modelsList.find(m => m.id === data.modelId);
   const area = data.customArea || model?.area || 0;
   const kitName = KIT_NAMES[data.kitType] || data.kitType;
   const kitDesc = data.kitType === 'custom' && data.customModelDescription ? data.customModelDescription : (KIT_DESCRIPTIONS[data.kitType] || '');
   const modelName = model?.name || 'Kit Personalizado';
-  const { items, freight, additionalFreight, subtotal, total: totalFinal, discount, materialSubtotal } = calculateProposalItems(data);
+  const { items, freight, additionalFreight, additionalTravelCost, subtotal, total: totalFinal, discount, materialSubtotal } = calculateProposalItems(data, modelsList);
 
   const subtotalComDesconto = subtotal - discount;
   const timberItem = items.find(i => i.label.toLowerCase().includes('madeiramento'));
@@ -308,6 +312,10 @@ export function generateProposalPDF(data: ProposalData): void {
 
   if (additionalFreight > 0) {
     tableBody.push(['Frete Adicional (> 200km)', '+' + fmt(additionalFreight)]);
+  }
+
+  if (additionalTravelCost > 0) {
+    tableBody.push(['Adicional Deslocamento Chave na Mão (> 200km)', '+' + fmt(additionalTravelCost)]);
   }
 
   autoTable(doc, {
@@ -462,7 +470,7 @@ export function generateProposalPDF(data: ProposalData): void {
   y += 10;
 
   const cardTableBody = CARD_RATES.map(([n]) => {
-    const res = calculateInstallmentValue(totalFinal, n);
+    const res = calculateInstallmentValue(totalFinal, n, discount > 0);
     const label = res.isInterestFree ? `${n}x sem juros` : `${n}x`;
     return [label, fmt(res.installment)];
   });
@@ -494,8 +502,8 @@ export function generateProposalPDF(data: ProposalData): void {
     },
     didParseCell: (hookData) => {
       if (hookData.section === 'body') {
-        // Highlight 1x, 2x, 3x rows (indices 0,1,2) in green
-        if (hookData.row.index <= 2) {
+        // Highlight 1x, 2x, 3x rows (indices 0,1,2) in green only if there's no discount
+        if (hookData.row.index <= 2 && discount === 0) {
           hookData.cell.styles.textColor = COLORS.green;
           hookData.cell.styles.fontStyle = 'bold';
           hookData.cell.styles.fillColor = [230, 245, 230];
@@ -511,6 +519,75 @@ export function generateProposalPDF(data: ProposalData): void {
   });
 
   y = (doc as any).lastAutoTable.finalY + 6;
+
+  // ─── NOVO BLOCO: MODALIDADES DE CONSTRUÇÃO ───
+  y = checkPageBreak(doc, y, 80);
+  
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(11);
+  doc.setTextColor(...COLORS.accent);
+  doc.text('MODALIDADES DE CONSTRUÇÃO & CUSTO-BENEFÍCIO', margin, y);
+  y += 5;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8.5);
+  doc.setTextColor(...COLORS.foreground);
+  const modIntro = 'Para viabilizar o seu chalé com total transparência, a Wood Bahia disponibiliza 3 modalidades de venda. Conheça as opções e saiba por que a Modalidade 2 é a nossa recomendação número um em economia:';
+  const modIntroLines = doc.splitTextToSize(modIntro, contentWidth);
+  doc.text(modIntroLines, margin, y);
+  y += modIntroLines.length * 4 + 4;
+
+  // Modalidade 1
+  doc.setFillColor(...COLORS.lightBg);
+  doc.roundedRect(margin, y, contentWidth, 12, 2, 2, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8.5);
+  doc.setTextColor(...COLORS.foreground);
+  doc.text('1. Apenas o Kit Madeiramento (Economia Bruta)', margin + 4, y + 4.5);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+  doc.setTextColor(...COLORS.muted);
+  doc.text('Madeiramento estrutural completo em Pinus autoclavado. A montagem e acabamentos são por conta do cliente.', margin + 4, y + 8.5);
+  y += 15;
+
+  // Modalidade 2 (Recomendada!)
+  doc.setFillColor(230, 245, 230); // Fundo verde claro
+  doc.setDrawColor(...COLORS.green); // Borda verde
+  doc.roundedRect(margin, y, contentWidth, 30, 2, 2, 'FD'); // Borda + Fundo
+  
+  // Badge
+  doc.setFillColor(...COLORS.green);
+  doc.roundedRect(margin + 4, y + 3, 50, 4.5, 1, 1, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(7);
+  doc.setTextColor(...COLORS.white);
+  doc.text('MELHOR CUSTO-BENEFÍCIO / RECOMENDADO', margin + 6, y + 6.2);
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.setTextColor(...COLORS.green);
+  doc.text('2. Kit + Montagem Parceira (Indicação de Mão de Obra)', margin + 58, y + 6.5);
+  
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(...COLORS.foreground);
+  const mod2Desc = 'Você adquire o Kit de madeiramento e esquadrias de fábrica, e nós indicamos equipes de montagem parceiras credenciadas com preço de mão de obra tabelado. Você contrata e paga o carpinteiro diretamente, o que garante ISENÇÃO TOTAL de taxas administrativas e intermediação de construtora. É a melhor forma de economizar até 30% na obra, sem abrir mão da garantia de 15 anos da madeira!';
+  const mod2Lines = doc.splitTextToSize(mod2Desc, contentWidth - 8);
+  doc.text(mod2Lines, margin + 4, y + 12);
+  y += 33;
+
+  // Modalidade 3
+  doc.setFillColor(...COLORS.lightBg);
+  doc.roundedRect(margin, y, contentWidth, 12, 2, 2, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8.5);
+  doc.setTextColor(...COLORS.foreground);
+  doc.text('3. Wood Bahia Chave na Mão (Praticidade Total)', margin + 4, y + 4.5);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+  doc.setTextColor(...COLORS.muted);
+  doc.text('A Wood Bahia assume a coordenação e responsabilidade total da estrutura montada, cobertura, vidros e stain aplicado.', margin + 4, y + 8.5);
+  y += 17;
 
   // ─── CHECK PAGE BREAK ───
   y = checkPageBreak(doc, y, 60);

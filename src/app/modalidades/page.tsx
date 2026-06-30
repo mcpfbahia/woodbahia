@@ -133,15 +133,18 @@ export default function ModalitiesPage() {
 
             {/* Modalidade 2 */}
             <StaggerItem index={1} className="flex">
-              <div className="bg-white p-8 md:p-10 rounded-[2.5rem] border border-stone-200 flex flex-col justify-between w-full hover:shadow-xl transition-all duration-300">
+              <div className="bg-[#FAF8F5] p-8 md:p-10 rounded-[2.5rem] border border-[#E8DCCF] flex flex-col justify-between w-full shadow-[0_12px_45px_rgba(182,109,70,0.06)] hover:shadow-2xl transition-all duration-300 relative">
+                <div className="absolute -top-3 right-6 rounded-full bg-emerald-700 text-white text-[10px] font-bold tracking-widest uppercase px-4 py-1">
+                  Melhor Custo-Benefício
+                </div>
                 <div>
-                  <div className="w-14 h-14 rounded-2xl bg-amber-50 text-[#B06D46] flex items-center justify-center mb-6">
+                  <div className="w-14 h-14 rounded-2xl bg-white text-[#B06D46] flex items-center justify-center mb-6 shadow-sm">
                     <Hammer className="w-7 h-7" />
                   </div>
                   <h3 className="text-2xl font-bold text-stone-900 mb-2">2. Kit + Montagem Parceira</h3>
-                  <span className="text-xs uppercase tracking-wider font-bold text-[#B06D46] block mb-6">Fuga de Intermediação Comercial</span>
+                  <span className="text-xs uppercase tracking-wider font-bold text-emerald-700 block mb-6">Máxima Economia — Sem Taxas Extras</span>
                   <p className="text-sm text-gray-500 leading-relaxed mb-6">
-                    Nós vendemos o Kit de Madeiramento e indicamos montadores parceiros credenciados na sua região. O contrato de montagem é fechado diretamente entre você e o profissional, gerando economia sem taxas extras.
+                    Nós vendemos o Kit de Madeiramento e indicamos montadores parceiros credenciados na sua região. O contrato de montagem é fechado diretamente entre você e o profissional, gerando até 30% de economia ao eliminar as taxas administrativas da construtora.
                   </p>
                   <ul className="space-y-3 mb-8 border-t border-stone-100 pt-6">
                     <li className="flex items-center gap-2.5 text-xs text-stone-700">
@@ -162,7 +165,7 @@ export default function ModalitiesPage() {
                   href="https://wa.me/5571992936290?text=Olá! Gostaria de entender mais sobre a modalidade de Montagem Parceira."
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full py-4 text-center rounded-2xl bg-amber-50 hover:bg-[#B06D46]/10 text-[#B06D46] font-bold text-sm transition-colors border border-[#B06D46]/20 flex items-center justify-center gap-2"
+                  className="w-full py-4 text-center rounded-2xl bg-[#8A3A1B] hover:bg-[#732F14] text-white font-bold text-sm transition-all shadow flex items-center justify-center gap-2"
                 >
                   <span>Orçamento de Montagem</span>
                   <ArrowRight className="w-4 h-4" />
@@ -172,16 +175,13 @@ export default function ModalitiesPage() {
 
             {/* Modalidade 3 */}
             <StaggerItem index={2} className="flex">
-              <div className="bg-[#FAF8F5] p-8 md:p-10 rounded-[2.5rem] border border-[#E8DCCF] flex flex-col justify-between w-full shadow-[0_12px_45px_rgba(182,109,70,0.06)] hover:shadow-2xl transition-all duration-300 relative">
-                <div className="absolute -top-3 right-6 rounded-full bg-[#8A3A1B] text-white text-[10px] font-bold tracking-widest uppercase px-4 py-1">
-                  Recomendado
-                </div>
+              <div className="bg-white p-8 md:p-10 rounded-[2.5rem] border border-stone-200 flex flex-col justify-between w-full hover:shadow-xl transition-all duration-300">
                 <div>
-                  <div className="w-14 h-14 rounded-2xl bg-white text-[#8A3A1B] flex items-center justify-center mb-6 shadow-sm">
+                  <div className="w-14 h-14 rounded-2xl bg-stone-50 text-[#8A3A1B] flex items-center justify-center mb-6">
                     <Home className="w-7 h-7" />
                   </div>
                   <h3 className="text-2xl font-bold text-stone-900 mb-2">3. Wood Bahia Chave na Mão</h3>
-                  <span className="text-xs uppercase tracking-wider font-bold text-[#8A3A1B] block mb-6">Comodidade e Responsabilidade Única</span>
+                  <span className="text-xs uppercase tracking-wider font-bold text-stone-500 block mb-6">Comodidade e Responsabilidade Única</span>
                   <p className="text-sm text-gray-500 leading-relaxed mb-6">
                     A Wood Bahia assume a responsabilidade total de execução da estrutura. Nós entregamos o kit estrutural montado, coberto com telha e manta térmica, com portas, janelas e vidros instalados, além do Stain protetor aplicado.
                   </p>
@@ -204,7 +204,7 @@ export default function ModalitiesPage() {
                   href="https://wa.me/5571992936290?text=Olá! Quero solicitar uma proposta para a modalidade Chave na Mão."
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full py-4 text-center rounded-2xl bg-[#8A3A1B] hover:bg-[#732F14] text-white font-bold text-sm transition-all shadow flex items-center justify-center gap-2"
+                  className="w-full py-4 text-center rounded-2xl bg-stone-100 hover:bg-stone-200 text-stone-800 font-bold text-sm transition-colors flex items-center justify-center gap-2"
                 >
                   <span>Solicitar Orçamento</span>
                   <ArrowRight className="w-4 h-4" />

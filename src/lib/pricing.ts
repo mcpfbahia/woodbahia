@@ -23,10 +23,17 @@ export const CARD_RATES: [number, number][] = [
   [16, 15.49], [17, 16.24], [18, 16.99],
 ];
 
-export function calculateInstallmentValue(total: number, installments: number): { total: number; installment: number; isInterestFree: boolean } {
+export function calculateInstallmentValue(
+  total: number, 
+  installments: number, 
+  hasDiscount: boolean = false
+): { total: number; installment: number; isInterestFree: boolean } {
   const rateInfo = CARD_RATES.find(([n]) => n === installments);
   const rate = rateInfo ? rateInfo[1] : 0;
-  const isInterestFree = installments <= 3;
+  
+  // Se tem desconto, não tem parcelamento sem juros (isInterestFree = false para todas)
+  // Se não tem desconto, permite até 3x sem juros (isInterestFree = true se installments <= 3)
+  const isInterestFree = !hasDiscount && installments <= 3;
   
   const totalWithInterest = isInterestFree 
     ? total 
@@ -317,8 +324,11 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
   return { items, freight, total, materialSubtotal, laborTotal };
 }
 
-export function calculateProposalItems(data: ProposalData): { items: LineItem[]; freight: number; additionalFreight: number; subtotal: number; total: number; discount: number; materialSubtotal: number; laborTotal: number } {
-  const model = CABIN_MODELS.find(m => m.id === data.modelId);
+export function calculateProposalItems(
+  data: ProposalData,
+  modelsList: CabinModel[] = CABIN_MODELS
+): { items: LineItem[]; freight: number; additionalFreight: number; additionalTravelCost: number; subtotal: number; total: number; discount: number; materialSubtotal: number; laborTotal: number } {
+  const model = modelsList.find(m => m.id === data.modelId);
   const area = data.customArea || model?.area || 0;
   const items: LineItem[] = [];
 
@@ -477,6 +487,11 @@ export function calculateProposalItems(data: ProposalData): { items: LineItem[];
     additionalFreight = (data.distanceFromFactory - 200) * 5;
   }
 
+  let additionalTravelCost = 0;
+  if (data.kitType === 'turnkey' && data.distanceFromFactory && data.distanceFromFactory > 200) {
+    additionalTravelCost = (data.distanceFromFactory - 200) * 7.5;
+  }
+
   let discount = 0;
   if (data.discountType === 'percentage') {
     discount = Math.round(materialSubtotal * (data.discountValue / 100));
@@ -484,7 +499,7 @@ export function calculateProposalItems(data: ProposalData): { items: LineItem[];
     discount = Math.min(data.discountValue, materialSubtotal);
   }
 
-  const total = subtotal - discount + freight + additionalFreight;
+  const total = subtotal - discount + freight + additionalFreight + additionalTravelCost;
 
-  return { items, freight, additionalFreight, subtotal, total, discount, materialSubtotal, laborTotal };
+  return { items, freight, additionalFreight, additionalTravelCost, subtotal, total, discount, materialSubtotal, laborTotal };
 }
