@@ -312,4 +312,49 @@ export const faqItems = [
     answer:
       "Sim! Pelo fato de as peças de madeira serem ajustadas e cortadas sob medida diretamente no local de montagem, você tem total flexibilidade para propor pequenos ajustes de layout (como alterar a posição interna de portas, janelas ou paredes) em comum acordo com a equipe de montagem, ou configurar um 'Kit Personalizado' na simulação.",
   },
+  {
+    question: "11 — Quais modelos são mais indicados para investimento, aluguel de temporada, residência permanente ou casa de praia?",
+    answer:
+      "Para Aluguel de Temporada, recomendamos modelos compactos e de alto impacto visual, como os estilos A-Frame ou Loft (ex: chalés de 30m² a 45m²), que oferecem baixo custo de construção, retorno rápido e excelente apelo no Airbnb. Para Residência Permanente, indicamos modelos mais espaçosos com divisões inteligentes (2 a 3 quartos com suíte e conceito aberto). Para Casa de Praia, sugerimos layouts com amplos avarandados ou integrados com decks elevados (palafitas), ideais para manter a casa fresca e protegida da umidade direta do solo.",
+  },
+  {
+    question: "12 — O valor inclui fundação, montagem, cobertura, instalações elétricas e hidráulicas, banheiro, cozinha, pisos, pintura e esquadrias?",
+    answer:
+      "Isso depende da modalidade contratada. Apenas Kit inclui somente a madeira estrutural usinada. A Montagem Parceira soma a mão de obra de carpintaria credenciada e, opcionalmente, esquadrias padrão. A modalidade Chave na Mão inclui a estrutura montada, cobertura estrutural, pintura Stain protetora, esquadrias e vidros temperados (8mm). Nenhuma modalidade inclui por padrão a fundação, instalações elétricas/hidráulicas, revestimentos (pisos), louças sanitárias ou bancadas de cozinha, mas estes itens podem ser orçados separadamente ou contratados como opcionais.",
+  },
+  {
+    question: "13 — O frete, a hospedagem da equipe e o descarregamento estão incluídos?",
+    answer:
+      "Não. Os custos de frete, o descarregamento do kit e as despesas com hospedagem/alimentação da equipe de montagem (nas modalidades com mão de obra) são calculados sob medida para a localidade do seu terreno e cobrados de forma separada.",
+  },
+  {
+    question: "14 — Qual madeira é utilizada e qual tratamento ela recebe?",
+    answer:
+      "Utilizamos Pinus e Eucalipto de reflorestamento tratados industrialmente em autoclave sob vácuo-pressão com produtos preservativos (CCA). Este tratamento imuniza profundamente as fibras da madeira, tornando-a totalmente resistente a cupins, brocas, umidade e fungos de apodrecimento.",
+  },
+  {
+    question: "15 — Quais ferragens e parafusos são usados em locais sujeitos à maresia?",
+    answer:
+      "Para garantir a máxima longevidade e solidez do seu chalé, especialmente em áreas de praia com forte incidência de maresia, selecionamos cuidadosamente cada fixador. Para o assoalho e paredes, onde o contato com a umidade e o salitre é mais intenso, utilizamos exclusivamente parafusos em aço inoxidável (Inox), totalmente imunes à oxidação. Para o forro e sarrafos, que ficam em posições internas e não aparentes, aplicamos parafusos galvanizados de alta resistência mecânica. Essa atenção rigorosa aos detalhes protege sua casa contra corrosões prematuras e mantém a estrutura impecável por décadas.",
+  },
+  {
+    question: "16 — Qual é a garantia da estrutura e do tratamento da madeira?",
+    answer:
+      "A madeira tratada em autoclave possui 15 anos de garantia de fábrica contra deterioração biológica (cupins e apodrecimento). Já a garantia dos serviços de montagem estrutural é fornecida pela construtora na modalidade Chave na Mão, ou acordada diretamente em contrato com o carpinteiro parceiro credenciado na modalidade Montagem Parceira.",
+  },
+  {
+    question: "17 — A empresa fornece projeto, ART ou RRT?",
+    answer:
+      "Fornecemos todos os projetos arquitetônicos e as modulações estruturais de montagem do chalé de madeira. A emissão de ART ou RRT referente à execução da base civil (fundação) ou ao acompanhamento geral da obra física local deve ser providenciada por um engenheiro ou arquiteto de sua preferência na sua cidade.",
+  },
+  {
+    question: "18 — Qual é o prazo total de fabricação e instalação?",
+    answer:
+      "A fabricação do kit madeiramento em fábrica leva em média de 15 a 60 dias úteis (dependendo da complexidade do modelo). Já a instalação física da estrutura no terreno é estimada no ritmo médio de 1 dia útil de montagem por metro quadrado de área construída (ex: chalé de 40m² leva aproximadamente 40 dias úteis para ser finalizado).",
+  },
+  {
+    question: "19 — É possível visitar alguma casa já construída no litoral?",
+    answer:
+      "Sim! Possuímos diversas obras executadas e em andamento em regiões de praia nos estados da Bahia (BA) e Sergipe (SE). Para agendar uma visita e conhecer de perto o nosso padrão de acabamento e madeiramento, entre em contato com nossa equipe de vendas para consultar datas e locais autorizados pelos proprietários.",
+  },
 ];
