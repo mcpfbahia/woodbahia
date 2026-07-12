@@ -304,7 +304,15 @@ export function generateProposalPDF(
   doc.text('INVESTIMENTO', margin, y);
   y += 4;
 
-  const tableBody = items.map(item => [item.label, fmt(item.value)]);
+  const tableBody = items.map(item => {
+    const isFoundationItem = item.label.toLowerCase().includes('sapata') || 
+                             item.label.toLowerCase().includes('base radier') || 
+                             item.label.toLowerCase().includes('base estrutural') || 
+                             item.label.toLowerCase().includes('fundação') ||
+                             item.label.toLowerCase().includes('alicerce');
+    const displayValue = (item.value === 0 && isFoundationItem) ? 'Incluso' : fmt(item.value);
+    return [item.label, displayValue];
+  });
   
   const freightBase = freight * 2;
   tableBody.push(['Frete Base Estimado (' + area + 'm² × R$ 180)', fmt(freightBase)]);

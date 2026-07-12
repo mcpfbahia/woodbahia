@@ -101,18 +101,33 @@ export function StepSummary({ state, onBack, onReset }: Props) {
             <CardContent className="p-7">
               <h3 className="font-display font-semibold text-lg mb-5">Detalhamento</h3>
               <div className="flex flex-col gap-3">
-                {items.map((item: LineItem, i: number) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.15 + i * 0.04 }}
-                    className="flex justify-between items-center text-sm py-1"
-                  >
-                    <span className="text-muted-foreground">{item.label}</span>
-                    <span className="font-semibold tabular-nums">{fmt(item.value)}</span>
-                  </motion.div>
-                ))}
+                {items.map((item: LineItem, i: number) => {
+                  const isIncFoundation = item.value === 0 && (
+                    item.label.toLowerCase().includes('sapata') || 
+                    item.label.toLowerCase().includes('base radier') || 
+                    item.label.toLowerCase().includes('base estrutural') || 
+                    item.label.toLowerCase().includes('fundação') ||
+                    item.label.toLowerCase().includes('alicerce')
+                  );
+                  return (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.15 + i * 0.04 }}
+                      className="flex justify-between items-center text-sm py-1"
+                    >
+                      <span className="text-muted-foreground">{item.label}</span>
+                      {isIncFoundation ? (
+                        <span className="font-semibold text-green-700 bg-green-50 px-2.5 py-0.5 rounded-full text-[10px] border border-green-100 uppercase tracking-wider">
+                          Incluso
+                        </span>
+                      ) : (
+                        <span className="font-semibold tabular-nums">{fmt(item.value)}</span>
+                      )}
+                    </motion.div>
+                  );
+                })}
                  <div className="flex justify-between items-center text-sm py-1">
                   <span className="text-muted-foreground">Frete Estimado ({area}m² × R$ 95)</span>
                   <span className="font-semibold tabular-nums">{fmt(freight)}</span>

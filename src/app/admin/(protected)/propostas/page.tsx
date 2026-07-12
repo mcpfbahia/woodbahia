@@ -180,6 +180,7 @@ export default function PropostasPage() {
   
   const [customIncludedItems, setCustomIncludedItems] = useState<string[] | undefined>(undefined);
   const [customNotIncludedItems, setCustomNotIncludedItems] = useState<string[] | undefined>(undefined);
+  const [foundationIncluded, setFoundationIncluded] = useState<boolean>(false);
 
   // Parsers de área e preço
   const parsePriceToBRL = (val: any): number => {
@@ -263,6 +264,19 @@ export default function PropostasPage() {
     }
   }, [kitType]);
 
+  // Sincronização da inclusão padrão da fundação
+  useEffect(() => {
+    if (kitType === 'turnkey') {
+      if (foundationType === 'wooden_eucalyptus' || foundationType === 'eucalyptus') {
+        setFoundationIncluded(true);
+      } else {
+        setFoundationIncluded(false);
+      }
+    } else {
+      setFoundationIncluded(false);
+    }
+  }, [kitType, foundationType]);
+
   const addExtraItem = () => setExtraItems([...extraItems, { description: '', value: 0 }]);
   const removeExtraItem = (index: number) => {
     const newItems = extraItems.filter((_, i) => i !== index);
@@ -306,6 +320,7 @@ export default function PropostasPage() {
     masonryBathroomPriceOverride: typeof masonryBathroomPriceOverride === 'number' ? masonryBathroomPriceOverride : undefined,
     paintType,
     paintPriceOverride: typeof paintPriceOverride === 'number' ? paintPriceOverride : undefined,
+    foundationIncluded,
     customIncludedItems,
     customNotIncludedItems,
   });
@@ -401,7 +416,10 @@ export default function PropostasPage() {
       setter = setProjectPriceOverride;
       isOverridden = projectPriceOverride !== undefined;
       onReset = () => setProjectPriceOverride(undefined);
-    } else if (label.includes('base') || label.includes('sapata') || label.includes('manilha')) {
+    } else if (label.includes('base') || label.includes('sapata') || label.includes('manilha') || label.includes('fundação') || label.includes('radier')) {
+      if (foundationIncluded) {
+        return <span className="font-bold text-green-700 bg-green-50 px-2.5 py-0.5 rounded-full text-[10px] border border-green-200 uppercase tracking-wider">Incluso</span>;
+      }
       setter = setFoundationPriceOverride;
       isOverridden = foundationPriceOverride !== undefined;
       onReset = () => setFoundationPriceOverride(undefined);
@@ -732,6 +750,21 @@ export default function PropostasPage() {
                              </SelectContent>
                            </Select>
                         </div>
+
+                        {foundationType !== 'none' && (
+                          <div className="flex items-center justify-between p-3 bg-primary/5 rounded-xl border border-primary/10">
+                            <div>
+                              <Label className="text-xs font-bold text-foreground">Fundação e Alicerce Inclusos</Label>
+                              <p className="text-[9px] text-muted-foreground">Define se a fundação está embutida no valor da proposta</p>
+                            </div>
+                            <Switch 
+                              checked={foundationIncluded} 
+                              onCheckedChange={setFoundationIncluded}
+                              className="toggle-glow data-[state=checked]:bg-primary"
+                            />
+                          </div>
+                        )}
+
                         {foundationType !== 'none' && (
                           <EditablePrice 
                             label="Valor da Base"

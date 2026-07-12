@@ -280,7 +280,7 @@ export const faqItems = [
   {
     question: "04 — Quais são as modalidades de contratação da Wood Bahia?",
     answer:
-      "Oferecemos três modalidades principais de contratação: 1) Apenas o Kit Madeiramento: a fábrica fornece o madeiramento estrutural completo e manual, e a montagem/insumos são de responsabilidade do cliente. 2) Kit + Montagem Parceira: inclui madeiramento, portas/janelas e mão de obra de carpintaria credenciada, com isenção de taxas administrativas da Wood Bahia. 3) Wood Bahia Chave na Mão: assumimos responsabilidade total de ponta a ponta, entregando o chalé montado, coberto, pintado no Stain, com esquadrias e vidros temperados instalados.",
+      "Oferecemos três modalidades principais: 1) Apenas o Kit Madeiramento: a fábrica fornece as peças de madeira tratada em autoclave para a estrutura, manual técnico e suporte em vídeo, sendo todo o restante responsabilidade do cliente. 2) Kit + Montagem Parceira: inclui todo o kit de madeira e indicamos carpinteiros parceiros homologados na sua região para a montagem direta, sem taxas administrativas. 3) Wood Bahia Chave na Mão: assumimos responsabilidade total de ponta a ponta, entregando o chalé montado com cobertura, portas, janelas, vidros temperados de 8mm, pintura Stain protetora e elétrica/hidráulica básica.",
   },
   {
     question: "05 — Como funciona a taxa de gestão na modalidade Chave na Mão?",
@@ -300,7 +300,7 @@ export const faqItems = [
   {
     question: "08 — Os chalés vêm com instalações elétricas e hidráulicas?",
     answer:
-      "As peças de madeira do kit saem de fábrica sem cortes ou tubulações embutidas. A instalação da fiação elétrica e pontos básicos de hidráulica é executada no canteiro de obras por profissionais especializados. O kit elétrico/hidráulico básico de materiais e a respectiva mão de obra podem ser incluídos como opcional na simulação do seu projeto.",
+      "Isso depende da modalidade contratada. No Kit Madeiramento e no Kit + Montagem Parceira, fornecemos as peças de madeira brutas sem instalações; a fiação elétrica, tubulações, louças e metais são comprados e instalados pelo cliente. No Chave na Mão, entregamos a infraestrutura básica (passagem de fiação, eletrodutos, canos e conexões embutidos na estrutura de madeira). Itens decorativos ou de uso final (espelhos de tomadas, lustres, sanitários, torneiras, caixa d'água e biodigestores) não estão inclusos.",
   },
   {
     question: "09 — O que são esquadrias e vidros opcionais nos simuladores?",
@@ -320,7 +320,7 @@ export const faqItems = [
   {
     question: "12 — O valor inclui fundação, montagem, cobertura, instalações elétricas e hidráulicas, banheiro, cozinha, pisos, pintura e esquadrias?",
     answer:
-      "Isso depende da modalidade contratada. Apenas Kit inclui somente a madeira estrutural usinada. A Montagem Parceira soma a mão de obra de carpintaria credenciada e, opcionalmente, esquadrias padrão. A modalidade Chave na Mão inclui a estrutura montada, cobertura estrutural, pintura Stain protetora, esquadrias e vidros temperados (8mm). Nenhuma modalidade inclui por padrão a fundação, instalações elétricas/hidráulicas, revestimentos (pisos), louças sanitárias ou bancadas de cozinha, mas estes itens podem ser orçados separadamente ou contratados como opcionais.",
+      "Depende da modalidade. O Kit Madeiramento inclui apenas a madeira Pinus estrutural tratada em autoclave, manual técnico e suporte em vídeo. A Montagem Parceira inclui a indicação do carpinteiro parceiro (cuja montagem é contratada e paga diretamente). A modalidade Chave na Mão inclui a estrutura montada, cobertura (telhas + manta), portas, janelas, vidros temperados de 8mm, pintura Stain protetora e elétrica e hidráulica básicas. Sapatas de eucalipto estão inclusas, mas fundações em radier e acabamentos finais (pisos, cerâmicas, torneiras, louças, tomadas finais e caixa d'água) são sob proposta e cotação à parte.",
   },
   {
     question: "13 — O frete, a hospedagem da equipe e o descarregamento estão incluídos?",

@@ -200,6 +200,7 @@ export interface ProposalData {
   masonryBathroomPriceOverride?: number;
   paintType?: PaintType;
   paintPriceOverride?: number;
+  foundationIncluded?: boolean;
   customIncludedItems?: string[];
   customNotIncludedItems?: string[];
 }
@@ -217,6 +218,7 @@ export interface SimulationState {
   customOptions: CustomOptions;
   kitAddons: KitAddons;
   foundationType: FoundationType | null;
+  foundationIncluded?: boolean;
   customArea: number; // used when kitType === 'custom'
   slidingDoor: boolean;
 }
@@ -304,14 +306,36 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
 
   // Foundation
   if (needsFoundationStep(state) && state.foundationType && state.foundationType !== 'none') {
+    const isTurnkey = state.kitType === 'turnkey';
+    const isEucalyptus = state.foundationType === 'wooden_eucalyptus' || state.foundationType === 'eucalyptus';
+    
+    // Regra padrão de inclusão: eucalipto no turnkey vem incluso por padrão.
+    // Outros tipos no turnkey dependem de state.foundationIncluded.
+    const isInc = isTurnkey && (isEucalyptus ? (state.foundationIncluded !== false) : !!state.foundationIncluded);
+
     if (state.foundationType === 'radier') {
-      items.push({ label: 'Base Radier + Banheiro Alvenaria', value: getRadierFoundation(area) });
+      items.push({ 
+        label: `Base Radier + Banheiro Alvenaria${isInc ? ' (Incluso)' : ''}`, 
+        value: isInc ? 0 : getRadierFoundation(area) 
+      });
     } else if (state.foundationType === 'wooden_eucalyptus') {
-      items.push({ label: 'Base Estrutural de Madeira + Assoalho', value: area * 150 });
-      items.push({ label: 'Fundação Sapatas em Eucalipto', value: getEucalyptusFoundation(area) });
+      items.push({ 
+        label: `Base Estrutural de Madeira + Assoalho${isInc ? ' (Incluso)' : ''}`, 
+        value: isInc ? 0 : (area * 150) 
+      });
+      items.push({ 
+        label: `Fundação Sapatas em Eucalipto${isInc ? ' (Incluso)' : ''}`, 
+        value: isInc ? 0 : getEucalyptusFoundation(area) 
+      });
     } else if (state.foundationType === 'wooden_masonry') {
-      items.push({ label: 'Base Estrutural de Madeira + Assoalho', value: area * 150 });
-      items.push({ label: 'Fundação Sapatas Manilhas de Alvenaria', value: getMasonryFoundation(area) });
+      items.push({ 
+        label: `Base Estrutural de Madeira + Assoalho${isInc ? ' (Incluso)' : ''}`, 
+        value: isInc ? 0 : (area * 150) 
+      });
+      items.push({ 
+        label: `Fundação Sapatas Manilhas de Alvenaria${isInc ? ' (Incluso)' : ''}`, 
+        value: isInc ? 0 : getMasonryFoundation(area) 
+      });
     }
   }
 
@@ -422,26 +446,43 @@ export function calculateProposalItems(
 
   // 8. Foundation
   if (data.foundationType && data.foundationType !== 'none') {
+    const isInc = !!data.foundationIncluded;
+    
     if (data.foundationType === 'radier') {
       let foundationValue = getRadierFoundation(area);
       if (data.foundationPriceOverride !== undefined) {
         foundationValue = data.foundationPriceOverride;
       }
-      items.push({ label: 'Base Radier', value: foundationValue });
+      items.push({ 
+        label: `Base Radier${isInc ? ' (Incluso)' : ''}`, 
+        value: isInc ? 0 : foundationValue 
+      });
     } else if (data.foundationType === 'wooden_eucalyptus') {
-      items.push({ label: 'Base Estrutural de Madeira + Assoalho', value: area * 150 });
+      items.push({ 
+        label: `Base Estrutural de Madeira + Assoalho${isInc ? ' (Incluso)' : ''}`, 
+        value: isInc ? 0 : (area * 150) 
+      });
       let foundationValue = getEucalyptusFoundation(area);
       if (data.foundationPriceOverride !== undefined) {
         foundationValue = data.foundationPriceOverride;
       }
-      items.push({ label: 'Sapatas de Eucalipto Tratado', value: foundationValue });
+      items.push({ 
+        label: `Sapatas de Eucalipto Tratado${isInc ? ' (Incluso)' : ''}`, 
+        value: isInc ? 0 : foundationValue 
+      });
     } else if (data.foundationType === 'wooden_masonry') {
-      items.push({ label: 'Base Estrutural de Madeira + Assoalho', value: area * 150 });
+      items.push({ 
+        label: `Base Estrutural de Madeira + Assoalho${isInc ? ' (Incluso)' : ''}`, 
+        value: isInc ? 0 : (area * 150) 
+      });
       let foundationValue = getMasonryFoundation(area);
       if (data.foundationPriceOverride !== undefined) {
         foundationValue = data.foundationPriceOverride;
       }
-      items.push({ label: 'Sapatas de Manilhas em Alvenaria', value: foundationValue });
+      items.push({ 
+        label: `Sapatas de Manilhas em Alvenaria${isInc ? ' (Incluso)' : ''}`, 
+        value: isInc ? 0 : foundationValue 
+      });
     }
   }
 
