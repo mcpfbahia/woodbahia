@@ -474,6 +474,7 @@ export default function ModelDetailPage() {
   const basePrice = numericArea * 150;
   const turnkeyEstimation = kitBasePriceNum + basePrice + laborCost + adminCost + getEucalyptusFoundation(numericArea) + modelTilesPrice + modelFixturesPrice + modelGlassPrice + paintCost + getElectricalKit(numericArea) + getFreight(numericArea);
   const turnkeyEstimationDiscounted = turnkeyEstimation - ((kitBasePriceNum + basePrice) * 0.05);
+  const hasPromo = !!model.promoPrice && model.promoPrice.trim() !== "" && model.promoPrice !== "R$ 0,00" && model.promoPrice !== "0";
 
   return (
     <div className="min-h-screen bg-background">
@@ -653,12 +654,21 @@ export default function ModelDetailPage() {
                     <div className="mt-4 pt-3 border-t border-stone-50">
                       <span className="text-[9px] text-gray-400 block uppercase font-bold">Investimento Estimado</span>
                       <div className="flex flex-wrap items-baseline gap-1.5 mt-0.5">
-                        <span className="text-[11px] text-muted-foreground line-through">{formatBRL(kitEstimation)}</span>
-                        <span className="font-serif text-xl font-bold text-primary">{formatBRL(kitPriceDiscounted)}</span>
+                        {hasPromo ? (
+                          <>
+                            <span className="text-[11px] text-muted-foreground line-through">{model.kitPrice || formatBRL(kitEstimation)}</span>
+                            <span className="font-serif text-xl font-bold text-primary">{model.promoPrice}</span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="text-[11px] text-muted-foreground line-through">{formatBRL(kitEstimation)}</span>
+                            <span className="font-serif text-xl font-bold text-primary">{formatBRL(kitPriceDiscounted)}</span>
+                          </>
+                        )}
                       </div>
                       <span className="text-[9px] text-emerald-600 font-bold block mt-0.5">5% de desc. à vista no madeiramento</span>
                       <div className="text-[10px] text-[#8C6239] font-bold bg-[#E8DCCF]/20 px-2 py-1 rounded-lg border border-[#E8DCCF]/45 mt-2.5 self-start inline-block">
-                        🪵 Opcional Kit Base + Assoalho: {formatBRL(numericArea * 150)}
+                        Consulte Kit Base + Assoalho
                       </div>
                       <span className="text-[9px] text-stone-500 block mt-2.5 font-medium italic">*Inclui frete. Solicite proposta para valores reais.</span>
                     </div>
@@ -682,7 +692,7 @@ export default function ModelDetailPage() {
                         <span className="font-serif text-xl font-bold text-[#B06D46]">{formatBRL(partnerEstimationDiscounted)}</span>
                       </div>
                       <span className="text-[9px] text-emerald-600 font-bold block mt-0.5">5% de desc. à vista no madeiramento</span>
-                      <span className="text-[9px] text-stone-550 block mt-2.5 font-medium italic">*Inclui frete e fundação. Solicite proposta para valores reais.</span>
+                      <span className="text-[9px] text-stone-555 block mt-2.5 font-medium italic">*Obra Completa. Solicite proposta para valores reais do frete/fundação no seu terreno.</span>
                     </div>
                   </div>
 
@@ -701,13 +711,22 @@ export default function ModelDetailPage() {
                       </p>
                     </div>
                     <div className="mt-4 pt-3 border-t border-[#E8DCCF]/60">
-                      <span className="text-[9px] text-gray-400 block uppercase font-bold">Investimento Estimado</span>
+                      <span className="text-[9px] text-[#8A3A1B] block uppercase font-black tracking-wider mb-1">Preço de Tabela (Montado)</span>
                       <div className="flex flex-wrap items-baseline gap-1.5 mt-0.5">
-                        <span className="text-[11px] text-muted-foreground line-through">{formatBRL(turnkeyEstimation)}</span>
-                        <span className="font-serif text-xl font-bold text-[#8A3A1B]">{formatBRL(turnkeyEstimationDiscounted)}</span>
+                        {model.price && model.price.trim() !== "" && model.price !== "R$ 0,00" ? (
+                          <>
+                            <span className="text-[11px] text-muted-foreground line-through">{formatBRL(turnkeyEstimation)}</span>
+                            <span className="font-serif text-xl font-bold text-[#8A3A1B]">{model.price}</span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="text-[11px] text-muted-foreground line-through">{formatBRL(turnkeyEstimation)}</span>
+                            <span className="font-serif text-xl font-bold text-[#8A3A1B]">{formatBRL(turnkeyEstimationDiscounted)}</span>
+                          </>
+                        )}
                       </div>
-                      <span className="text-[9px] text-emerald-600 font-bold block mt-0.5">5% de desc. à vista no madeiramento/base</span>
-                      <span className="text-[9px] text-stone-550 block mt-2.5 font-medium italic">*Obra Completa. Solicite proposta para valores reais do frete/fundação no seu terreno.</span>
+                      <span className="text-[9px] text-emerald-600 font-bold block mt-0.5">Desconto especial aplicado sobre a estimativa</span>
+                      <span className="text-[9px] text-stone-555 block mt-2.5 font-medium italic">*Obra Completa. Solicite proposta para valores reais do frete/fundação no seu terreno.</span>
                     </div>
                   </div>
                 </div>
