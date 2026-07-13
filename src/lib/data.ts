@@ -14,6 +14,20 @@ export const initialModels = [
     purposes: ["airbnb", "praia", "campo"],
   },
   {
+    id: "chale-arembepe-plus",
+    name: "Chalé Arembepe Plus",
+    image: "/images/models/model-1.jpg",
+    area: "20m²",
+    floors: "1 Pavimento",
+    bedrooms: 1,
+    infoLabel: "20m² | 1 quarto (banheiro incluso)",
+    description: "Chalé Arembepe Plus (20m²): versão ampliada com banheiro incluso e pé-direito de 3,40m. Estrutura em madeira pinus tratada, aliando praticidade, conforto e excelente aproveitamento de espaço.",
+    kitPrice: "R$ 13.000,00",
+    freight_value: "R$ 3.500,00",
+    freight_is_promo: true,
+    purposes: ["airbnb", "praia", "campo"],
+  },
+  {
     id: "casa-jorge-amado",
     name: "Casa Jorge Amado",
     image: "/images/models/model-2.jpg",
@@ -95,6 +109,11 @@ const MODEL_OVERRIDES: Record<string, Partial<{
   infoLabel: string;
   description: string;
 }>> = {
+  "arembepe-plus": {
+    kitPrice: "R$ 13.000,00",
+    freight_value: "R$ 3.500,00",
+    freight_is_promo: true,
+  },
   arembepe: {
     kitPrice: "R$ 8.334,09",
     freight_value: "R$ 1.800,00",
@@ -133,9 +152,11 @@ export function applyModelOverrides(model: any): any {
   const modelId: string = (model.id || "").toLowerCase();
   const modelName: string = (model.name || "").toLowerCase();
 
-  const matchedKey = Object.keys(MODEL_OVERRIDES).find(
-    (key) => modelId.includes(key) || modelName.includes(key)
-  );
+  const matchedKey = Object.keys(MODEL_OVERRIDES)
+    .sort((a, b) => b.length - a.length)
+    .find(
+      (key) => modelId.includes(key) || modelName.includes(key)
+    );
 
   if (!matchedKey) return model;
   return { ...model, ...MODEL_OVERRIDES[matchedKey] };

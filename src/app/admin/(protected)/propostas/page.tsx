@@ -214,9 +214,17 @@ export default function PropostasPage() {
             fixturesPrice: parsePriceToBRL(data.fixturesPrice || getFixturesPrice(areaNum).base),
           } as CabinModel;
         });
-        
         if (modelsData.length > 0) {
-          setCabinModels(modelsData);
+          const merged = [...CABIN_MODELS];
+          modelsData.forEach(firestoreModel => {
+            const index = merged.findIndex(m => m.id === firestoreModel.id);
+            if (index !== -1) {
+              merged[index] = firestoreModel;
+            } else {
+              merged.push(firestoreModel);
+            }
+          });
+          setCabinModels(merged);
         }
       } catch (err) {
         console.error("Erro ao carregar modelos do Firestore:", err);

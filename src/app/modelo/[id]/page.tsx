@@ -247,6 +247,13 @@ export default function ModelDetailPage() {
       { id: 'pintura',   name: 'Kit Pintura (Stain impregnante)',                   price: 1100 },
       { id: 'ferragens', name: 'Kit Ferragens (parafusos, porcas, barras roscadas, etc...)', price: 900 },
     ],
+    'arembepe-plus': [
+      { id: 'cobertura', name: 'Kit Cobertura (telhas ecológicas e manta térmica)', price: 5500 },
+      { id: 'pintura',   name: 'Kit Pintura (Stain impregnante)',                   price: 1200 },
+      { id: 'ferragens', name: 'Kit Ferragens (parafusos, porcas, barras roscadas, etc...)', price: 1200 },
+      { id: 'portas',    name: 'Kit Portas e Janelas em Madeira',                  price: 0 },
+      { id: 'vidros',    name: 'Vidro Fachada',                                     price: 2500 },
+    ],
     // Casa Jorge Amado (sem portas e janelas)
     'jorge-amado': [
       { id: 'cobertura', name: 'Kit Cobertura (telhas ecológicas e manta térmica)', price: 12900 },

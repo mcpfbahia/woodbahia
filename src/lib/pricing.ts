@@ -12,6 +12,7 @@ export const CABIN_MODELS: CabinModel[] = [
   { id: 'itacimirim', name: 'Chalé Itacimirim', area: 35, kitPrice: 22750, tilesStainPrice: 10250, fixturesPrice: 3500 },
   { id: 'curralinho', name: 'Cabana Camping Curralinho', area: 6.5, kitPrice: 5122, tilesStainPrice: 0, fixturesPrice: 650 },
   { id: 'praia-do-forte', name: 'Chalé Praia do Forte', area: 21, kitPrice: 12675, tilesStainPrice: 6875, fixturesPrice: 2100 },
+  { id: 'arembepe-plus', name: 'Chalé Arembepe Plus', area: 20, kitPrice: 13000, tilesStainPrice: 6700, fixturesPrice: 0 },
   { id: 'arembepe', name: 'Cabana Camping Arembepe', area: 10.5, kitPrice: 8334, tilesStainPrice: 0, fixturesPrice: 1050 },
   { id: 'baixios', name: 'Chalé Baixios', area: 32, kitPrice: 20800, tilesStainPrice: 9650, fixturesPrice: 3200 },
 ];
@@ -62,7 +63,10 @@ export const TILES_RATE_3 = 80;    // acima de 40m²
 export const TILES_TIER_1 = 25;
 export const TILES_TIER_2 = 40;
 
-export function getTilesStainPrice(area: number): { total: number; perM2: number } {
+export function getTilesStainPrice(area: number, modelId?: string): { total: number; perM2: number } {
+  if (modelId === 'arembepe-plus') {
+    return { total: 6700, perM2: 335 };
+  }
   // Regra especial para Kits Camping abaixo de 10m² (ex: Curralinho)
   if (area < 10) {
     const total = 4200;
@@ -93,13 +97,17 @@ export const FIXTURES_TIER2_EXTRA = 700;
 export const SLIDING_DOOR_PRICE = 3000;
 export const SLIDING_DOOR_DISCOUNT = 0.05;
 
-export function getFixturesPrice(area: number): { base: number; withSlidingDoor: number } {
+export function getFixturesPrice(area: number, modelId?: string): { base: number; withSlidingDoor: number } {
+  if (modelId === 'arembepe-plus') {
+    return { base: 0, withSlidingDoor: 0 };
+  }
   const base = area * 100;
   const withSlidingDoor = Math.round((base + SLIDING_DOOR_PRICE) * (1 - SLIDING_DOOR_DISCOUNT) * 100) / 100;
   return { base, withSlidingDoor };
 }
 /** Vidros — fixo até 32m², acima cobra excedente a R$ 150/m² */
-export function getGlassPrice(area: number): number {
+export function getGlassPrice(area: number, modelId?: string): number {
+  if (modelId === 'arembepe-plus') return 2500;
   if (area <= 32) return 7000;
   return 7000 + Math.round((area - 32) * 150);
 }
@@ -251,7 +259,7 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
 
     const opts = state.customOptions;
     if (opts.fixtures) {
-      const fp = getFixturesPrice(area);
+      const fp = getFixturesPrice(area, 'custom');
       if (state.slidingDoor) {
         items.push({ label: `Portas, Janelas e Ferragens + Porta de Correr (c/ 5% desc.)`, value: fp.withSlidingDoor });
       } else {
@@ -259,14 +267,14 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
       }
     }
     if (opts.tilesStain) {
-      const ts = getTilesStainPrice(area);
+      const ts = getTilesStainPrice(area, 'custom');
       items.push({ label: `Telhas e Stain (${area}m² — R$ ${ts.perM2.toLocaleString('pt-BR')}/m²)`, value: ts.total });
     }
     if (opts.labor) {
       items.push({ label: `Mão de Obra (${area}m² × R$ ${getLaborRate(area).toLocaleString('pt-BR')})`, value: getLaborCost(area) });
     }
     if (opts.electrical) items.push({ label: `Kit Elétrica/Hidráulica`, value: getElectricalKit(area) });
-    if (opts.glass) items.push({ label: `Vidros`, value: getGlassPrice(area) });
+    if (opts.glass) items.push({ label: `Vidros`, value: getGlassPrice(area, 'custom') });
     if (opts.project) items.push({ label: `Projeto Personalizado (${area}m² × R$ 25,00)`, value: Math.round(area * 25) });
   } else {
     // Standard modalities — use model prices
@@ -276,7 +284,7 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
     items.push({ label: 'Kit Madeiramento', value: model.kitPrice });
 
     if (kit === 'parceira' || kit === 'turnkey') {
-      const fp = getFixturesPrice(model.area);
+      const fp = getFixturesPrice(model.area, model.id);
       if (state.slidingDoor) {
         items.push({ label: `Portas, Janelas e Ferragens + Porta de Correr (c/ 5% desc.)`, value: fp.withSlidingDoor });
       } else {
@@ -287,9 +295,9 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
     }
 
     if (kit === 'turnkey') {
-      const ts = getTilesStainPrice(model.area);
+      const ts = getTilesStainPrice(model.area, model.id);
       items.push({ label: `Telhas e Stain (${model.area}m² — R$ ${ts.perM2.toLocaleString('pt-BR')}/m²)`, value: ts.total });
-      items.push({ label: 'Vidros', value: getGlassPrice(model.area) });
+      items.push({ label: 'Vidros', value: getGlassPrice(model.area, model.id) });
       
       const paintCost = model.area <= 25 ? 2000 : model.area <= 55 ? 3000 : 4500;
       items.push({ label: 'Pintura e Tratamento (Stain)', value: paintCost });
@@ -301,7 +309,7 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
     // Kit add-ons (electrical / glass)
     const addons = state.kitAddons;
     if (addons.electrical) items.push({ label: `Kit Elétrica/Hidráulica`, value: getElectricalKit(model.area) });
-    if (addons.glass && kit !== 'turnkey') items.push({ label: `Vidros`, value: getGlassPrice(model.area) }); // turnkey já inclui vidros
+    if (addons.glass && kit !== 'turnkey') items.push({ label: `Vidros`, value: getGlassPrice(model.area, model.id) }); // turnkey já inclui vidros
   }
 
   // Foundation
@@ -382,7 +390,7 @@ export function calculateProposalItems(
   const hasFixtures = data.kitType === 'custom' ? data.includeFixtures : ['parceira', 'turnkey'].includes(data.kitType);
   if (hasFixtures) {
     let fpValue = 0;
-    const fp = getFixturesPrice(area);
+    const fp = getFixturesPrice(area, data.modelId);
     if (data.slidingDoor) {
       fpValue = fp.withSlidingDoor;
     } else {
@@ -402,7 +410,7 @@ export function calculateProposalItems(
   // 3. Tiles & Stain
   const hasTiles = data.kitType === 'custom' ? data.includeTilesStain : ['turnkey'].includes(data.kitType);
   if (hasTiles) {
-    let tsValue = getTilesStainPrice(area).total;
+    let tsValue = getTilesStainPrice(area, data.modelId).total;
     if (data.tilesStainPriceOverride !== undefined) tsValue = data.tilesStainPriceOverride;
     items.push({ label: `Telhas e Stain (${area}m²)`, value: tsValue });
   }
@@ -432,8 +440,10 @@ export function calculateProposalItems(
   // Vidros inclusos por padrão no turnkey
   const hasGlass = data.includeGlass || data.kitType === 'turnkey';
   if (hasGlass) {
-    let glassValue = getGlassPrice(area);
-    if (data.glassPriceOverride !== undefined) glassValue = data.glassPriceOverride;
+    let glassValue = getGlassPrice(area, data.modelId);
+    if (data.glassPriceOverride !== undefined) {
+      glassValue = data.glassPriceOverride;
+    }
     items.push({ label: 'Vidros', value: glassValue });
   }
 
