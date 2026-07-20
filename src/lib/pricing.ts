@@ -15,6 +15,7 @@ export const CABIN_MODELS: CabinModel[] = [
   { id: 'arembepe-plus', name: 'Chalé Arembepe Plus', area: 20, kitPrice: 13000, tilesStainPrice: 6700, fixturesPrice: 0 },
   { id: 'arembepe', name: 'Cabana Camping Arembepe', area: 10.5, kitPrice: 8334, tilesStainPrice: 0, fixturesPrice: 1050 },
   { id: 'baixios', name: 'Chalé Baixios', area: 32, kitPrice: 20800, tilesStainPrice: 9650, fixturesPrice: 3200 },
+  { id: 'casa-caymmi', name: 'Casa Caymmi', area: 60, kitPrice: 35500, tilesStainPrice: 12850, fixturesPrice: 6000 },
 ];
 
 export const CARD_RATES: [number, number][] = [

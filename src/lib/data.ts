@@ -97,6 +97,20 @@ export const initialModels = [
     freight_is_promo: true,
     purposes: ["airbnb", "praia"],
   },
+  {
+    id: "casa-caymmi",
+    name: "Casa Caymmi",
+    image: "https://czeayphtvpirdfbzbpgc.supabase.co/storage/v1/object/public/woodbahia/models/covers/1784502905777_x44flyv26.jpg",
+    area: "60m²",
+    floors: "1 Pavimento",
+    bedrooms: 2,
+    infoLabel: "60m² | 2 quartos",
+    description: "Refúgio de madeira rústico-chique com design de cabana pré-fabricada. Fachada em madeira de tom quente com telhado vermelho icônico e ampla varanda coberta com deck estendido. Interior luminoso e aconchegante com 2 quartos, banheiro, sala e cozinha integrados por grandes aberturas de vidro. Ideal para seu sítio, praia ou serra.",
+    kitPrice: "R$ 35.500,00",
+    freight_value: "R$ 8.500,00",
+    freight_is_promo: true,
+    purposes: ["moradia", "campo", "praia", "airbnb"],
+  },
 ];
 
 // ── Overrides que corrigem dados do Firebase (fonte de verdade local) ──────────
@@ -142,6 +156,11 @@ const MODEL_OVERRIDES: Record<string, Partial<{
   "praia-do-forte": {
     kitPrice: "R$ 12.675,00",
     freight_value: "R$ 6.500,00",
+    freight_is_promo: true,
+  },
+  caymmi: {
+    kitPrice: "R$ 35.500,00",
+    freight_value: "R$ 8.500,00",
     freight_is_promo: true,
   },
 };
