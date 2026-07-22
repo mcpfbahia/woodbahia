@@ -5,6 +5,7 @@ export interface CabinModel {
   kitPrice: number;
   tilesStainPrice: number;
   fixturesPrice: number;
+  discountRate?: number | string;
 }
 
 export const CABIN_MODELS: CabinModel[] = [
@@ -16,7 +17,23 @@ export const CABIN_MODELS: CabinModel[] = [
   { id: 'arembepe', name: 'Cabana Camping Arembepe', area: 10.5, kitPrice: 8334, tilesStainPrice: 0, fixturesPrice: 1050 },
   { id: 'baixios', name: 'Chalé Baixios', area: 32, kitPrice: 20800, tilesStainPrice: 9650, fixturesPrice: 3200 },
   { id: 'casa-caymmi', name: 'Casa Caymmi', area: 60, kitPrice: 35500, tilesStainPrice: 12850, fixturesPrice: 6000 },
+  { id: 'chale-vilas-do-atlantico', name: 'Chalé Vilas do Atlântico', area: 35, kitPrice: 21000, tilesStainPrice: 10250, fixturesPrice: 3500 },
 ];
+
+export function getModelDiscountRate(modelIdOrName?: string, customDiscountRate?: number | string): number {
+  if (customDiscountRate !== undefined && customDiscountRate !== null && customDiscountRate !== "") {
+    const rate = parseFloat(customDiscountRate.toString());
+    if (!isNaN(rate) && rate > 0) {
+      return rate > 1 ? rate / 100 : rate;
+    }
+  }
+  if (!modelIdOrName) return 0.05; // Geral: 5%
+  const normalized = modelIdOrName.toLowerCase();
+  if (normalized.includes('vilas') || normalized.includes('villas') || normalized.includes('atlantico')) {
+    return 0.15; // Vilas do Atlântico: 15%
+  }
+  return 0.05; // Geral: 5%
+}
 
 export const CARD_RATES: [number, number][] = [
   [1, 0], [2, 3.99], [3, 4.99], [4, 6.59], [5, 7.09], [6, 7.69],

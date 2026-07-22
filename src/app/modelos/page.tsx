@@ -6,7 +6,7 @@ import { ArrowRight, Maximize2, Truck, Loader2, Package, Tag } from "lucide-reac
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "~/lib/firebase";
 import { initialModels, applyModelOverrides } from "~/lib/data";
-import { getTilesStainPrice, getFixturesPrice, getGlassPrice, getLaborCost, getEucalyptusFoundation, getElectricalKit, getFreight } from "~/lib/pricing";
+import { getTilesStainPrice, getFixturesPrice, getGlassPrice, getLaborCost, getEucalyptusFoundation, getElectricalKit, getFreight, getModelDiscountRate } from "~/lib/pricing";
 import { StaggerContainer, StaggerItem } from "~/components/common/ScrollReveal";
 import Image from "next/image";
 import { Header } from "~/components/layout/Header";
@@ -114,10 +114,10 @@ export default function ModelsGalleryPage() {
 
           {/* Banner desconto */}
           {selectedModalidade === 'kit' && (
-            <div className="mb-8 flex items-center justify-center gap-2 rounded-2xl border border-amber-200 bg-amber-50 py-3 px-5 text-center sm:mx-auto sm:max-w-md">
+            <div className="mb-8 flex items-center justify-center gap-2 rounded-2xl border border-amber-200 bg-amber-50 py-3 px-5 text-center sm:mx-auto sm:max-w-xl">
               <Tag className="h-4 w-4 shrink-0 text-amber-600" />
               <p className="text-sm font-semibold text-amber-800">
-                5% de desconto em todos os kits para pagamento à vista
+                5% de desconto à vista em todos os modelos (15% para o Vilas do Atlântico)
               </p>
             </div>
           )}
@@ -140,20 +140,22 @@ export default function ModelsGalleryPage() {
                 const modelTilesPrice = model.tilesStainPrice ? parsePriceToBRL(model.tilesStainPrice) : getTilesStainPrice(numericArea).total;
                 const modelGlassPrice = getGlassPrice(numericArea);
                 const adminCost = Math.round(laborCost * 0.25); // 25% de coordenação
+                
+                const discountRate = getModelDiscountRate(model.id || model.name, model.discountRate);
 
                 // 1. Kit Madeiramento (Completo com Frete)
                 const kitEstimation = kitFull + getFreight(numericArea);
-                const kitPriceDiscounted = kitEstimation - (kitFull * 0.05);
+                const kitPriceDiscounted = kitEstimation - (kitFull * discountRate);
 
                 // 2. Montagem Parceira (Completo com Frete + Fundação Eucalipto)
                 const partnerEstimation = kitFull + laborCost + getEucalyptusFoundation(numericArea) + getFreight(numericArea);
-                const partnerEstimationDiscounted = partnerEstimation - (kitFull * 0.05);
+                const partnerEstimationDiscounted = partnerEstimation - (kitFull * discountRate);
 
                 // 3. Chave na Mão (Obra Completa)
                 const paintCost = numericArea <= 25 ? 2000 : numericArea <= 55 ? 3000 : 4500;
                 const basePrice = numericArea * 150;
                 const turnkeyEstimation = kitFull + basePrice + laborCost + adminCost + getEucalyptusFoundation(numericArea) + modelTilesPrice + modelFixturesPrice + modelGlassPrice + paintCost + getElectricalKit(numericArea) + getFreight(numericArea);
-                const turnkeyEstimationDiscounted = turnkeyEstimation - ((kitFull + basePrice) * 0.05);
+                const turnkeyEstimationDiscounted = turnkeyEstimation - ((kitFull + basePrice) * discountRate);
 
                 return (
                   <StaggerItem key={model.id} index={idx}>
@@ -257,7 +259,7 @@ export default function ModelsGalleryPage() {
                                 </div>
                                 {kitFull > 0 && (
                                   <div className="shrink-0 flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-1 text-[10px] font-bold text-emerald-700">
-                                    5% desc. à vista
+                                    {discountRate * 100}% desc. à vista
                                   </div>
                                 )}
                               </div>
@@ -290,7 +292,7 @@ export default function ModelsGalleryPage() {
                                   )}
                                 </div>
                                 <div className="shrink-0 flex items-center gap-1 rounded-full bg-[#E8DCCF]/50 px-2 py-1 text-[10px] font-bold text-[#8C6239]">
-                                  🔨 5% desc. à vista
+                                  🔨 {discountRate * 100}% desc. à vista
                                 </div>
                               </div>
                             </div>

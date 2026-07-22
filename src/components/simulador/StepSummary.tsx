@@ -1,4 +1,4 @@
-import { calculateSummary, getEffectiveArea, calculateInstallmentValue } from '@/lib/pricing';
+import { calculateSummary, getEffectiveArea, calculateInstallmentValue, getModelDiscountRate } from '@/lib/pricing';
 import type { SimulationState, LineItem } from '@/lib/pricing';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -37,7 +37,7 @@ export function StepSummary({ state, onBack, onReset }: Props) {
   const woodenBaseItem = items.find(i => i.label.toLowerCase().includes('base de madeira') || i.label.toLowerCase().includes('base estrutural'));
   const discountableBase = (timberItem ? timberItem.value : 0) + (woodenBaseItem ? woodenBaseItem.value : 0);
 
-  const CASH_DISCOUNT = 0.05;
+  const CASH_DISCOUNT = getModelDiscountRate(state.model?.id || state.model?.name, state.model?.discountRate);
   const discountValue = Math.round(discountableBase * CASH_DISCOUNT);
   const totalAVista = Math.round(total - discountValue);
   const sinal = total * 0.3;
@@ -61,7 +61,7 @@ export function StepSummary({ state, onBack, onReset }: Props) {
     additionalTravelCost > 0 ? `• Deslocamento Adicional Chave na Mão (> 200km): ${fmt(additionalTravelCost)}` : ``,
     ``,
     `💰 *Total do Investimento: ${fmt(total)}*`,
-    `💚 *À Vista (5% desc. no madeiramento/base): ${fmt(totalAVista)}*`,
+    `💚 *À Vista (${CASH_DISCOUNT * 100}% desc. no madeiramento/base): ${fmt(totalAVista)}*`,
     ``,
     `📅 *Condições de Pagamento:*`,
     `• Sinal (30%): ${fmt(sinal)}`,
@@ -174,7 +174,7 @@ export function StepSummary({ state, onBack, onReset }: Props) {
                 className="flex justify-between items-center bg-green-500/10 border border-green-500/20 rounded-xl p-4 -mx-1 mt-3"
               >
                 <div>
-                  <span className="text-sm font-bold font-display text-green-700 dark:text-green-400">💰 À Vista (5% de desconto no madeiramento)</span>
+                  <span className="text-sm font-bold font-display text-green-700 dark:text-green-400">💰 À Vista ({CASH_DISCOUNT * 100}% de desconto no madeiramento)</span>
                   <p className="text-xs text-muted-foreground mt-0.5">Aplicado sobre o madeiramento e base de madeira</p>
                 </div>
                 <span className="text-xl md:text-2xl font-bold text-green-700 dark:text-green-400 font-display">{fmt(totalAVista)}</span>

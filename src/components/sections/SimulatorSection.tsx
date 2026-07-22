@@ -23,7 +23,8 @@ import {
   getEucalyptusFoundation,
   getMasonryFoundation,
   getRadierFoundation,
-  getFreight
+  getFreight,
+  getModelDiscountRate
 } from "~/lib/pricing";
 import { ScrollReveal } from "~/components/common/ScrollReveal";
 
@@ -204,6 +205,8 @@ export const SimulatorSection = () => {
     const mensagem = `Olá Wood Bahia! Fiz uma simulação de custos no site para um projeto de ${area}m² e gostaria de receber uma proposta detalhada.\n\n*Itens Selecionados:*\n${itens}\n\n*Investimento Total Estimado: ${formatBRL(totalPrice)}*`;
     return `https://wa.me/5571992936290?text=${encodeURIComponent(mensagem)}`;
   };
+
+  const discountRate = getModelDiscountRate();
 
   return (
     <section id="simulador" className="w-full bg-[#FAF8F5] py-24 lg:py-32 relative overflow-hidden">
@@ -609,10 +612,10 @@ export const SimulatorSection = () => {
                       Investimento à Vista (PIX/Boleto)
                     </span>
                     <div className="font-serif font-black text-2xl sm:text-3xl text-emerald-800 leading-none">
-                      {formatBRL(totalPrice - ((timberPrice + woodenBasePrice) * 0.05))}
+                      {formatBRL(totalPrice - ((timberPrice + woodenBasePrice) * discountRate))}
                     </div>
                     <span className="text-[10px] text-emerald-700/95 font-semibold mt-1.5 block leading-relaxed">
-                      *Com desconto de 5% aplicado sobre o madeiramento e base estrutural. Economia de {formatBRL((timberPrice + woodenBasePrice) * 0.05)}.
+                      *Com desconto de {discountRate * 100}% aplicado sobre o madeiramento e base estrutural. Economia de {formatBRL((timberPrice + woodenBasePrice) * discountRate)}.
                     </span>
                   </div>
 

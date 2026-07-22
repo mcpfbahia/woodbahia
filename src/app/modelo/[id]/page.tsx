@@ -28,7 +28,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "~/lib/firebase";
 import { initialModels, applyModelOverrides } from "~/lib/data";
-import { getTilesStainPrice, getFixturesPrice, getGlassPrice, getLaborCost, getEucalyptusFoundation, getElectricalKit, getFreight } from "~/lib/pricing";
+import { getTilesStainPrice, getFixturesPrice, getGlassPrice, getLaborCost, getEucalyptusFoundation, getElectricalKit, getFreight, getModelDiscountRate } from "~/lib/pricing";
 import { cn } from "~/lib/utils";
 import { Header } from "~/components/layout/Header";
 import { WhatsAppButton } from "~/components/common/WhatsAppButton";
@@ -461,19 +461,22 @@ export default function ModelDetailPage() {
   const modelGlassPrice = getGlassPrice(numericArea);
   const adminCost = Math.round(laborCost * 0.25); // 25% de coordenação
 
+  const discountRate = getModelDiscountRate(model.id || model.name, model.discountRate);
+
   // Kit Madeiramento (Completo com Frete)
   const kitEstimation = kitBasePriceNum + getFreight(numericArea);
-  const kitPriceDiscounted = kitEstimation - (kitBasePriceNum * 0.05);
+  const kitPriceDiscounted = kitEstimation - (kitBasePriceNum * discountRate);
 
   // Montagem Parceira (Completo com Frete + Fundação Eucalipto + Portas/Janelas)
   const partnerEstimation = kitBasePriceNum + modelFixturesPrice + laborCost + getEucalyptusFoundation(numericArea) + getFreight(numericArea);
-  const partnerEstimationDiscounted = partnerEstimation - (kitBasePriceNum * 0.05);
+  const partnerEstimationDiscounted = partnerEstimation - (kitBasePriceNum * discountRate);
 
   // Chave na Mão (Obra Completa)
   const paintCost = numericArea <= 25 ? 2000 : numericArea <= 55 ? 3000 : 4500;
   const basePrice = numericArea * 150;
+  const isVilas = id.includes('vilas') || (model.name && (model.name.toLowerCase().includes('vilas') || model.name.toLowerCase().includes('villas')));
   const turnkeyEstimation = kitBasePriceNum + basePrice + laborCost + adminCost + getEucalyptusFoundation(numericArea) + modelTilesPrice + modelFixturesPrice + modelGlassPrice + paintCost + getElectricalKit(numericArea) + getFreight(numericArea);
-  const turnkeyEstimationDiscounted = turnkeyEstimation - ((kitBasePriceNum + basePrice) * 0.05);
+  const turnkeyEstimationDiscounted = turnkeyEstimation - ((kitBasePriceNum + basePrice) * discountRate);
   const hasPromo = !!model.promoPrice && model.promoPrice.trim() !== "" && model.promoPrice !== "R$ 0,00" && model.promoPrice !== "0";
 
   return (
@@ -666,7 +669,7 @@ export default function ModelDetailPage() {
                           </>
                         )}
                       </div>
-                      <span className="text-[9px] text-emerald-600 font-bold block mt-0.5">5% de desc. à vista no madeiramento</span>
+                      <span className="text-[9px] text-emerald-600 font-bold block mt-0.5">{discountRate * 100}% de desc. à vista no madeiramento</span>
                       <div className="text-[10px] text-[#8C6239] font-bold bg-[#E8DCCF]/20 px-2 py-1 rounded-lg border border-[#E8DCCF]/45 mt-2.5 self-start inline-block">
                         Consulte Kit Base + Assoalho
                       </div>
@@ -691,7 +694,7 @@ export default function ModelDetailPage() {
                         <span className="text-[11px] text-muted-foreground line-through">{formatBRL(partnerEstimation)}</span>
                         <span className="font-serif text-xl font-bold text-[#B06D46]">{formatBRL(partnerEstimationDiscounted)}</span>
                       </div>
-                      <span className="text-[9px] text-emerald-600 font-bold block mt-0.5">5% de desc. à vista no madeiramento</span>
+                      <span className="text-[9px] text-emerald-600 font-bold block mt-0.5">{discountRate * 100}% de desc. à vista no madeiramento</span>
                       <span className="text-[9px] text-stone-555 block mt-2.5 font-medium italic">*Obra Completa. Solicite proposta para valores reais do frete/fundação no seu terreno.</span>
                     </div>
                   </div>
@@ -713,10 +716,10 @@ export default function ModelDetailPage() {
                     <div className="mt-4 pt-3 border-t border-[#E8DCCF]/60">
                       <span className="text-[9px] text-[#8A3A1B] block uppercase font-black tracking-wider mb-1">Preço de Tabela (Montado)</span>
                       <div className="flex flex-wrap items-baseline gap-1.5 mt-0.5">
-                        {model.price && model.price.trim() !== "" && model.price !== "R$ 0,00" ? (
+                        {model.price && model.price.trim() !== "" && model.price !== "R$ 0,00" && !isVilas ? (
                           <>
-                            <span className="text-[11px] text-muted-foreground line-through">{formatBRL(turnkeyEstimation)}</span>
-                            <span className="font-serif text-xl font-bold text-[#8A3A1B]">{model.price}</span>
+                            <span className="text-[11px] text-muted-foreground line-through">{model.price}</span>
+                            <span className="font-serif text-xl font-bold text-[#8A3A1B]">{formatBRL(turnkeyEstimationDiscounted)}</span>
                           </>
                         ) : (
                           <>
@@ -725,7 +728,7 @@ export default function ModelDetailPage() {
                           </>
                         )}
                       </div>
-                      <span className="text-[9px] text-emerald-600 font-bold block mt-0.5">Desconto especial aplicado sobre a estimativa</span>
+                      <span className="text-[9px] text-emerald-600 font-bold block mt-0.5">{discountRate * 100}% de desc. à vista aplicado</span>
                       <span className="text-[9px] text-stone-555 block mt-2.5 font-medium italic">*Obra Completa. Solicite proposta para valores reais do frete/fundação no seu terreno.</span>
                     </div>
                   </div>
@@ -1086,19 +1089,19 @@ export default function ModelDetailPage() {
                       // 1. Kit
                       const kitAPrazo = kitBasePriceNum + getFreight(numericArea) + (includeBaseInSim ? basePrice : 0);
                       const kitDiscountable = kitBasePriceNum + (includeBaseInSim ? basePrice : 0);
-                      const kitDesconto = Math.round(kitDiscountable * 0.05);
+                      const kitDesconto = Math.round(kitDiscountable * discountRate);
                       const kitAVista = kitAPrazo - kitDesconto;
                       
                       // 2. Parceira
                       const partnerAPrazo = kitBasePriceNum + laborCost + getEucalyptusFoundation(numericArea) + getFreight(numericArea) + (includeBaseInSim ? basePrice : 0);
                       const partnerDiscountable = kitBasePriceNum + (includeBaseInSim ? basePrice : 0);
-                      const partnerDesconto = Math.round(partnerDiscountable * 0.05);
+                      const partnerDesconto = Math.round(partnerDiscountable * discountRate);
                       const partnerAVista = partnerAPrazo - partnerDesconto;
                       
                       // 3. Chave na mão (base está inclusa por padrão)
                       const turnkeyAPrazo = kitBasePriceNum + basePrice + laborCost + adminCost + getEucalyptusFoundation(numericArea) + modelTilesPrice + modelFixturesPrice + modelGlassPrice + (numericArea <= 25 ? 2000 : numericArea <= 55 ? 3000 : 4500) + getElectricalKit(numericArea) + getFreight(numericArea);
                       const turnkeyDiscountable = kitBasePriceNum + basePrice;
-                      const turnkeyDesconto = Math.round(turnkeyDiscountable * 0.05);
+                      const turnkeyDesconto = Math.round(turnkeyDiscountable * discountRate);
                       const turnkeyAVista = turnkeyAPrazo - turnkeyDesconto;
                       
                       const totalAPrazo = simModalidade === 'kit' ? kitAPrazo : simModalidade === 'parceira' ? partnerAPrazo : turnkeyAPrazo;
@@ -1108,7 +1111,7 @@ export default function ModelDetailPage() {
                       return (
                         <div className="space-y-4">
                           <div className="flex justify-between pb-3 border-b border-stone-100 text-emerald-700 bg-emerald-50/50 p-2 rounded-lg text-xs font-semibold">
-                            <span>Desconto de 5% (Aplicado à Vista no Madeiramento {includeBaseInSim || simModalidade === 'turnkey' ? "+ Base" : ""}):</span>
+                            <span>Desconto de {discountRate * 100}% (Aplicado à Vista no Madeiramento {includeBaseInSim || simModalidade === 'turnkey' ? "+ Base" : ""}):</span>
                             <span>- {formatBRL(descontoAVista)}</span>
                           </div>
 

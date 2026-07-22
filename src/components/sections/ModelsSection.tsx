@@ -7,7 +7,7 @@ import Link from "next/link";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "~/lib/firebase";
 import { initialModels, applyModelOverrides } from "~/lib/data";
-import { getTilesStainPrice, getFixturesPrice, getGlassPrice, getLaborCost, getEucalyptusFoundation, getElectricalKit, getFreight } from "~/lib/pricing";
+import { getTilesStainPrice, getFixturesPrice, getGlassPrice, getLaborCost, getEucalyptusFoundation, getElectricalKit, getFreight, getModelDiscountRate } from "~/lib/pricing";
 import {
   ScrollReveal,
   StaggerContainer,
@@ -124,19 +124,21 @@ export const ModelsSection = () => {
               const modelGlassPrice = getGlassPrice(numericArea);
               const adminCost = Math.round(laborCost * 0.25); // 25% de coordenação
 
+              const discountRate = getModelDiscountRate(model.id || model.name, model.discountRate);
+
               // 1. Kit Madeiramento (Completo com Frete)
               const kitEstimation = kitFull + getFreight(numericArea);
-              const kitPriceDiscounted = kitEstimation - (kitFull * 0.05);
+              const kitPriceDiscounted = kitEstimation - (kitFull * discountRate);
 
               // 2. Montagem Parceira (Completo com Frete + Fundação Eucalipto)
               const partnerEstimation = kitFull + laborCost + getEucalyptusFoundation(numericArea) + getFreight(numericArea);
-              const partnerEstimationDiscounted = partnerEstimation - (kitFull * 0.05);
+              const partnerEstimationDiscounted = partnerEstimation - (kitFull * discountRate);
 
               // 3. Chave na Mão (Obra Completa)
               const paintCost = numericArea <= 25 ? 2000 : numericArea <= 55 ? 3000 : 4500;
               const basePrice = numericArea * 150;
               const turnkeyEstimation = kitFull + basePrice + laborCost + adminCost + getEucalyptusFoundation(numericArea) + modelTilesPrice + modelFixturesPrice + modelGlassPrice + paintCost + getElectricalKit(numericArea) + getFreight(numericArea);
-              const turnkeyEstimationDiscounted = turnkeyEstimation - ((kitFull + basePrice) * 0.05);
+              const turnkeyEstimationDiscounted = turnkeyEstimation - ((kitFull + basePrice) * discountRate);
 
               return (
                 <StaggerItem key={model.id} index={idx}>
@@ -238,7 +240,7 @@ export const ModelsSection = () => {
                               </div>
                               {kitFull > 0 && (
                                 <div className="shrink-0 flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-1 text-[10px] font-bold text-emerald-700">
-                                  5% desc. à vista
+                                  {discountRate * 100}% desc. à vista
                                 </div>
                               )}
                             </div>
@@ -271,7 +273,7 @@ export const ModelsSection = () => {
                                 )}
                               </div>
                               <div className="shrink-0 flex items-center gap-1 rounded-full bg-[#E8DCCF]/50 px-2 py-1 text-[10px] font-bold text-[#8C6239]">
-                                🔨 5% desc. à vista
+                                🔨 {discountRate * 100}% desc. à vista
                               </div>
                             </div>
                           </div>
@@ -298,7 +300,7 @@ export const ModelsSection = () => {
                                 )}
                               </div>
                               <div className="shrink-0 flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-1 text-[10px] font-bold text-emerald-700">
-                                🔑 5% desc. à vista
+                                🔑 {discountRate * 100}% desc. à vista
                               </div>
                             </div>
                           </div>

@@ -111,6 +111,20 @@ export const initialModels = [
     freight_is_promo: true,
     purposes: ["moradia", "campo", "praia", "airbnb"],
   },
+  {
+    id: "chale-vilas-do-atlantico",
+    name: "Chalé Villas do Atlantico",
+    image: "https://czeayphtvpirdfbzbpgc.supabase.co/storage/v1/object/public/woodbahia/models/covers/1784502905777_x44flyv26.jpg",
+    area: "35m²",
+    floors: "1 Pavimento",
+    bedrooms: 1,
+    infoLabel: "35m² | 1 quarto",
+    description: "O Chalé Vilas do Atlântico reúne design moderno, conforto e excelente custo-benefício. Com 35 m², mezanino, deck frontal e uma imponente fachada em vidro temperado, oferece ambientes bem aproveitados e muito aconchegantes.",
+    kitPrice: "R$ 21.000,00",
+    freight_value: "R$ 5.500,00",
+    freight_is_promo: true,
+    purposes: ["airbnb", "praia", "campo"],
+  },
 ];
 
 // ── Overrides que corrigem dados do Firebase (fonte de verdade local) ──────────
@@ -161,6 +175,11 @@ const MODEL_OVERRIDES: Record<string, Partial<{
   caymmi: {
     kitPrice: "R$ 35.500,00",
     freight_value: "R$ 8.500,00",
+    freight_is_promo: true,
+  },
+  "vilas-do-atlantico": {
+    kitPrice: "R$ 21.000,00",
+    freight_value: "R$ 5.500,00",
     freight_is_promo: true,
   },
 };

@@ -6,6 +6,7 @@ import {
   CABIN_MODELS,
   CARD_RATES,
   calculateInstallmentValue,
+  getModelDiscountRate,
   type ProposalData,
   type KitType,
   type CabinModel,
@@ -199,8 +200,9 @@ export function generateProposalPDF(
   const timberItem = items.find(i => i.label.toLowerCase().includes('madeiramento'));
   const woodenBaseItem = items.find(i => i.label.toLowerCase().includes('base de madeira') || i.label.toLowerCase().includes('base estrutural'));
   const discountableBase = (timberItem ? timberItem.value : 0) + (woodenBaseItem ? woodenBaseItem.value : 0);
+  const discountRate = getModelDiscountRate(data.modelId, model?.discountRate);
   const discountableBaseNet = Math.max(0, discountableBase - discount);
-  const totalAVista = Math.round(totalFinal - (discountableBaseNet * 0.05));
+  const totalAVista = Math.round(totalFinal - (discountableBaseNet * discountRate));
 
   let y = 0;
 
@@ -441,8 +443,8 @@ export function generateProposalPDF(
   doc.text('CONDIÇÕES DE PAGAMENTO (PIX / BOLETO)', margin, y);
   y += 6;
 
-  // À vista com 5% de desconto no madeiramento e base
-  drawPaymentLine('À Vista (5% desc. no madeiramento/base):', fmt(totalAVista), 'No PIX ou Transferência Bancária', y);
+  // À vista com desconto no madeiramento e base
+  drawPaymentLine(`À Vista (${discountRate * 100}% desc. no madeiramento/base):`, fmt(totalAVista), 'No PIX ou Transferência Bancária', y);
   y += 5;
 
   // Novo modelo 50/50 (pagamento do material)
