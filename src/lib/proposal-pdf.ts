@@ -34,7 +34,7 @@ const KIT_NAMES: Record<string, string> = {
 const KIT_DESCRIPTIONS: Record<string, string> = {
   madeiramento: 'Madeiramento estrutural completo em Pinus tratado em autoclave (pilares, vigas, paredes, forro, estrutura de telhado). A montagem e demais materiais são de responsabilidade do cliente.',
   parceira: 'Madeiramento + esquadrias (portas/janelas/ferragens) + mão de obra de carpintaria credenciada, com isenção de taxas administrativas da Wood Bahia. A cobertura, vidros e elétrica são contratados à parte.',
-  turnkey: 'Estrutura de madeira montada e acabada com responsabilidade única da Wood Bahia. Inclui madeiramento, esquadrias, cobertura completa (telhas ecológicas e manta térmica), vidros de 8mm, pintura em Stain (protetor), mão de obra própria e coordenação/gestão técnica total.',
+  turnkey: 'Estrutura de madeira montada e acabada com responsabilidade única da Wood Bahia. Inclui madeiramento, esquadrias, cobertura completa (telhas ecológicas e manta térmica), vidros fachada, pintura em Stain (protetor), mão de obra própria e coordenação/gestão técnica total.',
   custom: 'Kit personalizado montado sob medida para o seu projeto.',
 };
 
@@ -74,7 +74,7 @@ export function getIncludedItems(data: ProposalData): string[] {
   // Vidros inclusos no Turnkey ou se selecionado
   const hasGlass = data.includeGlass || data.kitType === 'turnkey';
   if (hasGlass) {
-    items.push('Vidros temperados (8mm)');
+    items.push('Vidros fachada');
   }
 
   if (data.kitType === 'custom' && data.includeProject) {

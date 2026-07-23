@@ -235,93 +235,89 @@ export default function ModelsGalleryPage() {
                         )}
 
                         {/* Bloco de preços dinâmico por modalidade */}
-                        <div className="mt-auto space-y-2.5 border-t border-border pt-3">
-
-                          {selectedModalidade === 'kit' && (
-                            <div className="flex flex-col gap-1.5">
-                              <div className="flex items-end justify-between gap-2">
-                                <div className="min-w-0">
-                                  <p className="text-[9px] font-black uppercase tracking-widest text-primary/60">
-                                    Kit Madeiramento Estrutural
-                                  </p>
-                                  {kitFull > 0 ? (
-                                    <div className="flex flex-wrap items-baseline gap-1.5">
-                                      <span className="text-xs text-muted-foreground line-through">
-                                        {formatBRL(kitEstimation)}
-                                      </span>
-                                      <span className="font-serif text-lg font-bold text-primary sm:text-xl">
-                                        {formatBRL(kitPriceDiscounted)}
-                                      </span>
-                                    </div>
-                                  ) : (
-                                    <p className="font-serif text-lg font-bold text-primary">Consulte</p>
-                                  )}
-                                </div>
-                                {kitFull > 0 && (
-                                  <div className="shrink-0 flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-1 text-[10px] font-bold text-emerald-700">
-                                    {discountRate * 100}% desc. à vista
+                        <div className="mt-auto border-t border-border pt-3">
+                          <div className="grid grid-cols-2 gap-3">
+                            {/* Coluna Esquerda: Kit Madeiramento sempre */}
+                            <div className="flex flex-col justify-between border-r border-border/60 pr-2">
+                              <div>
+                                <p className="text-[9px] font-black uppercase tracking-widest text-primary/60 mb-0.5 leading-none">
+                                  🪵 Kit Madeiramento
+                                </p>
+                                {kitFull > 0 ? (
+                                  <div className="flex flex-col mt-1">
+                                    <span className="text-[9px] text-muted-foreground line-through leading-none mb-0.5">
+                                      {formatBRL(kitEstimation)}
+                                    </span>
+                                    <span className="font-serif text-sm font-bold text-primary leading-tight sm:text-base">
+                                      {formatBRL(kitPriceDiscounted)}
+                                    </span>
                                   </div>
+                                ) : (
+                                  <p className="font-serif text-xs font-bold text-primary mt-1">Consulte</p>
                                 )}
                               </div>
                               {kitFull > 0 && (
-                                <div className="text-[10px] text-[#8C6239] font-bold bg-[#E8DCCF]/20 px-2 py-1 rounded-lg border border-[#E8DCCF]/45 self-start">
-                                  🪵 Opcional Kit Base + Assoalho: {formatBRL(numericArea * 150)}
-                                </div>
+                                <span className="text-[8px] sm:text-[9px] text-emerald-700 font-bold mt-1 block">
+                                  {discountRate * 100}% desc. à vista
+                                </span>
                               )}
                             </div>
-                          )}
 
-                          {selectedModalidade === 'parceira' && (
-                            <div className="flex flex-col gap-1.5">
-                              <div className="flex items-end justify-between gap-2">
-                                <div className="min-w-0">
-                                  <p className="text-[9px] font-black uppercase tracking-widest text-[#8C6239]">
-                                    Kit + Montagem Parceira
-                                  </p>
-                                  {kitFull > 0 ? (
-                                    <div className="flex flex-wrap items-baseline gap-1.5">
-                                      <span className="text-xs text-muted-foreground line-through">
-                                        {formatBRL(partnerEstimation)}
-                                      </span>
-                                      <span className="font-serif text-lg font-bold text-[#8C6239] sm:text-xl">
-                                        {formatBRL(partnerEstimationDiscounted)}
-                                      </span>
-                                    </div>
-                                  ) : (
-                                    <p className="font-serif text-lg font-bold text-primary">Consulte</p>
-                                  )}
-                                </div>
-                                <div className="shrink-0 flex items-center gap-1 rounded-full bg-[#E8DCCF]/50 px-2 py-1 text-[10px] font-bold text-[#8C6239]">
-                                  🔨 {discountRate * 100}% desc. à vista
-                                </div>
-                              </div>
+                            {/* Coluna Direita: Depende da modalidade selecionada (Parceira ou Chave na Mão) */}
+                            <div className="flex flex-col justify-between pl-1">
+                              {selectedModalidade === 'parceira' ? (
+                                <>
+                                  <div>
+                                    <p className="text-[9px] font-black uppercase tracking-widest text-[#8C6239] mb-0.5 leading-none">
+                                      🔨 Montagem Parceira
+                                    </p>
+                                    {kitFull > 0 ? (
+                                      <div className="flex flex-col mt-1">
+                                        <span className="text-[9px] text-muted-foreground line-through leading-none mb-0.5">
+                                          {formatBRL(partnerEstimation)}
+                                        </span>
+                                        <span className="font-serif text-sm font-bold text-[#8C6239] leading-tight sm:text-base">
+                                          {formatBRL(partnerEstimationDiscounted)}
+                                        </span>
+                                      </div>
+                                    ) : (
+                                      <p className="font-serif text-xs font-bold text-[#8C6239] mt-1">Consulte</p>
+                                    )}
+                                  </div>
+                                  <span className="text-[8px] sm:text-[9px] text-[#8C6239] font-bold mt-1 block">
+                                    {discountRate * 100}% desc. à vista
+                                  </span>
+                                </>
+                              ) : (
+                                <>
+                                  <div>
+                                    <p className="text-[9px] font-black uppercase tracking-widest text-emerald-700 mb-0.5 leading-none">
+                                      🔑 Chave na Mão
+                                    </p>
+                                    {kitFull > 0 ? (
+                                      <div className="flex flex-col mt-1">
+                                        <span className="text-[9px] text-muted-foreground line-through leading-none mb-0.5">
+                                          {formatBRL(turnkeyEstimation)}
+                                        </span>
+                                        <span className="font-serif text-sm font-bold text-emerald-700 leading-tight sm:text-base">
+                                          {formatBRL(turnkeyEstimationDiscounted)}
+                                        </span>
+                                      </div>
+                                    ) : (
+                                      <p className="font-serif text-xs font-bold text-emerald-700 mt-1">Consulte</p>
+                                    )}
+                                  </div>
+                                  <span className="text-[8px] sm:text-[9px] text-emerald-700 font-bold mt-1 block">
+                                    {discountRate * 100}% desc. à vista
+                                  </span>
+                                </>
+                              )}
                             </div>
-                          )}
+                          </div>
 
-                          {selectedModalidade === 'turnkey' && (
-                            <div className="flex flex-col gap-1.5">
-                              <div className="flex items-end justify-between gap-2">
-                                <div className="min-w-0">
-                                  <p className="text-[9px] font-black uppercase tracking-widest text-emerald-700">
-                                    Obra Turnkey Chave na Mão
-                                  </p>
-                                  {kitFull > 0 ? (
-                                    <div className="flex flex-wrap items-baseline gap-1.5">
-                                      <span className="text-xs text-muted-foreground line-through">
-                                        {formatBRL(turnkeyEstimation)}
-                                      </span>
-                                      <span className="font-serif text-lg font-bold text-emerald-700 sm:text-xl">
-                                        {formatBRL(turnkeyEstimationDiscounted)}
-                                      </span>
-                                    </div>
-                                  ) : (
-                                    <p className="font-serif text-lg font-bold text-primary">Consulte</p>
-                                  )}
-                                </div>
-                                <div className="shrink-0 flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-1 text-[10px] font-bold text-emerald-700">
-                                  🔑 5% desc. à vista
-                                </div>
-                              </div>
+                          {selectedModalidade === 'kit' && kitFull > 0 && (
+                            <div className="text-[10px] text-[#8C6239] font-bold bg-[#E8DCCF]/20 px-2 py-1 rounded-lg border border-[#E8DCCF]/45 mt-2.5 inline-block">
+                              🪵 Opcional Kit Base + Assoalho: {formatBRL(numericArea * 150)}
                             </div>
                           )}
                         </div>

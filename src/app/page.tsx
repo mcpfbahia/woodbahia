@@ -15,7 +15,6 @@ import { FooterWoodBahia } from "~/components/layout/FooterWoodBahia";
 import { WhatsAppButton } from "~/components/common/WhatsAppButton";
 import { PaymentSection } from "~/components/sections/PaymentSection";
 import { SimulatorSection } from "~/components/sections/SimulatorSection";
-import { AnnouncementModal } from "~/components/common/AnnouncementModal";
 import { type Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -57,7 +56,6 @@ export default function Home() {
       </main>
       <FooterWoodBahia />
       <WhatsAppButton />
-      <AnnouncementModal />
     </div>
   );
 }

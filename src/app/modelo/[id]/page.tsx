@@ -365,7 +365,7 @@ export default function ModelDetailPage() {
           "Ferragens, pregos e parafusos",
           "Barras roscadas e fixadores",
           "Telhas e manta térmica",
-          "Vidros temperados",
+          "Vidros fachada",
           "Stain e pintura protetora",
           "Fundação e base civil",
           "Mão de obra de montagem",
@@ -401,7 +401,7 @@ export default function ModelDetailPage() {
         ],
         exclusions: [
           "Telhas e manta térmica (cobertura)",
-          "Vidros temperados (8mm)",
+          "Vidros fachada",
           "Stain e pintura protetora",
           "Instalações de elétrica/hidro",
           "Base civil / Laje radier",
@@ -431,7 +431,7 @@ export default function ModelDetailPage() {
           "Mão de obra própria e montagem",
           "Fundação de sapatas eucalipto",
           "Telhas ecológicas e manta térmica",
-          "Vidros temperados (8mm)",
+          "Vidros fachada",
           "Pintura protetora em Stain (1 cor)",
           "Instalações de elétrica/hidráulica básica",
           "Gestão, coordenação e garantia Wood Bahia",
@@ -1039,12 +1039,12 @@ export default function ModelDetailPage() {
                     {/* Item 8: Vidros Temperados */}
                     {simModalidade === 'turnkey' ? (
                       <div className="flex justify-between pb-3 border-b border-stone-100">
-                        <span className="text-stone-700 font-medium">8. Vidros Temperados (Incluso apenas no Chave na Mão):</span>
+                        <span className="text-stone-700 font-medium">8. Vidros Fachada (Incluso apenas no Chave na Mão):</span>
                         <span className="font-bold text-stone-850">{formatBRL(modelGlassPrice)}</span>
                       </div>
                     ) : (
                       <div className="flex justify-between pb-3 border-b border-stone-100 text-stone-300">
-                        <span className="font-medium">8. Vidros Temperados (8mm):</span>
+                        <span className="font-medium">8. Vidros Fachada:</span>
                         <span className="italic text-xs font-semibold">Não Incluso (Por conta do cliente nesta modalidade)</span>
                       </div>
                     )}
