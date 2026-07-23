@@ -64,6 +64,7 @@ export function StepSummary({ state, onBack, onReset }: Props) {
     `💚 *À Vista (${CASH_DISCOUNT * 100}% desc. no madeiramento/base): ${fmt(totalAVista)}*`,
     ``,
     `⚠️ *Nota:* Os valores de frete e fundação são aproximados de acordo com a distância inserida, e serão confirmados em proposta comercial pelo especialista da Wood Bahia de acordo com as características do terreno.`,
+    state.kitType === 'madeiramento' ? `\n⚠️ *Alerta Kit Madeiramento:* Esta modalidade contempla unicamente a madeira estrutural da fábrica. Portas, janelas, ferragens, telhas, stain de pintura, vidros, drywall e placa cimentícia devem ser adquiridos separadamente pelo cliente.` : ``,
     ``,
     `📅 *Condições de Pagamento:*`,
     `• Sinal (30%): ${fmt(sinal)}`,
@@ -340,6 +341,26 @@ export function StepSummary({ state, onBack, onReset }: Props) {
           </Button>
         </motion.div>
       </div>
+
+      {/* Alerta Kit Madeiramento */}
+      {state.kitType === 'madeiramento' && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.65 }}
+          className="max-w-4xl mx-auto mt-6 px-2"
+        >
+          <div className="flex items-start gap-3 bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 text-amber-800 dark:text-amber-300">
+            <span className="text-lg leading-none mt-0.5">⚠️</span>
+            <div>
+              <strong className="text-xs uppercase font-bold block mb-1">Atenção sobre o Kit Madeiramento:</strong>
+              <p className="text-xs leading-relaxed opacity-95">
+                Esta modalidade contempla <strong>exclusivamente as madeiras estruturais</strong> da fábrica. Para a conclusão da sua obra, você precisará adquirir por conta própria todos os itens de acabamento e complementares (como portas, janelas, ferragens de fixação, telhas de cobertura, stain de pintura, vidros de esquadrias, drywall, placa cimentícia, fiação elétrica e encanamentos hidráulicos).
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      )}
 
       {/* Disclaimer */}
       <motion.div

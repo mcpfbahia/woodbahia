@@ -83,6 +83,7 @@ export function getIncludedItems(data: ProposalData): string[] {
 
   if (data.kitType === 'turnkey') {
     items.push('Coordenação e Gestão Técnica Wood Bahia');
+    items.push('Paredes e piso drywall e placa cimentícia');
   }
 
   if (data.foundationType && data.foundationType !== 'none') {
@@ -144,6 +145,10 @@ export function getNotIncludedItems(data: ProposalData): string[] {
 
   if (data.kitType !== 'turnkey') {
     items.push('Coordenação e gestão técnica de obra');
+  }
+
+  if (data.kitType === 'madeiramento' || data.kitType === 'parceira') {
+    items.push('Paredes e piso drywall e placa cimentícia');
   }
 
   items.push('Frete (salvo combinado na proposta)');
