@@ -11,6 +11,7 @@ const navLinks = [
   { name: "Início", href: "/" },
   { name: "Sobre", href: "/#sobre" },
   { name: "Modelos", href: "/modelos" },
+  { name: "Simulador", href: "/simulador" },
   { name: "Portfólio", href: "/portfolio" },
   { name: "Como Funciona", href: "/#como-funciona" },
   { name: "Diário de Obras", href: "/diario-de-obras" },

@@ -425,7 +425,7 @@ export const SimulatorSection = () => {
                       />
                       <div>
                         <span className="text-sm font-bold text-stone-800 block">Kit de Vidros</span>
-                        <span className="text-xs text-gray-400">Vidros temperados de 8mm e acabamentos de fixação.</span>
+                        <span className="text-xs text-gray-400">Vidros fachada e acabamentos de fixação.</span>
                       </div>
                     </div>
                   </label>
@@ -572,7 +572,7 @@ export const SimulatorSection = () => {
 
                   {includeGlass && (
                     <div className="flex justify-between text-sm">
-                      <span className="text-[#5C3317] font-medium">Vidros Temperados 8mm:</span>
+                      <span className="text-[#5C3317] font-medium">Vidros Fachada:</span>
                       <span className="font-bold text-stone-800">{formatBRL(glassPrice)}</span>
                     </div>
                   )}

@@ -10,7 +10,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 const KIT_OPTIONS: { id: Exclude<KitType, 'custom'>; name: string; desc: string; highlight?: boolean }[] = [
   { id: 'madeiramento', name: '🪵 1. Apenas o Kit Madeiramento', desc: 'Madeiramento estrutural completo em Pinus tratado em autoclave (pilares, vigas, paredes, forro, estrutura de telhado). A montagem e demais materiais são de responsabilidade do cliente.' },
   { id: 'parceira', name: '🔨 2. Kit + Montagem Parceira', desc: 'Madeiramento + esquadrias (portas/janelas/ferragens) + mão de obra de carpintaria credenciada, com isenção de taxas administrativas da Wood Bahia. A cobertura, vidros e elétrica são contratados à parte.' },
-  { id: 'turnkey', name: '🔑 3. Wood Bahia Chave na Mão', desc: 'Estrutura de madeira montada e acabada com responsabilidade única da Wood Bahia. Inclui madeiramento, esquadrias, cobertura completa (telhas ecológicas e manta térmica), vidros de 8mm, pintura em Stain (protetor), mão de obra própria e coordenação/gestão técnica total.', highlight: true },
+  { id: 'turnkey', name: '🔑 3. Wood Bahia Chave na Mão', desc: 'Estrutura de madeira montada e acabada com responsabilidade única da Wood Bahia. Inclui madeiramento, esquadrias, cobertura completa (telhas ecológicas e manta térmica), vidros fachada, pintura em Stain (protetor), mão de obra própria e coordenação/gestão técnica total.', highlight: true },
 ];
 
 const CUSTOM_ADDONS: { key: keyof CustomOptions; label: string }[] = [
@@ -159,7 +159,7 @@ function StandardMode({ isEligibleForFull, model, kitType, kitAddons, slidingDoo
               <div className="flex items-center gap-3 opacity-80">
                 <Checkbox id="std-glass-turnkey" checked disabled />
                 <Label htmlFor="std-glass-turnkey" className="text-sm text-muted-foreground cursor-not-allowed">
-                  Vidros Temperados (Já inclusos no pacote)
+                  Vidros Fachada (Já inclusos no pacote)
                 </Label>
               </div>
             )}

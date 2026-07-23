@@ -63,6 +63,8 @@ export function StepSummary({ state, onBack, onReset }: Props) {
     `💰 *Total do Investimento: ${fmt(total)}*`,
     `💚 *À Vista (${CASH_DISCOUNT * 100}% desc. no madeiramento/base): ${fmt(totalAVista)}*`,
     ``,
+    `⚠️ *Nota:* Os valores de frete e fundação são aproximados de acordo com a distância inserida, e serão confirmados em proposta comercial pelo especialista da Wood Bahia de acordo com as características do terreno.`,
+    ``,
     `📅 *Condições de Pagamento:*`,
     `• Sinal (30%): ${fmt(sinal)}`,
     `• Entrega do Kit (20%): ${fmt(entrega)}`,
@@ -70,6 +72,25 @@ export function StepSummary({ state, onBack, onReset }: Props) {
   ].filter(Boolean).join('\n');
 
   const whatsappUrl = `https://wa.me/5571992936290?text=${encodeURIComponent(whatsappMessage)}`;
+
+  // Filtragem de itens por categoria
+  const materialItems = items.filter(item => {
+    const label = item.label.toLowerCase();
+    const isService = label.includes('mão de obra') || 
+                      label.includes('gestão') || 
+                      label.includes('coordenação') || 
+                      label.includes('deslocamento');
+    return !isService;
+  });
+
+  const serviceItems = items.filter(item => {
+    const label = item.label.toLowerCase();
+    const isService = label.includes('mão de obra') || 
+                      label.includes('gestão') || 
+                      label.includes('coordenação') || 
+                      label.includes('deslocamento');
+    return isService;
+  });
 
   return (
     <motion.div
@@ -99,58 +120,86 @@ export function StepSummary({ state, onBack, onReset }: Props) {
         >
           <Card className="glass-card border-0 rounded-2xl premium-shadow overflow-hidden">
             <CardContent className="p-7">
-              <h3 className="font-display font-semibold text-lg mb-5">Detalhamento</h3>
-              <div className="flex flex-col gap-3">
-                {items.map((item: LineItem, i: number) => {
-                  const isIncFoundation = item.value === 0 && (
-                    item.label.toLowerCase().includes('sapata') || 
-                    item.label.toLowerCase().includes('base radier') || 
-                    item.label.toLowerCase().includes('base estrutural') || 
-                    item.label.toLowerCase().includes('fundação') ||
-                    item.label.toLowerCase().includes('alicerce')
-                  );
-                  return (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.15 + i * 0.04 }}
-                      className="flex justify-between items-center text-sm py-1"
-                    >
-                      <span className="text-muted-foreground">{item.label}</span>
-                      {isIncFoundation ? (
-                        <span className="font-semibold text-green-700 bg-green-50 px-2.5 py-0.5 rounded-full text-[10px] border border-green-100 uppercase tracking-wider">
-                          Incluso
-                        </span>
-                      ) : (
-                        <span className="font-semibold tabular-nums">{fmt(item.value)}</span>
-                      )}
-                    </motion.div>
-                  );
-                })}
-                 <div className="flex justify-between items-center text-sm py-1">
-                  <span className="text-muted-foreground">Frete Estimado ({area}m² × R$ 95)</span>
-                  <span className="font-semibold tabular-nums">{fmt(freight)}</span>
+              <h3 className="font-display font-semibold text-lg mb-5">Detalhamento do Orçamento</h3>
+              
+              <div className="flex flex-col gap-6">
+                {/* 1. Materiais do Kit & Logística */}
+                <div>
+                  <h4 className="text-xs font-black uppercase tracking-widest text-[#B06D46] mb-3 flex items-center gap-1.5 border-b border-stone-100 pb-1.5">
+                    <span>🪵</span> Materiais do Kit & Logística
+                  </h4>
+                  <div className="flex flex-col gap-2.5 pl-1">
+                    {materialItems.map((item: LineItem, i: number) => {
+                      const isIncFoundation = item.value === 0 && (
+                        item.label.toLowerCase().includes('sapata') || 
+                        item.label.toLowerCase().includes('base radier') || 
+                        item.label.toLowerCase().includes('base estrutural') || 
+                        item.label.toLowerCase().includes('fundação') ||
+                        item.label.toLowerCase().includes('alicerce')
+                      );
+                      return (
+                        <div key={i} className="flex justify-between items-center text-sm py-0.5">
+                          <span className="text-muted-foreground">{item.label}</span>
+                          {isIncFoundation ? (
+                            <span className="font-semibold text-green-700 bg-green-50 px-2.5 py-0.5 rounded-full text-[10px] border border-green-100 uppercase tracking-wider">
+                              Incluso
+                            </span>
+                          ) : (
+                            <span className="font-semibold tabular-nums text-stone-850">{fmt(item.value)}</span>
+                          )}
+                        </div>
+                      );
+                    })}
+                    {/* Frete básico e adicional sempre entram em Logística de Materiais */}
+                    <div className="flex justify-between items-center text-sm py-0.5">
+                      <span className="text-muted-foreground">Frete Compartilhado Estimado ({area}m² × R$ 90)</span>
+                      <span className="font-semibold tabular-nums text-stone-850">{fmt(freight)}</span>
+                    </div>
+                    {additionalFreight > 0 && (
+                      <div className="flex justify-between items-center text-sm py-0.5 text-amber-600 font-semibold">
+                        <span>Frete Adicional (&gt; 200km)</span>
+                        <span className="tabular-nums">+{fmt(additionalFreight)}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-                {additionalFreight > 0 && (
-                  <motion.div
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="flex justify-between items-center text-sm py-1 text-amber-600 font-semibold"
-                  >
-                    <span>Frete Adicional (&gt; 200km)</span>
-                    <span className="tabular-nums">+{fmt(additionalFreight)}</span>
-                  </motion.div>
-                )}
-                {additionalTravelCost > 0 && (
-                  <motion.div
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="flex justify-between items-center text-sm py-1 text-amber-600 font-semibold"
-                  >
-                    <span>Deslocamento Adicional Chave na Mão (&gt; 200km)</span>
-                    <span className="tabular-nums">+{fmt(additionalTravelCost)}</span>
-                  </motion.div>
+
+                {/* 2. Serviços & Montagem de Obra */}
+                {(serviceItems.length > 0 || additionalTravelCost > 0) && (
+                  <div>
+                    <h4 className="text-xs font-black uppercase tracking-widest text-[#B06D46] mb-3 flex items-center gap-1.5 border-b border-stone-100 pb-1.5">
+                      <span>🔨</span> Montagem & Serviços de Obra
+                    </h4>
+                    <div className="flex flex-col gap-2.5 pl-1">
+                      {serviceItems.map((item: LineItem, i: number) => {
+                        const isIncFoundation = item.value === 0 && (
+                          item.label.toLowerCase().includes('sapata') || 
+                          item.label.toLowerCase().includes('base radier') || 
+                          item.label.toLowerCase().includes('base estrutural') || 
+                          item.label.toLowerCase().includes('fundação') ||
+                          item.label.toLowerCase().includes('alicerce')
+                        );
+                        return (
+                          <div key={i} className="flex justify-between items-center text-sm py-0.5">
+                            <span className="text-muted-foreground">{item.label}</span>
+                            {isIncFoundation ? (
+                              <span className="font-semibold text-green-700 bg-green-50 px-2.5 py-0.5 rounded-full text-[10px] border border-green-100 uppercase tracking-wider">
+                                Incluso
+                              </span>
+                            ) : (
+                              <span className="font-semibold tabular-nums text-stone-850">{fmt(item.value)}</span>
+                            )}
+                          </div>
+                        );
+                      })}
+                      {additionalTravelCost > 0 && (
+                        <div className="flex justify-between items-center text-sm py-0.5 text-amber-600 font-semibold">
+                          <span>Deslocamento Adicional Chave na Mão (&gt; 200km)</span>
+                          <span className="tabular-nums">+{fmt(additionalTravelCost)}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 )}
               </div>
 

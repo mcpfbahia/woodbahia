@@ -672,19 +672,33 @@ export function generateProposalPDF(
   y = (doc as any).lastAutoTable.finalY + 8;
 
   // ─── GUARANTEE & VALIDITY ───
-  y = checkPageBreak(doc, y, 30);
+  y = checkPageBreak(doc, y, 42);
   doc.setFillColor(...COLORS.lightBg);
-  doc.roundedRect(margin, y, contentWidth, 18, 3, 3, 'F');
+  doc.roundedRect(margin, y, contentWidth, 32, 3, 3, 'F');
+  
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(9);
+  doc.setFontSize(8.5);
   doc.setTextColor(...COLORS.primary);
-  doc.text('GARANTIA', margin + 6, y + 6);
+  doc.text('GARANTIA', margin + 6, y + 5);
+  
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8);
+  doc.setFontSize(7.5);
   doc.setTextColor(...COLORS.foreground);
-  doc.text('15 anos de garantia na madeira Pinus tratada em autoclave contra cupins e fungos.', margin + 6, y + 12);
+  doc.text('15 anos de garantia na madeira Pinus tratada em autoclave contra cupins e fungos.', margin + 6, y + 10);
 
-  y += 22;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8.5);
+  doc.setTextColor(...COLORS.primary);
+  doc.text('CONDIÇÕES DO TERRENO & FUNDAÇÃO', margin + 6, y + 16);
+  
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+  doc.setTextColor(...COLORS.foreground);
+  const obsTerreno = 'Os valores estimados de fundação e montagem consideram terreno plano ou com desnível de até 50cm. Para terrenos com desnível superior ao indicado, a proposta estrutural definitiva será confirmada somente após visita técnica e avaliação topográfica presencial do local.';
+  const obsTerrenoLines = doc.splitTextToSize(obsTerreno, contentWidth - 12);
+  doc.text(obsTerrenoLines, margin + 6, y + 21);
+
+  y += 36;
 
   // Ícone de Atenção desenhado
   doc.setFillColor(180, 60, 30);

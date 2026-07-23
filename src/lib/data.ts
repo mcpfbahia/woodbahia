@@ -339,7 +339,7 @@ export const faqItems = [
   {
     question: "04 — Quais são as modalidades de contratação da Wood Bahia?",
     answer:
-      "Oferecemos três modalidades principais: 1) Apenas o Kit Madeiramento: a fábrica fornece as peças de madeira tratada em autoclave para a estrutura, manual técnico e suporte em vídeo, sendo todo o restante responsabilidade do cliente. 2) Kit + Montagem Parceira: inclui todo o kit de madeira e indicamos carpinteiros parceiros homologados na sua região para a montagem direta, sem taxas administrativas. 3) Wood Bahia Chave na Mão: assumimos responsabilidade total de ponta a ponta, entregando o chalé montado com cobertura, portas, janelas, vidros temperados de 8mm, pintura Stain protetora e elétrica/hidráulica básica.",
+      "Oferecemos três modalidades principais: 1) Apenas o Kit Madeiramento: a fábrica fornece as peças de madeira tratada em autoclave para a estrutura, manual técnico e suporte em vídeo, sendo todo o restante responsabilidade do cliente. 2) Kit + Montagem Parceira: inclui todo o kit de madeira e indicamos carpinteiros parceiros homologados na sua região para a montagem direta, sem taxas administrativas. 3) Wood Bahia Chave na Mão: assumimos responsabilidade total de ponta a ponta, entregando o chalé montado com cobertura, portas, janelas, vidros fachada, pintura Stain protetora e elétrica/hidráulica básica.",
   },
   {
     question: "05 — Como funciona a taxa de gestão na modalidade Chave na Mão?",
@@ -364,7 +364,7 @@ export const faqItems = [
   {
     question: "09 — O que são esquadrias e vidros opcionais nos simuladores?",
     answer:
-      "Nas modalidades Apenas Kit e Montagem Parceira, você pode optar por adicionar o kit de portas, janelas e ferragens padrão. A porta de correr em eucalipto de 1.8m é opcional e concede 5% de desconto no total de portas e janelas. Já a modalidade Chave na Mão já traz todos os vidros temperados de 8mm e pintura Stain protetora inclusos no pacote padrão.",
+      "Nas modalidades Apenas Kit e Montagem Parceira, você pode optar por adicionar o kit de portas, janelas and ferragens padrão. A porta de correr em eucalipto de 1.8m é opcional e concede 5% de desconto no total de portas e janelas. Já a modalidade Chave na Mão já traz os vidros fachada e pintura Stain protetora inclusos no pacote padrão.",
   },
   {
     question: "10 — Posso realizar modificações personalizadas no layout do chalé?",
@@ -379,7 +379,7 @@ export const faqItems = [
   {
     question: "12 — O valor inclui fundação, montagem, cobertura, instalações elétricas e hidráulicas, banheiro, cozinha, pisos, pintura e esquadrias?",
     answer:
-      "Depende da modalidade. O Kit Madeiramento inclui apenas a madeira Pinus estrutural tratada em autoclave, manual técnico e suporte em vídeo. A Montagem Parceira inclui a indicação do carpinteiro parceiro (cuja montagem é contratada e paga diretamente). A modalidade Chave na Mão inclui a estrutura montada, cobertura (telhas + manta), portas, janelas, vidros temperados de 8mm, pintura Stain protetora e elétrica e hidráulica básicas. Sapatas de eucalipto estão inclusas, mas fundações em radier e acabamentos finais (pisos, cerâmicas, torneiras, louças, tomadas finais e caixa d'água) são sob proposta e cotação à parte.",
+      "Depende da modalidade. O Kit Madeiramento inclui apenas a madeira Pinus estrutural tratada em autoclave, manual técnico e suporte em vídeo. A Montagem Parceira inclui a indicação do carpinteiro parceiro (cuja montagem é contratada e paga diretamente). A modalidade Chave na Mão inclui a estrutura montada, cobertura (telhas + manta), portas, janelas, vidros fachada, pintura Stain protetora e elétrica e hidráulica básicas. Sapatas de eucalipto estão inclusas, mas fundações em radier e acabamentos finais (pisos, cerâmicas, torneiras, louças, tomadas finais e caixa d'água) são sob proposta e cotação à parte.",
   },
   {
     question: "13 — O frete, a hospedagem da equipe e o descarregamento estão incluídos?",

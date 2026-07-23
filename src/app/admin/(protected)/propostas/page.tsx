@@ -158,8 +158,7 @@ export default function PropostasPage() {
   const [includeProject, setIncludeProject] = useState(false);
   const [discountType, setDiscountType] = useState<'none' | 'percentage' | 'fixed'>('none');
   const [discountValue, setDiscountValue] = useState(0);
-  const [showExtraItems, setShowExtraItems] = useState(false);
-  const [extraItems, setExtraItems] = useState<ExtraItem[]>([{ description: '', value: 0 }]);
+  const [extraItems, setExtraItems] = useState<ExtraItem[]>([]);
   
   const [kitPriceOverride, setKitPriceOverride] = useState<number | string | undefined>(undefined);
   const [fixturesPriceOverride, setFixturesPriceOverride] = useState<number | string | undefined>(undefined);
@@ -312,7 +311,7 @@ export default function PropostasPage() {
     includeProject,
     discountType,
     discountValue: discountType !== 'none' ? discountValue : 0,
-    extraItems: showExtraItems ? extraItems.filter(i => i.description.trim() && i.value > 0) : undefined,
+    extraItems: extraItems.filter(i => i.description.trim() && i.value > 0),
     kitPriceOverride: typeof kitPriceOverride === 'number' ? kitPriceOverride : undefined,
     fixturesPriceOverride: typeof fixturesPriceOverride === 'number' ? fixturesPriceOverride : undefined,
     tilesStainPriceOverride: typeof tilesStainPriceOverride === 'number' ? tilesStainPriceOverride : undefined,
@@ -753,8 +752,6 @@ export default function PropostasPage() {
                                <SelectItem value="wooden_eucalyptus">Base Estrutural de Madeira + Eucalipto</SelectItem>
                                <SelectItem value="wooden_masonry">Base Estrutural de Madeira + Alvenaria</SelectItem>
                                <SelectItem value="radier">Base Radier + Banheiro Alvenaria</SelectItem>
-                               <SelectItem value="eucalyptus">Sapatas de Eucalipto Tratado (Legado)</SelectItem>
-                               <SelectItem value="masonry">Sapatas de Manilhas em Alvenaria (Legado)</SelectItem>
                              </SelectContent>
                            </Select>
                         </div>
@@ -890,62 +887,7 @@ export default function PropostasPage() {
                         </motion.div>
                       )}
                     </div>
-                    <div className="pt-6 border-t border-primary/10 mt-6">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2">
-                          <Layers className="w-4 h-4 text-primary" />
-                          <h3 className="font-black text-[10px] uppercase tracking-widest text-primary/80">Edições Especiais</h3>
-                        </div>
-                        <Switch checked={showExtraItems} onCheckedChange={setShowExtraItems} className="toggle-glow data-[state=checked]:bg-primary" />
-                      </div>
 
-                      {showExtraItems && (
-                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="space-y-4 overflow-hidden">
-                          {extraItems.map((item, index) => (
-                            <div key={index} className="space-y-2 p-3 bg-white/20 rounded-xl border border-primary/5 relative group">
-                              <div className="flex gap-2">
-                                <div className="flex-1 space-y-1">
-                                  <Label className="text-[9px] font-bold uppercase text-muted-foreground ml-1">Descrição</Label>
-                                  <Input
-                                    placeholder="Ex: Madeiramento para Deck"
-                                    value={item.description}
-                                    onChange={e => updateExtraItem(index, { description: e.target.value })}
-                                    className="h-9 text-xs recessed-input rounded-lg"
-                                  />
-                                </div>
-                                <div className="w-28 space-y-1">
-                                  <Label className="text-[9px] font-bold uppercase text-muted-foreground ml-1">Valor (R$)</Label>
-                                  <Input
-                                    type="number"
-                                    placeholder="0,00"
-                                    value={item.value || ''}
-                                    onChange={e => updateExtraItem(index, { value: Number(e.target.value) })}
-                                    className="h-9 text-xs recessed-input rounded-lg"
-                                  />
-                                </div>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => removeExtraItem(index)}
-                                  className="self-end h-9 w-9 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </div>
-                          ))}
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={addExtraItem}
-                            className="w-full h-9 border-dashed border-primary/30 text-primary hover:bg-primary/5 rounded-xl uppercase text-[10px] font-black tracking-widest"
-                          >
-                            <Plus className="w-4 h-4 mr-2" />
-                            Adicionar Item Extra
-                          </Button>
-                        </motion.div>
-                      )}
-                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -1008,12 +950,17 @@ export default function PropostasPage() {
                       <div className="space-y-4">
                         <p className="text-[10px] font-black uppercase tracking-widest text-primary/60 border-l-4 border-primary pl-3">Detalhamento Técnico</p>
                         <div className="space-y-2">
-                          {summary.items.map((item, i) => (
-                            <div key={i} className="flex justify-between text-sm py-2 border-b border-primary/5 items-center">
-                              <span className="text-muted-foreground font-medium">{item.label}</span>
-                              {renderSummaryItem(item)}
-                            </div>
-                          ))}
+                          {summary.items
+                            .filter(item => {
+                              // Filtra para remover itens extras daqui, pois vamos renderizá-los separadamente com inputs
+                              return !extraItems.some(extra => extra.description === item.label);
+                            })
+                            .map((item, i) => (
+                              <div key={i} className="flex justify-between text-sm py-2 border-b border-primary/5 items-center">
+                                <span className="text-muted-foreground font-medium">{item.label}</span>
+                                {renderSummaryItem(item)}
+                              </div>
+                            ))}
                            <div className="flex justify-between text-sm py-2 border-b border-primary/5 items-center">
                               <span className="text-muted-foreground font-medium">Frete Estimado (Logística)</span>
                               <div className="flex items-center gap-4">
@@ -1038,6 +985,53 @@ export default function PropostasPage() {
                                 <span className="font-bold text-amber-600">+{fmt(summary.additionalTravelCost)}</span>
                               </div>
                             )}
+
+                          {/* Itens Adicionais Personalizados (Editáveis) */}
+                          {extraItems.map((item, index) => (
+                            <div key={`extra-${index}`} className="flex gap-2 py-2 border-b border-primary/5 items-center group relative">
+                              <div className="flex-1">
+                                <Input
+                                  placeholder="Descrição do item extra (ex: Alojamento equipe)"
+                                  value={item.description}
+                                  onChange={e => updateExtraItem(index, { description: e.target.value })}
+                                  className="h-8 text-xs recessed-input rounded-lg border-primary/10 w-full"
+                                />
+                              </div>
+                              <div className="w-24 flex items-center gap-1">
+                                <span className="text-[10px] font-bold text-muted-foreground">R$</span>
+                                <Input
+                                  type="number"
+                                  placeholder="0"
+                                  value={item.value || ''}
+                                  onChange={e => updateExtraItem(index, { value: e.target.value === '' ? 0 : Number(e.target.value) })}
+                                  className="h-8 text-xs font-bold font-mono text-right border-primary/10 rounded-lg focus-visible:ring-1 focus-visible:ring-primary/20 bg-white w-full"
+                                />
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => removeExtraItem(index)}
+                                className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0"
+                                title="Remover item personalizado"
+                              >
+                                <Trash2 className="h-4 w-4" strokeWidth={2.5} />
+                              </Button>
+                            </div>
+                          ))}
+
+                          {/* Botão de incluir item adicional no final do detalhamento */}
+                          <div className="pt-2">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={addExtraItem}
+                              className="w-full h-8 border-dashed border-primary/30 text-primary hover:bg-primary/5 rounded-xl uppercase text-[9px] font-black tracking-widest"
+                            >
+                              <Plus className="w-3.5 h-3.5 mr-1.5" />
+                              Incluir Item Adicional Personalizado
+                            </Button>
+                          </div>
                         </div>
                       </div>
 
