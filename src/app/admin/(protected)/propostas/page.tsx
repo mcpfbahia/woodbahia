@@ -8,10 +8,10 @@ import { Label } from '~/components/ui/label';
 import { Card, CardContent } from '~/components/ui/card';
 import { Switch } from '~/components/ui/switch';
 import { Separator } from '~/components/ui/separator';
-import { FileDown, User, Home, Settings2, Tag, LayoutDashboard, Plus, Trash2, Layers, Paintbrush } from 'lucide-react';
+import { FileDown, User, Home, Settings2, Tag, LayoutDashboard, Plus, Trash2, Layers, Paintbrush, Edit2, Loader2, ArrowLeft, Eye } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { db } from "~/lib/firebase";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy, serverTimestamp } from "firebase/firestore";
 import { CABIN_MODELS, calculateProposalItems, calculateInstallmentValue, getTilesStainPrice, getFixturesPrice, type KitType, type ProposalData, type ExtraItem, type FoundationType, type PaintType, type CabinModel } from '~/lib/pricing';
 import { generateProposalPDF, getIncludedItems, getNotIncludedItems } from '~/lib/proposal-pdf';
 import {
@@ -142,7 +142,10 @@ const InlineEditablePrice = ({
 export default function PropostasPage() {
   const router = useRouter();
   const [cabinModels, setCabinModels] = useState<CabinModel[]>(CABIN_MODELS);
-  const [view, setView] = useState<'form' | 'summary'>('form');
+  const [view, setView] = useState<'list' | 'form' | 'summary'>('list');
+  const [currentProposalId, setCurrentProposalId] = useState<string | null>(null);
+  const [proposals, setProposals] = useState<any[]>([]);
+  const [loadingProposals, setLoadingProposals] = useState(true);
   const [clientName, setClientName] = useState('');
   const [workLocation, setWorkLocation] = useState('');
   const [modelId, setModelId] = useState('');
@@ -287,12 +290,172 @@ export default function PropostasPage() {
   const addExtraItem = () => setExtraItems([...extraItems, { description: '', value: 0 }]);
   const removeExtraItem = (index: number) => {
     const newItems = extraItems.filter((_, i) => i !== index);
-    setExtraItems(newItems.length > 0 ? newItems : [{ description: '', value: 0 }]);
+    setExtraItems(newItems.length > 0 ? newItems : []);
   };
   const updateExtraItem = (index: number, fields: Partial<ExtraItem>) => {
     const newItems = [...extraItems];
     newItems[index] = { ...newItems[index]!, ...fields };
     setExtraItems(newItems);
+  };
+
+  const fetchProposals = async () => {
+    if (!db) return;
+    setLoadingProposals(true);
+    try {
+      const q = query(collection(db, "proposals"), orderBy("updatedAt", "desc"));
+      const querySnapshot = await getDocs(q);
+      const data = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setProposals(data);
+    } catch (err) {
+      console.error("Erro ao buscar propostas:", err);
+      toast.error("Erro ao carregar histórico de propostas.");
+    } finally {
+      setLoadingProposals(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProposals();
+  }, []);
+
+  const handleSaveProposal = async () => {
+    if (!db) return;
+    try {
+      const currentData = getProposalData();
+      const selectedModel = cabinModels.find(m => m.id === modelId);
+      const proposalPayload = {
+        clientName: clientName.trim(),
+        workLocation: workLocation.trim(),
+        modelName: kitType === 'custom' ? 'Personalizado' : (selectedModel?.name || 'Desconhecido'),
+        kitTypeLabel: KIT_OPTIONS.find(o => o.value === kitType)?.label || kitType,
+        totalValue: summary.total,
+        updatedAt: serverTimestamp(),
+        data: currentData
+      };
+
+      if (currentProposalId) {
+        // Atualizar proposta existente
+        await updateDoc(doc(db, "proposals", currentProposalId), proposalPayload);
+        toast.success("Proposta atualizada com sucesso!");
+      } else {
+        // Criar nova proposta
+        await addDoc(collection(db, "proposals"), {
+          ...proposalPayload,
+          createdAt: serverTimestamp()
+        });
+        toast.success("Proposta salva com sucesso!");
+      }
+      
+      // Atualizar lista e voltar para a listagem
+      await fetchProposals();
+      setView('list');
+    } catch (err) {
+      console.error("Erro ao salvar proposta:", err);
+      toast.error("Erro ao salvar proposta no banco de dados.");
+    }
+  };
+
+  const handleEditProposal = (proposal: any) => {
+    const d = proposal.data as ProposalData;
+    setCurrentProposalId(proposal.id);
+    
+    // Setar estados locais com os dados da proposta salva
+    setClientName(d.clientName || '');
+    setWorkLocation(d.workLocation || '');
+    setKitType(d.kitType || 'turnkey');
+    setModelId(d.modelId || '');
+    setCustomArea(d.customArea || 30);
+    setCustomModelDescription(d.customModelDescription || '');
+    setSlidingDoor(!!d.slidingDoor);
+    setIncludeGlass(!!d.includeGlass);
+    setIncludeElectrical(!!d.includeElectrical);
+    setIncludeFixtures(!!d.includeFixtures);
+    setIncludeTilesStain(!!d.includeTilesStain);
+    setIncludeLabor(!!d.includeLabor);
+    setIncludeProject(!!d.includeProject);
+    setDiscountType(d.discountType || 'none');
+    setDiscountValue(d.discountValue || 0);
+    setExtraItems(d.extraItems || []);
+    
+    setKitPriceOverride(d.kitPriceOverride);
+    setFixturesPriceOverride(d.fixturesPriceOverride);
+    setTilesStainPriceOverride(d.tilesStainPriceOverride);
+    setLaborPriceOverride(d.laborPriceOverride);
+    setElectricalPriceOverride(d.electricalPriceOverride);
+    setGlassPriceOverride(d.glassPriceOverride);
+    setProjectPriceOverride(d.projectPriceOverride);
+    setFreightOverride(d.freightOverride);
+    setDistanceFromFactory(d.distanceFromFactory);
+    
+    setFoundationType(d.foundationType || 'none');
+    setFoundationPriceOverride(d.foundationPriceOverride);
+    setMasonryBathroomCount(d.masonryBathroomCount || 0);
+    setMasonryBathroomPriceOverride(d.masonryBathroomPriceOverride);
+    setPaintType(d.paintType || 'none');
+    setPaintPriceOverride(d.paintPriceOverride);
+    setFoundationIncluded(!!d.foundationIncluded);
+    setCustomIncludedItems(d.customIncludedItems);
+    setCustomNotIncludedItems(d.customNotIncludedItems);
+    
+    setView('form');
+  };
+
+  const handleDeleteProposal = async (id: string) => {
+    if (!confirm("Tem certeza que deseja excluir esta proposta definitivamente?")) return;
+    if (!db) return;
+    try {
+      await deleteDoc(doc(db, "proposals", id));
+      toast.success("Proposta excluída com sucesso.");
+      fetchProposals();
+    } catch (err) {
+      console.error("Erro ao excluir proposta:", err);
+      toast.error("Erro ao excluir proposta.");
+    }
+  };
+
+  const handleNewProposal = () => {
+    setCurrentProposalId(null);
+    setClientName('');
+    setWorkLocation('');
+    setKitType('turnkey');
+    setModelId('');
+    setCustomArea(30);
+    setCustomModelDescription('');
+    setSlidingDoor(false);
+    setIncludeGlass(false);
+    setIncludeElectrical(false);
+    setIncludeFixtures(false);
+    setIncludeTilesStain(false);
+    setIncludeLabor(false);
+    setIncludeProject(false);
+    setDiscountType('none');
+    setDiscountValue(0);
+    setExtraItems([]);
+    
+    setKitPriceOverride(undefined);
+    setFixturesPriceOverride(undefined);
+    setTilesStainPriceOverride(undefined);
+    setLaborPriceOverride(undefined);
+    setElectricalPriceOverride(undefined);
+    setGlassPriceOverride(undefined);
+    setProjectPriceOverride(undefined);
+    setFreightOverride(undefined);
+    setDistanceFromFactory(undefined);
+    
+    setFoundationType('none');
+    setFoundationPriceOverride(undefined);
+    setMasonryBathroomCount(0);
+    setMasonryBathroomPriceOverride(undefined);
+    setPaintType('none');
+    setPaintPriceOverride(undefined);
+    setFoundationIncluded(false);
+    setCustomIncludedItems(undefined);
+    setCustomNotIncludedItems(undefined);
+    
+    setView('form');
   };
 
   const getProposalData = (): ProposalData => ({
@@ -458,18 +621,144 @@ export default function PropostasPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white/50 p-4 md:p-6 rounded-2xl border border-border/40 backdrop-blur-sm gap-4">
         <div>
           <h1 className="text-xl md:text-3xl font-bold engraved-text">
-            {view === 'form' ? 'Gerador de Propostas' : 'Resumo da Proposta'}
+            {view === 'list' ? 'Histórico de Propostas' : view === 'form' ? (currentProposalId ? 'Editar Proposta' : 'Gerador de Propostas') : 'Resumo da Proposta'}
           </h1>
           <p className="text-muted-foreground text-[10px] md:text-sm uppercase tracking-widest font-bold mt-1">Wood Bahia — Propostas Comerciais</p>
         </div>
-        <Button variant="outline" size="sm" className="rounded-xl border-primary/20 hover:bg-primary/5 w-full sm:w-auto" onClick={() => router.push('/admin')}>
-          <LayoutDashboard className="mr-2 h-4 w-4 text-primary" />
-          Dashboard
-        </Button>
+        <div className="flex gap-2 w-full sm:w-auto">
+          {view !== 'list' && (
+            <Button variant="outline" size="sm" className="rounded-xl border-stone-200 hover:bg-stone-50 w-full sm:w-auto" onClick={() => setView('list')}>
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Ver Histórico
+            </Button>
+          )}
+          <Button variant="outline" size="sm" className="rounded-xl border-primary/20 hover:bg-primary/5 w-full sm:w-auto" onClick={() => router.push('/admin')}>
+            <LayoutDashboard className="mr-2 h-4 w-4 text-primary" />
+            Dashboard
+          </Button>
+        </div>
       </div>
 
       <div className="max-w-4xl mx-auto">
-        {view === 'form' ? (
+        {view === 'list' ? (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-6"
+          >
+            {/* Cards de Métricas (Contador) */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              <Card className="wood-card overflow-hidden">
+                <CardContent className="p-6 flex items-center justify-between">
+                  <div>
+                    <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider mb-1">Total de Propostas</p>
+                    <h3 className="text-3xl font-black text-primary">{proposals.length}</h3>
+                  </div>
+                  <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary text-xl">
+                    📄
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="flex justify-between items-center pt-4">
+              <h2 className="text-lg font-bold text-primary flex items-center gap-2">
+                <span>📋</span> Propostas Emitidas
+              </h2>
+              <Button onClick={handleNewProposal} className="wood-button text-white rounded-xl font-bold flex items-center gap-2">
+                <Plus className="w-4 h-4" /> Nova Proposta
+              </Button>
+            </div>
+
+            {loadingProposals ? (
+              <Card className="wood-card">
+                <CardContent className="p-12 flex flex-col items-center justify-center gap-4 text-muted-foreground">
+                  <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                  <span className="text-xs uppercase font-bold tracking-wider">Carregando histórico...</span>
+                </CardContent>
+              </Card>
+            ) : proposals.length === 0 ? (
+              <Card className="wood-card">
+                <CardContent className="p-12 text-center text-muted-foreground space-y-4">
+                  <span className="text-4xl block">📂</span>
+                  <p className="text-sm font-semibold">Nenhuma proposta salva ainda.</p>
+                  <p className="text-xs max-w-sm mx-auto opacity-70">Comece criando sua primeira proposta personalizada clicando no botão acima.</p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-4">
+                {proposals.map((proposal) => {
+                  const dateStr = proposal.createdAt?.seconds 
+                    ? new Date(proposal.createdAt.seconds * 1000).toLocaleDateString('pt-BR') 
+                    : proposal.createdAt 
+                    ? new Date(proposal.createdAt).toLocaleDateString('pt-BR')
+                    : new Date().toLocaleDateString('pt-BR');
+                  return (
+                    <Card key={proposal.id} className="wood-card overflow-hidden hover:shadow-lg transition-all duration-300">
+                      <CardContent className="p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-stone-850 text-base">{proposal.clientName}</span>
+                            <span className="text-[10px] text-muted-foreground bg-stone-100 border border-stone-200 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">{dateStr}</span>
+                          </div>
+                          <div className="text-xs text-muted-foreground flex flex-wrap gap-x-3 gap-y-1">
+                            <span>📍 <strong>Local:</strong> {proposal.workLocation}</span>
+                            <span>🏡 <strong>Modelo:</strong> {proposal.modelName}</span>
+                            <span>📦 <strong>Kit:</strong> {proposal.kitTypeLabel}</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4 border-t sm:border-0 pt-3 sm:pt-0 border-stone-100">
+                          <div className="text-right">
+                            <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider block">Investimento</span>
+                            <span className="font-black text-primary text-base font-display">{fmt(proposal.totalValue)}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <Button 
+                              variant="outline" 
+                              size="icon" 
+                              className="h-9 w-9 rounded-lg border-primary/10 text-primary/70 hover:text-primary hover:bg-primary/5"
+                              onClick={() => handleEditProposal(proposal)}
+                              title="Editar Proposta"
+                            >
+                              <Edit2 className="h-4.5 w-4.5" />
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="icon" 
+                              className="h-9 w-9 rounded-lg border-green-200 text-green-700 hover:text-green-800 hover:bg-green-50"
+                              onClick={async () => {
+                                const toastId = toast.loading('Gerando proposta em PDF...');
+                                try {
+                                  await generateProposalPDF(proposal.data, cabinModels);
+                                  toast.success('Proposta gerada com sucesso!', { id: toastId });
+                                } catch (err) {
+                                  toast.error('Erro ao gerar proposta.', { id: toastId });
+                                  console.error(err);
+                                }
+                              }}
+                              title="Baixar PDF Comercial"
+                            >
+                              <FileDown className="h-4.5 w-4.5" />
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="icon" 
+                              className="h-9 w-9 rounded-lg border-destructive/10 text-destructive hover:bg-destructive/10"
+                              onClick={() => handleDeleteProposal(proposal.id)}
+                              title="Excluir Proposta"
+                            >
+                              <Trash2 className="h-4.5 w-4.5" />
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+          </motion.div>
+        ) : view === 'form' ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -1151,21 +1440,29 @@ export default function PropostasPage() {
                 </CardContent>
             </Card>
 
-            <div className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center pt-8">
+            <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center pt-8">
               <Button
                 variant="outline"
                 size="lg"
                 onClick={() => setView('form')}
-                className="h-12 md:h-16 px-8 md:px-12 rounded-[1rem] md:rounded-[1.5rem] border-2 border-primary/20 font-black text-primary/60 hover:bg-primary/5 hover:text-primary transition-all uppercase tracking-widest text-xs md:text-base"
+                className="h-12 md:h-16 px-6 md:px-8 rounded-[1.2rem] border-2 border-primary/20 font-black text-primary/60 hover:bg-primary/5 hover:text-primary transition-all uppercase tracking-widest text-xs md:text-sm"
               >
-                Tentar Outras Opções
+                Voltar ao Formulário
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={handleSaveProposal}
+                className="h-12 md:h-16 px-6 md:px-8 rounded-[1.2rem] border-2 border-[#B06D46]/20 bg-[#B06D46]/5 font-black text-[#B06D46] hover:bg-[#B06D46]/10 transition-all uppercase tracking-widest text-xs md:text-sm"
+              >
+                {currentProposalId ? 'Atualizar Proposta' : 'Salvar Proposta'}
               </Button>
               <Button
                 onClick={handleGenerate}
                 size="lg"
-                className="h-16 md:h-20 px-8 md:px-16 text-sm md:text-xl font-black wood-button text-white rounded-[1.5rem] md:rounded-[2rem] shadow-2xl flex items-center gap-2 md:gap-4 group transition-all hover:scale-105 uppercase tracking-widest"
+                className="h-12 md:h-16 px-8 md:px-10 text-xs md:text-sm font-black wood-button text-white rounded-[1.2rem] shadow-xl flex items-center gap-2 group transition-all hover:scale-105 uppercase tracking-widest"
               >
-                <FileDown className="w-5 h-5 md:w-7 md:h-7 group-hover:animate-bounce" />
+                <FileDown className="w-4 h-4 md:w-5 md:h-5 group-hover:animate-bounce" />
                 GERAR PDF COMERCIAL
               </Button>
             </div>
