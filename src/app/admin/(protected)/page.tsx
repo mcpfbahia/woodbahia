@@ -5,7 +5,7 @@ import Link from "next/link";
 import { collection, getCountFromServer } from "firebase/firestore";
 import { db } from "~/lib/firebase";
 import { useAuth } from "~/contexts/AuthContext";
-import { Home, Image as ImageIcon, Hammer, ExternalLink, Users, Activity, Loader2 } from "lucide-react";
+import { Home, Image as ImageIcon, Hammer, ExternalLink, Users, Activity, Loader2, FileText } from "lucide-react";
 
 export default function AdminDashboardPage() {
   const { user } = useAuth();
@@ -13,6 +13,7 @@ export default function AdminDashboardPage() {
     modelos: 0,
     portfolio: 0,
     obras: 0,
+    propostas: 0,
     leads: 0,
   });
   const [loading, setLoading] = useState(true);
@@ -21,11 +22,12 @@ export default function AdminDashboardPage() {
     const fetchStats = async () => {
       if (!db) return;
       try {
-        const [modelosSnap, portfolioSnap, obrasSnap, leadsSnap] = await Promise.all([
+        const [modelosSnap, portfolioSnap, obrasSnap, leadsSnap, propostasSnap] = await Promise.all([
           getCountFromServer(collection(db, "models")),
           getCountFromServer(collection(db, "portfolio")),
           getCountFromServer(collection(db, "diario_obras")),
-          getCountFromServer(collection(db, "leads"))
+          getCountFromServer(collection(db, "leads")),
+          getCountFromServer(collection(db, "proposals"))
         ]);
 
         setStats({
@@ -33,6 +35,7 @@ export default function AdminDashboardPage() {
           portfolio: portfolioSnap.data().count,
           obras: obrasSnap.data().count,
           leads: leadsSnap.data().count,
+          propostas: propostasSnap.data().count,
         });
       } catch (error) {
         console.error("Erro ao carregar estatísticas", error);
@@ -47,6 +50,7 @@ export default function AdminDashboardPage() {
     { title: "Modelos Ativos", value: stats.modelos, icon: Home, color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-100" },
     { title: "Projetos no Portfólio", value: stats.portfolio, icon: ImageIcon, color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-100" },
     { title: "Obras Cadas.", value: stats.obras, icon: Hammer, color: "text-amber-600", bg: "bg-amber-50", border: "border-amber-100" },
+    { title: "Propostas Salvas", value: stats.propostas, icon: FileText, color: "text-rose-600", bg: "bg-rose-50", border: "border-rose-100" },
     { title: "Leads / Contatos", value: stats.leads, icon: Users, color: "text-indigo-600", bg: "bg-indigo-50", border: "border-indigo-100" },
   ];
 
@@ -79,6 +83,15 @@ export default function AdminDashboardPage() {
       text: "text-amber-600"
     },
     {
+      title: "Propostas",
+      description: "Gerencie, crie e exporte as propostas comerciais do sistema.",
+      icon: FileText,
+      href: "/admin/propostas",
+      color: "bg-rose-500",
+      light: "bg-rose-50",
+      text: "text-rose-600"
+    },
+    {
       title: "Leads (Contatos)",
       description: "Visualize as mensagens recebidas via formulário do site.",
       icon: Users,
@@ -109,7 +122,7 @@ export default function AdminDashboardPage() {
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       ) : (
-        <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
+        <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-5">
           {topCards.map((card, i) => (
             <div key={i} className={`rounded-xl border ${card.border} bg-white p-5 shadow-sm`}>
               <div className="flex items-center gap-4">
@@ -126,7 +139,7 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
         {modules.map((mod) => (
           <div key={mod.title} className="group relative overflow-hidden rounded-2xl bg-white border border-slate-200 p-6 shadow-sm transition-all hover:shadow-md hover:border-slate-300">
             <div className={`mb-4 inline-flex rounded-xl p-3 ${mod.light} ${mod.text}`}>

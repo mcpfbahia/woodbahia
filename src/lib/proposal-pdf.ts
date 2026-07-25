@@ -703,7 +703,34 @@ export function generateProposalPDF(
   const obsTerrenoLines = doc.splitTextToSize(obsTerreno, contentWidth - 12);
   doc.text(obsTerrenoLines, margin + 6, y + 21);
 
-  y += 36;
+  y += 32;
+
+  // ─── OBSERVAÇÕES CUSTOMIZADAS ───
+  if (data.observations && data.observations.trim()) {
+    const obsLines = doc.splitTextToSize(data.observations.trim(), contentWidth - 12);
+    const obsHeight = 10 + obsLines.length * 4.5;
+    
+    y = checkPageBreak(doc, y, obsHeight + 8);
+    
+    doc.setFillColor(248, 246, 242); 
+    doc.setDrawColor(...COLORS.muted);
+    doc.setLineWidth(0.15);
+    doc.roundedRect(margin, y, contentWidth, obsHeight, 2, 2, 'FD'); 
+    
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8.5);
+    doc.setTextColor(...COLORS.accent);
+    doc.text('OBSERVAÇÕES ESPECIAIS', margin + 6, y + 6);
+    
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(...COLORS.foreground);
+    doc.text(obsLines, margin + 6, y + 12);
+    
+    y += obsHeight + 6;
+  }
+
+  y = checkPageBreak(doc, y, 10);
 
   // Ícone de Atenção desenhado
   doc.setFillColor(180, 60, 30);

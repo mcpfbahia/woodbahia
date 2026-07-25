@@ -229,6 +229,8 @@ export interface ProposalData {
   foundationIncluded?: boolean;
   customIncludedItems?: string[];
   customNotIncludedItems?: string[];
+  status?: 'rascunho' | 'enviada' | 'fechada' | 'perdida';
+  observations?: string;
 }
 
 /** Options available as add-ons for standard kits (1-4) */

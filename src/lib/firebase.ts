@@ -1,6 +1,6 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { initializeFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import { env } from "~/env";
 
@@ -23,7 +23,9 @@ if (env.NEXT_PUBLIC_FIREBASE_API_KEY && env.NEXT_PUBLIC_FIREBASE_API_KEY !== "")
   try {
     app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
     auth = getAuth(app);
-    db = getFirestore(app);
+    db = initializeFirestore(app, {
+      ignoreUndefinedProperties: true,
+    });
     storage = getStorage(app);
   } catch (error) {
     console.error("Firebase initialization failed:", error);

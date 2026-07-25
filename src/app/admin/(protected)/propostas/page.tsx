@@ -8,10 +8,17 @@ import { Label } from '~/components/ui/label';
 import { Card, CardContent } from '~/components/ui/card';
 import { Switch } from '~/components/ui/switch';
 import { Separator } from '~/components/ui/separator';
-import { FileDown, User, Home, Settings2, Tag, LayoutDashboard, Plus, Trash2, Layers, Paintbrush, Edit2, Loader2, ArrowLeft, Eye } from 'lucide-react';
+import { FileDown, User, Home, Settings2, Tag, LayoutDashboard, Plus, Trash2, Layers, Paintbrush, Edit2, Loader2, ArrowLeft, Eye, FileText, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { db } from "~/lib/firebase";
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy, serverTimestamp } from "firebase/firestore";
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy, serverTimestamp, limit, startAfter } from "firebase/firestore";
+
+const STATUS_CONFIG: Record<'rascunho' | 'enviada' | 'fechada' | 'perdida', { label: string; bg: string; text: string; border: string; emoji: string }> = {
+  rascunho: { label: 'Rascunho', bg: 'bg-stone-50', text: 'text-stone-600', border: 'border-stone-200/60', emoji: '📝' },
+  enviada: { label: 'Enviada', bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200/60', emoji: '✉️' },
+  fechada: { label: 'Ganha', bg: 'bg-green-50', text: 'text-green-700', border: 'border-green-200/60', emoji: '🤝' },
+  perdida: { label: 'Perdida', bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-200/60', emoji: '❌' },
+};
 import { CABIN_MODELS, calculateProposalItems, calculateInstallmentValue, getTilesStainPrice, getFixturesPrice, type KitType, type ProposalData, type ExtraItem, type FoundationType, type PaintType, type CabinModel } from '~/lib/pricing';
 import { generateProposalPDF, getIncludedItems, getNotIncludedItems } from '~/lib/proposal-pdf';
 import {
@@ -146,7 +153,15 @@ export default function PropostasPage() {
   const [currentProposalId, setCurrentProposalId] = useState<string | null>(null);
   const [proposals, setProposals] = useState<any[]>([]);
   const [loadingProposals, setLoadingProposals] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('todos');
+  const [status, setStatus] = useState<'rascunho' | 'enviada' | 'fechada' | 'perdida'>('rascunho');
+  const [observations, setObservations] = useState('');
   const [clientName, setClientName] = useState('');
+  const [lastVisible, setLastVisible] = useState<any>(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasLoadedAllForSearch, setHasLoadedAllForSearch] = useState(false);
   const [workLocation, setWorkLocation] = useState('');
   const [modelId, setModelId] = useState('');
   const [kitType, setKitType] = useState<KitType>('turnkey');
@@ -302,13 +317,21 @@ export default function PropostasPage() {
     if (!db) return;
     setLoadingProposals(true);
     try {
-      const q = query(collection(db, "proposals"), orderBy("updatedAt", "desc"));
+      const q = query(collection(db, "proposals"), orderBy("updatedAt", "desc"), limit(20));
       const querySnapshot = await getDocs(q);
       const data = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       }));
       setProposals(data);
+      if (querySnapshot.docs.length > 0) {
+        setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
+        setHasMore(querySnapshot.docs.length === 20);
+      } else {
+        setLastVisible(null);
+        setHasMore(false);
+      }
+      setHasLoadedAllForSearch(false);
     } catch (err) {
       console.error("Erro ao buscar propostas:", err);
       toast.error("Erro ao carregar histórico de propostas.");
@@ -316,6 +339,75 @@ export default function PropostasPage() {
       setLoadingProposals(false);
     }
   };
+
+  const loadMoreProposals = async () => {
+    if (!db || !lastVisible || loadingMore) return;
+    setLoadingMore(true);
+    try {
+      const q = query(
+        collection(db, "proposals"),
+        orderBy("updatedAt", "desc"),
+        startAfter(lastVisible),
+        limit(20)
+      );
+      const querySnapshot = await getDocs(q);
+      const data = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      
+      setProposals(prev => [...prev, ...data]);
+      
+      if (querySnapshot.docs.length > 0) {
+        setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
+        setHasMore(querySnapshot.docs.length === 20);
+      } else {
+        setHasMore(false);
+      }
+    } catch (err) {
+      console.error("Erro ao carregar mais propostas:", err);
+      toast.error("Erro ao carregar mais propostas.");
+    } finally {
+      setLoadingMore(false);
+    }
+  };
+
+  useEffect(() => {
+    const loadAllForSearch = async () => {
+      if (!db || !searchTerm.trim() || hasLoadedAllForSearch) return;
+      try {
+        const q = query(collection(db, "proposals"), orderBy("updatedAt", "desc"));
+        const querySnapshot = await getDocs(q);
+        const data = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setProposals(data);
+        setHasMore(false);
+        setHasLoadedAllForSearch(true);
+      } catch (err) {
+        console.error("Erro ao buscar base de dados para pesquisa:", err);
+      }
+    };
+
+    loadAllForSearch();
+  }, [searchTerm, hasLoadedAllForSearch]);
+
+  const filteredProposals = useMemo(() => {
+    return proposals.filter(p => {
+      const nameMatch = p.clientName?.toLowerCase().includes(searchTerm.toLowerCase());
+      const locationMatch = p.workLocation?.toLowerCase().includes(searchTerm.toLowerCase());
+      const modelMatch = p.modelName?.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const textMatch = !searchTerm.trim() || nameMatch || locationMatch || modelMatch;
+      
+      // Filtro por status
+      const propStatus = p.status || p.data?.status || 'rascunho';
+      const statusMatch = statusFilter === 'todos' || propStatus === statusFilter;
+      
+      return textMatch && statusMatch;
+    });
+  }, [proposals, searchTerm, statusFilter]);
 
   useEffect(() => {
     fetchProposals();
@@ -332,6 +424,8 @@ export default function PropostasPage() {
         modelName: kitType === 'custom' ? 'Personalizado' : (selectedModel?.name || 'Desconhecido'),
         kitTypeLabel: KIT_OPTIONS.find(o => o.value === kitType)?.label || kitType,
         totalValue: summary.total,
+        status,
+        observations: observations.trim() || undefined,
         updatedAt: serverTimestamp(),
         data: currentData
       };
@@ -352,9 +446,9 @@ export default function PropostasPage() {
       // Atualizar lista e voltar para a listagem
       await fetchProposals();
       setView('list');
-    } catch (err) {
+    } catch (err: any) {
       console.error("Erro ao salvar proposta:", err);
-      toast.error("Erro ao salvar proposta no banco de dados.");
+      toast.error(`Erro ao salvar proposta no banco de dados: ${err?.message || err}`);
     }
   };
 
@@ -365,6 +459,8 @@ export default function PropostasPage() {
     // Setar estados locais com os dados da proposta salva
     setClientName(d.clientName || '');
     setWorkLocation(d.workLocation || '');
+    setStatus(proposal.status || d.status || 'rascunho');
+    setObservations(proposal.observations || d.observations || '');
     setKitType(d.kitType || 'turnkey');
     setModelId(d.modelId || '');
     setCustomArea(d.customArea || 30);
@@ -420,6 +516,8 @@ export default function PropostasPage() {
     setCurrentProposalId(null);
     setClientName('');
     setWorkLocation('');
+    setStatus('rascunho');
+    setObservations('');
     setKitType('turnkey');
     setModelId('');
     setCustomArea(30);
@@ -493,6 +591,8 @@ export default function PropostasPage() {
     foundationIncluded,
     customIncludedItems,
     customNotIncludedItems,
+    status,
+    observations: observations.trim() || undefined,
   });
 
   const handleShowSummary = () => {
@@ -661,13 +761,37 @@ export default function PropostasPage() {
               </Card>
             </div>
 
-            <div className="flex justify-between items-center pt-4">
+            <div className="flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center pt-4">
               <h2 className="text-lg font-bold text-primary flex items-center gap-2">
                 <span>📋</span> Propostas Emitidas
               </h2>
-              <Button onClick={handleNewProposal} className="wood-button text-white rounded-xl font-bold flex items-center gap-2">
-                <Plus className="w-4 h-4" /> Nova Proposta
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center flex-1 max-w-2xl justify-end">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    type="text"
+                    placeholder="Pesquisar por cliente, local..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-9 pr-4 h-10 text-xs rounded-xl recessed-input w-full"
+                  />
+                </div>
+                <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v || 'todos')}>
+                  <SelectTrigger className="w-full sm:w-[150px] h-10 text-xs rounded-xl recessed-input">
+                    <SelectValue placeholder="Filtrar por Status" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl border-primary/20">
+                    <SelectItem value="todos">Todos Status</SelectItem>
+                    <SelectItem value="rascunho">📝 Rascunho</SelectItem>
+                    <SelectItem value="enviada">✉️ Enviada</SelectItem>
+                    <SelectItem value="fechada">🤝 Ganha</SelectItem>
+                    <SelectItem value="perdida">❌ Perdida</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button onClick={handleNewProposal} className="wood-button text-white rounded-xl h-10 font-bold flex items-center gap-2 px-4 shrink-0 text-xs">
+                  <Plus className="w-4 h-4" /> Nova
+                </Button>
+              </div>
             </div>
 
             {loadingProposals ? (
@@ -677,29 +801,35 @@ export default function PropostasPage() {
                   <span className="text-xs uppercase font-bold tracking-wider">Carregando histórico...</span>
                 </CardContent>
               </Card>
-            ) : proposals.length === 0 ? (
+            ) : filteredProposals.length === 0 ? (
               <Card className="wood-card">
                 <CardContent className="p-12 text-center text-muted-foreground space-y-4">
-                  <span className="text-4xl block">📂</span>
-                  <p className="text-sm font-semibold">Nenhuma proposta salva ainda.</p>
-                  <p className="text-xs max-w-sm mx-auto opacity-70">Comece criando sua primeira proposta personalizada clicando no botão acima.</p>
+                  <span className="text-4xl block">🔍</span>
+                  <p className="text-sm font-semibold">Nenhuma proposta encontrada.</p>
+                  <p className="text-xs max-w-sm mx-auto opacity-70">Ajuste os filtros de pesquisa ou status para encontrar o registro desejado.</p>
                 </CardContent>
               </Card>
             ) : (
-              <div className="space-y-4">
-                {proposals.map((proposal) => {
+              <>
+                <div className="space-y-4">
+                {filteredProposals.map((proposal) => {
                   const dateStr = proposal.createdAt?.seconds 
                     ? new Date(proposal.createdAt.seconds * 1000).toLocaleDateString('pt-BR') 
                     : proposal.createdAt 
                     ? new Date(proposal.createdAt).toLocaleDateString('pt-BR')
                     : new Date().toLocaleDateString('pt-BR');
+                  const propStatus = (proposal.status || proposal.data?.status || 'rascunho') as 'rascunho' | 'enviada' | 'fechada' | 'perdida';
+                  const statusInfo = STATUS_CONFIG[propStatus];
                   return (
                     <Card key={proposal.id} className="wood-card overflow-hidden hover:shadow-lg transition-all duration-300">
                       <CardContent className="p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <div className="space-y-1">
-                          <div className="flex items-center gap-2">
+                          <div className="flex flex-wrap items-center gap-2">
                             <span className="font-bold text-stone-850 text-base">{proposal.clientName}</span>
                             <span className="text-[10px] text-muted-foreground bg-stone-100 border border-stone-200 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">{dateStr}</span>
+                            <span className={`text-[9px] ${statusInfo.bg} ${statusInfo.text} ${statusInfo.border} border px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider flex items-center gap-1`}>
+                              <span>{statusInfo.emoji}</span> {statusInfo.label}
+                            </span>
                           </div>
                           <div className="text-xs text-muted-foreground flex flex-wrap gap-x-3 gap-y-1">
                             <span>📍 <strong>Local:</strong> {proposal.workLocation}</span>
@@ -756,8 +886,28 @@ export default function PropostasPage() {
                   );
                 })}
               </div>
-            )}
-          </motion.div>
+              
+              {hasMore && !searchTerm.trim() && (
+                <div className="flex justify-center pt-6">
+                  <Button
+                    variant="outline"
+                    disabled={loadingMore}
+                    onClick={loadMoreProposals}
+                    className="rounded-xl px-8 h-11 border-primary/20 text-primary font-bold hover:bg-primary/5 gap-2 shrink-0 text-xs shadow-sm bg-white/50 backdrop-blur-sm transition-all hover:scale-105"
+                  >
+                    {loadingMore ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin text-primary" /> Carregando...
+                      </>
+                    ) : (
+                      "Carregar Mais Propostas"
+                    )}
+                  </Button>
+                </div>
+              )}
+            </>
+          )}
+        </motion.div>
         ) : view === 'form' ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -1175,6 +1325,55 @@ export default function PropostasPage() {
                           />
                         </motion.div>
                       )}
+                 {/* Status & Observations */}
+             <Card className="wood-card overflow-hidden">
+               <CardContent className="p-4 md:p-8 space-y-6">
+                 <div className="flex items-center gap-3 border-b border-border/10 pb-4 mb-6">
+                   <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                     <Settings2 className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+                   </div>
+                   <h2 className="font-bold text-lg md:text-xl engraved-text">Status e Notas de Negociação</h2>
+                 </div>
+                 
+                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                   <div className="space-y-2 sm:col-span-1">
+                     <Label htmlFor="proposalStatus" className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Status da Proposta</Label>
+                     <Select value={status} onValueChange={(v) => setStatus(v as any)}>
+                       <SelectTrigger className="h-12 recessed-input rounded-xl w-full">
+                         <SelectValue />
+                       </SelectTrigger>
+                       <SelectContent className="rounded-xl border-primary/20">
+                         <SelectItem value="rascunho">📝 Rascunho</SelectItem>
+                         <SelectItem value="enviada">✉️ Enviada</SelectItem>
+                         <SelectItem value="fechada">🤝 Ganha (Fechada)</SelectItem>
+                         <SelectItem value="perdida">❌ Perdida</SelectItem>
+                       </SelectContent>
+                     </Select>
+                   </div>
+                   <div className="space-y-2 sm:col-span-2">
+                     <Label htmlFor="observations" className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Observações Especiais (Serão impressas no PDF)</Label>
+                     <textarea
+                       id="observations"
+                       placeholder="Ex: Incluso brinde X, pagamento em 50% de sinal e saldo no embarque..."
+                       value={observations}
+                       onChange={e => setObservations(e.target.value)}
+                       className="w-full min-h-[48px] p-3 text-sm recessed-input rounded-xl border-primary/10 focus:ring-1 focus:ring-primary/20 bg-background resize-y"
+                     />
+                   </div>
+                 </div>
+               </CardContent>
+             </Card>
+
+             {/* Action Button */}
+             <div className="flex justify-center pt-8">
+               <Button
+                 onClick={handleShowSummary}
+                 className="h-16 md:h-20 px-8 md:px-16 text-sm md:text-xl font-black wood-button text-white rounded-[1.5rem] md:rounded-[2rem] shadow-2xl flex items-center gap-2 md:gap-4 group transition-all hover:scale-105 uppercase tracking-widest w-full md:w-auto"
+               >
+                 <FileDown className="w-5 h-5 md:w-7 md:h-7 group-hover:animate-bounce" />
+                 Gerar Resumo da Proposta
+               </Button>
+             </div>
                     </div>
 
                   </div>
@@ -1230,11 +1429,24 @@ export default function PropostasPage() {
                             <p className="font-bold text-primary">{kitType === 'custom' ? 'Personalizado' : selectedModel?.name}</p>
                           </div>
                           <div>
-                            <p className="text-[10px] uppercase text-muted-foreground font-bold mb-1">Área Total</p>
-                            <p className="font-bold text-primary">{kitType === 'custom' ? customArea : selectedModel?.area}m²</p>
-                          </div>
-                        </div>
-                      </div>
+                             <p className="text-[10px] uppercase text-muted-foreground font-bold mb-1">Área Total</p>
+                             <p className="font-bold text-primary">{kitType === 'custom' ? customArea : selectedModel?.area}m²</p>
+                           </div>
+                           <div>
+                             <p className="text-[10px] uppercase text-muted-foreground font-bold mb-1">Status Comercial</p>
+                             <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${STATUS_CONFIG[status]?.bg} ${STATUS_CONFIG[status]?.text} ${STATUS_CONFIG[status]?.border} border uppercase tracking-wider`}>
+                               {STATUS_CONFIG[status]?.emoji} {STATUS_CONFIG[status]?.label}
+                             </span>
+                           </div>
+                         </div>
+                       </div>
+
+                       {observations.trim() && (
+                         <div className="space-y-2 bg-amber-500/5 p-4 rounded-xl border border-amber-500/10">
+                           <p className="text-[10px] font-black uppercase tracking-widest text-amber-800">Observações Especiais para o PDF</p>
+                           <p className="text-xs text-stone-700 whitespace-pre-wrap">{observations}</p>
+                         </div>
+                       )}
 
                       <div className="space-y-4">
                         <p className="text-[10px] font-black uppercase tracking-widest text-primary/60 border-l-4 border-primary pl-3">Detalhamento Técnico</p>
