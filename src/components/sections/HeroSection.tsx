@@ -79,7 +79,34 @@ export const HeroSection = () => {
             Construa seu chalé de madeira ou casa pré-fabricada com Pinus tratado em autoclave, ideal para investimento, campo ou praia.
           </motion.p>
 
-
+          {/* BANNER PROMOCIONAL 18X */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.25, type: "spring" }}
+            className="mb-8 relative overflow-hidden rounded-2xl border border-amber-400/30 bg-black/40 backdrop-blur-md group shadow-2xl"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 via-orange-500/20 to-amber-500/10" />
+            {/* Efeito de brilho animado */}
+            <div className="absolute -inset-[100%] animate-[spin_8s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,rgba(251,191,36,0.2)_50%,transparent_100%)] blur-2xl" />
+            
+            <div className="relative p-5 sm:p-6 flex flex-col sm:flex-row items-center sm:items-start gap-5">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-600 text-white shadow-[0_0_30px_rgba(245,158,11,0.5)]">
+                <span className="text-2xl">💳</span>
+              </div>
+              <div className="text-center sm:text-left">
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-widest text-amber-300 mb-2 border border-amber-400/20">
+                  <span className="animate-pulse">🔥</span> Oferta Limitada
+                </div>
+                <h3 className="font-display text-xl font-black uppercase tracking-tight text-white sm:text-2xl drop-shadow-md">
+                  Compre seu chalé em até <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-amber-500">18X SEM JUROS</span>
+                </h3>
+                <p className="mt-1.5 text-sm font-medium text-white/90 md:text-base leading-relaxed">
+                  Condição inédita e exclusiva para você tirar seu projeto do papel. Parcele qualquer kit madeiramento em até 18x sem juros no cartão ou ganhe <strong className="text-amber-300 font-bold">10% OFF</strong> pagando à vista.
+                </p>
+              </div>
+            </div>
+          </motion.div>
 
           {/* CTAs */}
           <motion.div

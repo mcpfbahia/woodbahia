@@ -669,7 +669,10 @@ export default function ModelDetailPage() {
                           </>
                         )}
                       </div>
-                      <span className="text-[9px] text-emerald-600 font-bold block mt-0.5">{discountRate * 100}% de desc. à vista no madeiramento</span>
+                    <div className="flex flex-col mt-0.5">
+                      <span className="text-[9px] text-emerald-600 font-bold block">{discountRate * 100}% de desc. à vista no madeiramento</span>
+                      <span className="text-[9px] text-slate-500 font-medium block">ou 18x s/ juros de {formatBRL(kitEstimation / 18)}</span>
+                    </div>
                       <div className="text-[10px] text-[#8C6239] font-bold bg-[#E8DCCF]/20 px-2 py-1 rounded-lg border border-[#E8DCCF]/45 mt-2.5 self-start inline-block">
                         Consulte Kit Base + Assoalho
                       </div>
@@ -694,7 +697,10 @@ export default function ModelDetailPage() {
                         <span className="text-[11px] text-muted-foreground line-through">{formatBRL(partnerEstimation)}</span>
                         <span className="font-serif text-xl font-bold text-[#B06D46]">{formatBRL(partnerEstimationDiscounted)}</span>
                       </div>
-                      <span className="text-[9px] text-emerald-600 font-bold block mt-0.5">{discountRate * 100}% de desc. à vista no madeiramento</span>
+                    <div className="flex flex-col mt-0.5">
+                      <span className="text-[9px] text-emerald-600 font-bold block">{discountRate * 100}% de desc. à vista no madeiramento</span>
+                      <span className="text-[9px] text-slate-500 font-medium block">ou 18x s/ juros de {formatBRL(partnerEstimation / 18)}</span>
+                    </div>
                       <span className="text-[9px] text-stone-555 block mt-2.5 font-medium italic">*Obra Completa. Solicite proposta para valores reais do frete/fundação no seu terreno.</span>
                     </div>
                   </div>
@@ -728,7 +734,10 @@ export default function ModelDetailPage() {
                           </>
                         )}
                       </div>
-                      <span className="text-[9px] text-emerald-600 font-bold block mt-0.5">{discountRate * 100}% de desc. à vista aplicado</span>
+                    <div className="flex flex-col mt-0.5">
+                      <span className="text-[9px] text-emerald-600 font-bold block">{discountRate * 100}% de desc. à vista aplicado</span>
+                      <span className="text-[9px] text-slate-500 font-medium block">ou 18x s/ juros de {formatBRL(turnkeyEstimation / 18)}</span>
+                    </div>
                       <span className="text-[9px] text-stone-555 block mt-2.5 font-medium italic">*Obra Completa. Solicite proposta para valores reais do frete/fundação no seu terreno.</span>
                     </div>
                   </div>
@@ -1115,20 +1124,60 @@ export default function ModelDetailPage() {
                             <span>- {formatBRL(descontoAVista)}</span>
                           </div>
 
-                          <div className="bg-[#FAF8F5] p-5 rounded-2xl border border-stone-200 mb-6 space-y-4">
-                            <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
-                              <div>
-                                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">Investimento Parcelado (A Prazo)</span>
-                                <span className="text-[11px] text-stone-500 italic mt-0.5 block">
-                                  {simModalidade === 'kit' && "Apenas compra do material estrutural + frete"}
-                                  {simModalidade === 'parceira' && "Kit, frete, montagem e fundação estimados"}
-                                  {simModalidade === 'turnkey' && "Obra completa coordenada pela Wood Bahia (inclui base de madeira, pintura e elétrica)"}
-                                </span>
-                              </div>
-                              <span className="font-serif font-black text-2xl text-stone-800">
-                                {formatBRL(totalAPrazo)}
-                              </span>
-                            </div>
+                            {/* Lógica de parcelamento híbrido */}
+                            {(() => {
+                              const baseParceladaCartao = includeBaseInSim || simModalidade === 'turnkey' 
+                                ? (kitFull + modelBasePrice)
+                                : kitFull;
+                              
+                              const complementosPix = totalAPrazo - baseParceladaCartao;
+
+                              if (complementosPix > 0) {
+                                return (
+                                  <div className="space-y-3 mb-6">
+                                    <div className="bg-[#FAF8F5] p-5 rounded-2xl border border-stone-200 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                                      <div>
+                                        <span className="text-[10px] text-[#8C6239] font-bold uppercase tracking-wider block">Parcelamento do Kit Madeiramento</span>
+                                        <span className="text-[11px] text-stone-500 italic mt-0.5 block">
+                                          Parcelável em até 18x sem juros no cartão
+                                        </span>
+                                      </div>
+                                      <span className="font-serif font-black text-2xl text-[#5C3317]">
+                                        {formatBRL(baseParceladaCartao)}
+                                      </span>
+                                    </div>
+                                    
+                                    <div className="bg-stone-50 p-4 rounded-xl border border-stone-200 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                                      <div>
+                                        <span className="text-[10px] text-stone-600 font-bold uppercase tracking-wider block">Complementos e Serviços (Via PIX)</span>
+                                        <span className="text-[11px] text-stone-500 italic mt-0.5 block">
+                                          Sinal e saldo conforme cronograma de evolução da obra
+                                        </span>
+                                      </div>
+                                      <span className="font-serif font-black text-xl text-stone-800">
+                                        {formatBRL(complementosPix)}
+                                      </span>
+                                    </div>
+                                  </div>
+                                );
+                              }
+
+                              return (
+                                <div className="bg-[#FAF8F5] p-5 rounded-2xl border border-stone-200 mb-6 space-y-4">
+                                  <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                                    <div>
+                                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">Investimento Parcelado (A Prazo)</span>
+                                      <span className="text-[11px] text-stone-500 italic mt-0.5 block">
+                                        Apenas compra do material estrutural + frete
+                                      </span>
+                                    </div>
+                                    <span className="font-serif font-black text-2xl text-stone-800">
+                                      {formatBRL(totalAPrazo)}
+                                    </span>
+                                  </div>
+                                </div>
+                              );
+                            })()}
 
                             <div className="w-full h-[1px] bg-stone-200"></div>
 

@@ -241,6 +241,7 @@ export default function PropostasPage() {
               merged.push(firestoreModel);
             }
           });
+          merged.sort((a, b) => a.name.localeCompare(b.name));
           setCabinModels(merged);
         }
       } catch (err) {

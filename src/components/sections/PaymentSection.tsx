@@ -45,7 +45,7 @@ export const PaymentSection = () => {
                 <ul className="space-y-4 mb-8">
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="w-6 h-6 text-[#B06D46] shrink-0" />
-                    <span className="text-[#57463A] font-medium">Pagamento no cartão de crédito em até 3X sem juros</span>
+                    <span className="text-[#57463A] font-medium">Pagamento no cartão de crédito em até 18X sem juros</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="w-6 h-6 text-[#B06D46] shrink-0" />

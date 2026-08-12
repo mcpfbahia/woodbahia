@@ -13,27 +13,9 @@ import { WhatsAppButton } from "~/components/common/WhatsAppButton";
 import { ScrollReveal, StaggerContainer, StaggerItem } from "~/components/common/ScrollReveal";
 import { motion, AnimatePresence } from "framer-motion";
 import { saveLead } from "~/lib/leads";
+import { calculateInstallmentValue, CARD_RATES } from "~/lib/pricing";
 
-const TAXAS = {
-  1: 0,              // 1x (Sem juros)
-  2: 0,              // 2x (Sem juros)
-  3: 0,              // 3x (Sem juros)
-  4: 2.47 + 3.92,    // 6.39%
-  5: 2.47 + 4.65,    // 7.12%
-  6: 2.47 + 5.38,    // 7.85%
-  7: 2.87 + 6.13,    // 9.00%
-  8: 2.87 + 6.90,    // 9.77%
-  9: 2.87 + 7.69,    // 10.56%
-  10: 2.87 + 8.49,   // 11.36%
-  11: 2.87 + 9.32,   // 12.19%
-  12: 2.87 + 10.15,  // 13.02%
-  13: 2.99 + 11.13,  // 14.12%
-  14: 2.99 + 12.01,  // 15.00%
-  15: 2.99 + 12.91,  // 15.90%
-  16: 2.99 + 13.84,  // 16.83%
-  17: 2.99 + 14.77,  // 17.76%
-  18: 2.99 + 15.78   // 18.77%
-};
+
 
 const formatCurrency = (value: number) => {
   return new Intl.NumberFormat('pt-BR', {
@@ -60,19 +42,15 @@ export default function InstallmentSimulatorPage() {
   const valorFinanciado = Math.max(0, valorProjeto - entrada);
 
   const tabelaSimulacao = useMemo(() => {
-    return Object.entries(TAXAS).map(([parc, taxa]) => {
-      const p = parseInt(parc);
-      const taxaDecimal = taxa / 100;
-      
-      const totalNoCartao = valorFinanciado / (1 - taxaDecimal);
-      const valorDaParcela = totalNoCartao / p;
+    return CARD_RATES.map(([parc, taxaBase]) => {
+      const res = calculateInstallmentValue(valorFinanciado, parc, false); // false = sem desconto a vista aplicado
       
       return {
-        parcelas: p,
-        valorDaParcela,
-        totalNoCartao,
-        taxa,
-        jurosTotal: totalNoCartao - valorFinanciado
+        parcelas: parc,
+        valorDaParcela: res.installment,
+        totalNoCartao: res.total,
+        taxa: res.isInterestFree ? 0 : taxaBase,
+        jurosTotal: res.total - valorFinanciado
       };
     });
   }, [valorFinanciado]);

@@ -125,6 +125,20 @@ export const initialModels = [
     freight_is_promo: true,
     purposes: ["airbnb", "praia", "campo"],
   },
+  {
+    id: "chale-escandinavo-trancoso",
+    name: "Chalé Escandinavo Trancoso",
+    image: "/images/models/chale-escandinavo-trancoso.jpg",
+    area: "35m²",
+    floors: "1 Pavimento",
+    bedrooms: 1,
+    infoLabel: "35m² | 1 quarto (Parede Dupla)",
+    description: "O Chalé Escandinavo Trancoso combina o charme do design nórdico com o aconchego da madeira. Com 35m² de área total (28,75m² interna e deck de 6,25m²), possui 1 dormitório, sala de estar e cozinha integradas, e banheiro. Destaca-se por sua fachada ampla em vidro, parede dupla para maior conforto térmico e acústico, ideal para investimento ou lazer.",
+    kitPrice: "R$ 35.000,00", // Preço sugerido, favor ajustar
+    freight_value: "R$ 5.000,00", // Frete sugerido, favor ajustar
+    freight_is_promo: true,
+    purposes: ["airbnb", "praia", "campo", "moradia"],
+  },
 ];
 
 // ── Overrides que corrigem dados do Firebase (fonte de verdade local) ──────────
@@ -180,6 +194,11 @@ const MODEL_OVERRIDES: Record<string, Partial<{
   "vilas-do-atlantico": {
     kitPrice: "R$ 21.000,00",
     freight_value: "R$ 5.500,00",
+    freight_is_promo: true,
+  },
+  "trancoso": {
+    kitPrice: "R$ 35.000,00",
+    freight_value: "R$ 5.000,00",
     freight_is_promo: true,
   },
 };
@@ -349,7 +368,7 @@ export const faqItems = [
   {
     question: "06 — Como funciona a política de descontos e pagamentos?",
     answer:
-      "Oferecemos 5% de desconto para pagamento à vista. Importante destacar que esse desconto incide exclusivamente sobre o valor dos materiais (Kit Madeiramento e base estrutural de madeira), não sendo aplicado sobre fretes ou mão de obra de terceiros. Também facilitamos o pagamento aceitando cartões de crédito em até 3x sem juros ou em até 18x com juros.",
+      "Oferecemos 10% de desconto para pagamento à vista. Importante destacar que esse desconto incide exclusivamente sobre o valor dos materiais (Kit Madeiramento e base estrutural de madeira), não sendo aplicado sobre fretes ou mão de obra de terceiros. Também facilitamos o pagamento aceitando cartões de crédito em até 18x sem juros.",
   },
   {
     question: "07 — O que preciso preparar no terreno antes da obra?",

@@ -42,10 +42,18 @@ export const ModelsSection = () => {
       }
       try {
         const querySnapshot = await getDocs(collection(db, "models"));
-        const modelsData = querySnapshot.docs
+        let modelsData = querySnapshot.docs
           .map((doc) => ({ id: doc.id, ...doc.data() }))
           .map(applyModelOverrides);
-        setModels(modelsData.length > 0 ? modelsData : initialModels);
+
+        if (modelsData.length > 0) {
+          const dbIds = new Set(modelsData.map((m: any) => m.id));
+          const missingModels = initialModels.filter(m => !dbIds.has(m.id));
+          modelsData = [...modelsData, ...missingModels].map(applyModelOverrides);
+          setModels(modelsData);
+        } else {
+          setModels(initialModels.map(applyModelOverrides));
+        }
       } catch {
         setModels(initialModels);
       } finally {
@@ -238,9 +246,14 @@ export const ModelsSection = () => {
                               )}
                             </div>
                             {kitFull > 0 && (
-                              <span className="text-[8px] sm:text-[9px] text-emerald-700 font-bold mt-1 block">
-                                {discountRate * 100}% desc. à vista
-                              </span>
+                              <div className="flex flex-col mt-1">
+                                <span className="text-[8px] sm:text-[9px] text-emerald-700 font-bold block">
+                                  {discountRate * 100}% desc. à vista
+                                </span>
+                                <span className="text-[8px] font-medium text-slate-500 mt-0.5 block leading-tight">
+                                  ou 18x s/ juros de {formatBRL(kitEstimation / 18)}
+                                </span>
+                              </div>
                             )}
                           </div>
 
@@ -265,9 +278,14 @@ export const ModelsSection = () => {
                                     <p className="font-serif text-xs font-bold text-[#8C6239] mt-1">Consulte</p>
                                   )}
                                 </div>
-                                <span className="text-[8px] sm:text-[9px] text-[#8C6239] font-bold mt-1 block">
-                                  {discountRate * 100}% desc. à vista
-                                </span>
+                                  <div className="flex flex-col mt-1">
+                                    <span className="text-[8px] sm:text-[9px] text-[#8C6239] font-bold block">
+                                      {discountRate * 100}% desc. à vista
+                                    </span>
+                                    <span className="text-[8px] font-medium text-slate-500 mt-0.5 block leading-tight">
+                                      ou Kit em 18x s/ juros de {formatBRL(kitEstimation / 18)}
+                                    </span>
+                                  </div>
                               </>
                             ) : (
                               <>
@@ -288,9 +306,14 @@ export const ModelsSection = () => {
                                     <p className="font-serif text-xs font-bold text-emerald-700 mt-1">Consulte</p>
                                   )}
                                 </div>
-                                <span className="text-[8px] sm:text-[9px] text-emerald-700 font-bold mt-1 block">
-                                  {discountRate * 100}% desc. à vista
-                                </span>
+                                  <div className="flex flex-col mt-1">
+                                    <span className="text-[8px] sm:text-[9px] text-emerald-700 font-bold block">
+                                      {discountRate * 100}% desc. à vista
+                                    </span>
+                                    <span className="text-[8px] font-medium text-slate-500 mt-0.5 block leading-tight">
+                                      ou Kit em 18x s/ juros de {formatBRL(kitEstimation / 18)}
+                                    </span>
+                                  </div>
                               </>
                             )}
                           </div>

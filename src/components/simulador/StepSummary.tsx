@@ -1,4 +1,4 @@
-import { calculateSummary, getEffectiveArea, calculateInstallmentValue, getModelDiscountRate } from '@/lib/pricing';
+import { calculateSummary, getEffectiveArea, calculateInstallmentValue, getModelDiscountRate, getPaymentBases } from '@/lib/pricing';
 import type { SimulationState, LineItem } from '@/lib/pricing';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -24,25 +24,19 @@ const KIT_NAMES: Record<string, string> = {
 };
 
 export function StepSummary({ state, onBack, onReset }: Props) {
-  const { items, freight, additionalFreight, additionalTravelCost, total, materialSubtotal } = calculateSummary(state);
+  const { items, freight, additionalFreight, additionalTravelCost, total } = calculateSummary(state);
   const area = getEffectiveArea(state);
+  const { creditCardBase, pixBase } = getPaymentBases(items, total);
+  
   const isCustom = state.kitType === 'custom';
   const modelLabel = isCustom
     ? `Kit Personalizado — ${area}m²`
     : `${state.model!.name} — ${state.model!.area}m²`;
   const kitLabel = state.kitType ? KIT_NAMES[state.kitType] || state.kitType : '';
 
-  // O desconto de 5% incide apenas sobre o Kit Madeiramento e a base estrutural de madeira se houver.
-  const timberItem = items.find(i => i.label.toLowerCase().includes('kit madeiramento'));
-  const woodenBaseItem = items.find(i => i.label.toLowerCase().includes('base de madeira') || i.label.toLowerCase().includes('base estrutural'));
-  const discountableBase = (timberItem ? timberItem.value : 0) + (woodenBaseItem ? woodenBaseItem.value : 0);
-
   const CASH_DISCOUNT = getModelDiscountRate(state.model?.id || state.model?.name, state.model?.discountRate);
-  const discountValue = Math.round(discountableBase * CASH_DISCOUNT);
-  const totalAVista = Math.round(total - discountValue);
-  const sinal = total * 0.3;
-  const entrega = total * 0.2;
-  const saldo = total * 0.5;
+  const totalAVista = Math.round(total - (creditCardBase * CASH_DISCOUNT));
+  const metadePix = total / 2;
 
   // Build WhatsApp message with full report
   const whatsappMessage = [
@@ -61,15 +55,17 @@ export function StepSummary({ state, onBack, onReset }: Props) {
     additionalTravelCost > 0 ? `• Deslocamento Adicional Chave na Mão (> 200km): ${fmt(additionalTravelCost)}` : ``,
     ``,
     `💰 *Total do Investimento: ${fmt(total)}*`,
-    `💚 *À Vista (${CASH_DISCOUNT * 100}% desc. no madeiramento/base): ${fmt(totalAVista)}*`,
+    `💚 *À Vista (Desconto no Kit): ${fmt(totalAVista)}*`,
     ``,
-    `⚠️ *Nota:* Os valores de frete e fundação são aproximados de acordo com a distância inserida, e serão confirmados em proposta comercial pelo especialista da Wood Bahia de acordo com as características do terreno.`,
-    state.kitType === 'madeiramento' ? `\n⚠️ *Alerta Kit Madeiramento:* Esta modalidade contempla unicamente a madeira estrutural da fábrica. Portas, janelas, ferragens, telhas, stain de pintura, vidros, drywall e placa cimentícia devem ser adquiridos separadamente pelo cliente.` : ``,
+    `📅 *OPÇÃO 1: PIX/BOLETO*`,
+    `• Sinal (50%): ${fmt(metadePix)} — Para iniciar o projeto`,
+    `• Saldo Final (50%): ${fmt(metadePix)} — Na saída da fábrica`,
     ``,
-    `📅 *Condições de Pagamento:*`,
-    `• Sinal (30%): ${fmt(sinal)}`,
-    `• Entrega do Kit (20%): ${fmt(entrega)}`,
-    `• Saldo Final (50%): ${fmt(saldo)}`,
+    `💳 *OPÇÃO 2: PARCELAMENTO (ATÉ 18X SEM JUROS)*`,
+    pixBase > 0 ? `*⚠️ Mão de Obra e Complementos (Via PIX)*: ${fmt(pixBase)} pago durante a obra.` : ``,
+    `*18x S/ Juros do Kit Madeiramento*: ${fmt(calculateInstallmentValue(creditCardBase, 18).installment)} por mês.`,
+    ``,
+    `*Status:* Gostaria de uma análise de crédito ou tem dúvidas sobre a proposta?`,
   ].filter(Boolean).join('\n');
 
   const whatsappUrl = `https://wa.me/5571992936290?text=${encodeURIComponent(whatsappMessage)}`;
@@ -151,7 +147,6 @@ export function StepSummary({ state, onBack, onReset }: Props) {
                         </div>
                       );
                     })}
-                    {/* Frete básico e adicional sempre entram em Logística de Materiais */}
                     <div className="flex justify-between items-center text-sm py-0.5">
                       <span className="text-muted-foreground">Frete Compartilhado Estimado ({area}m² × R$ 90)</span>
                       <span className="font-semibold tabular-nums text-stone-850">{fmt(freight)}</span>
@@ -224,8 +219,8 @@ export function StepSummary({ state, onBack, onReset }: Props) {
                 className="flex justify-between items-center bg-green-500/10 border border-green-500/20 rounded-xl p-4 -mx-1 mt-3"
               >
                 <div>
-                  <span className="text-sm font-bold font-display text-green-700 dark:text-green-400">💰 À Vista ({CASH_DISCOUNT * 100}% de desconto no madeiramento)</span>
-                  <p className="text-xs text-muted-foreground mt-0.5">Aplicado sobre o madeiramento e base de madeira</p>
+                  <span className="text-sm font-bold font-display text-green-700 dark:text-green-400">💰 À Vista ({CASH_DISCOUNT * 100}% desc.)</span>
+                  <p className="text-xs text-muted-foreground mt-0.5">Aplicado sobre o madeiramento e base</p>
                 </div>
                 <span className="text-xl md:text-2xl font-bold text-green-700 dark:text-green-400 font-display">{fmt(totalAVista)}</span>
               </motion.div>
@@ -233,11 +228,10 @@ export function StepSummary({ state, onBack, onReset }: Props) {
               <Separator className="my-6" />
 
               <h3 className="font-display font-semibold text-base mb-4">Condições de Pagamento (Boleto/PIX)</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {[
-                  { label: 'Sinal (30%)', value: sinal, desc: 'Para iniciar o projeto' },
-                  { label: 'Entrega do Kit (20%)', value: entrega, desc: 'Na chegada do material' },
-                  { label: 'Saldo Final (50%)', value: saldo, desc: 'Até a entrega das chaves' },
+                  { label: 'Sinal (50%)', value: metadePix, desc: 'Para iniciar o projeto' },
+                  { label: 'Saldo Final (50%)', value: metadePix, desc: 'Na saída da fábrica' },
                 ].map((p, i) => (
                   <motion.div
                     key={p.label}
@@ -265,9 +259,21 @@ export function StepSummary({ state, onBack, onReset }: Props) {
                   <span className="text-lg">💳</span>
                   <h3 className="font-display font-semibold text-base">Simulação no Cartão de Crédito</h3>
                 </div>
+
+                {pixBase > 0 && (
+                  <div className="bg-accent/10 border border-accent/20 rounded-xl p-3 mb-4 flex items-start gap-3">
+                    <div className="bg-accent/20 p-2 rounded-full text-accent mt-0.5"><Info size={16} /></div>
+                    <p className="text-[11px] text-foreground/80 leading-snug">
+                      Na modalidade <b>Chave na Mão</b> ou <b>Parceira</b>, os itens complementares e a mão de obra (<span className="font-bold text-accent">{fmt(pixBase)}</span>) 
+                      são pagos de forma independente via PIX (Sinal + Saldo no andamento da obra). <br/>
+                      A tabela de 18x abaixo é baseada <b>exclusivamente</b> no valor do Kit Madeiramento (<b>{fmt(creditCardBase)}</b>).
+                    </p>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {[3, 6, 10, 12, 15, 18].map((n, i) => {
-                    const res = calculateInstallmentValue(total, n);
+                    const res = calculateInstallmentValue(creditCardBase, n);
                     return (
                       <motion.div
                         key={n}
@@ -275,20 +281,20 @@ export function StepSummary({ state, onBack, onReset }: Props) {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.7 + i * 0.06 }}
                         className={`rounded-xl p-4 border transition-all duration-300 hover:shadow-md ${
-                          n === 3
+                          n === 18
+                            ? 'bg-accent/15 border-accent/30 ring-2 ring-accent/40 shadow-lg'
+                            : res.isInterestFree
                             ? 'bg-green-500/10 border-green-500/20'
-                            : n === 18
-                            ? 'bg-accent/15 border-accent/30 ring-1 ring-accent/20'
                             : 'bg-secondary/40 border-secondary/20 hover:bg-secondary/60'
                         }`}
                       >
                         <span className={`text-[10px] font-bold uppercase tracking-widest ${
-                          n === 3 ? 'text-green-700 dark:text-green-400' : 'text-foreground/70'
+                          n === 18 ? 'text-accent font-black' : res.isInterestFree ? 'text-green-700 dark:text-green-400' : 'text-foreground/70'
                         }`}>
                           {n}x {res.isInterestFree ? 'sem juros' : 'c/ taxas'}
                         </span>
                         <p className={`font-bold text-xl mt-1 font-display tabular-nums ${
-                          n === 3 ? 'text-green-700 dark:text-green-400' : 'text-primary'
+                          n === 18 ? 'text-accent' : res.isInterestFree ? 'text-green-700 dark:text-green-400' : 'text-primary'
                         }`}>
                           {fmt(res.installment)}
                         </p>

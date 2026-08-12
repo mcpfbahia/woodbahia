@@ -180,7 +180,7 @@ export const Footer = () => {
                   <a href="https://www.instagram.com/woodbahiacasasprefabricadas/" target="_blank" rel="noopener noreferrer" className="font-medium transition-colors hover:text-white">
                     @woodbahia
                   </a>
-                  <span className="mt-1 block text-sm text-primary-foreground/50">+47 mil seguidores</span>
+                  <span className="mt-1 block text-sm text-primary-foreground/50">+49 mil seguidores</span>
                 </div>
               </li>
             </ul>
@@ -194,7 +194,7 @@ export const Footer = () => {
                 <CreditCard className="h-5 w-5 text-primary-foreground/60" />
                 <div>
                   <span className="block text-[10px] uppercase tracking-wider text-primary-foreground/40">Cartão de Crédito</span>
-                  <span className="font-bold text-white text-sm">Até 3x sem juros ou 18x com juros</span>
+                  <span className="font-bold text-white text-sm">Até 18x sem juros no cartão</span>
                 </div>
               </div>
               

@@ -7,6 +7,7 @@ import {
   CARD_RATES,
   calculateInstallmentValue,
   getModelDiscountRate,
+  getPaymentBases,
   type ProposalData,
   type KitType,
   type CabinModel,
@@ -200,6 +201,7 @@ export function generateProposalPDF(
   const kitDesc = data.kitType === 'custom' && data.customModelDescription ? data.customModelDescription : (KIT_DESCRIPTIONS[data.kitType] || '');
   const modelName = model?.name || 'Kit Personalizado';
   const { items, freight, additionalFreight, additionalTravelCost, subtotal, total: totalFinal, discount, materialSubtotal } = calculateProposalItems(data, modelsList);
+  const { creditCardBase, pixBase } = getPaymentBases(items, totalFinal);
 
   const subtotalComDesconto = subtotal - discount;
   const timberItem = items.find(i => i.label.toLowerCase().includes('madeiramento'));
@@ -430,8 +432,8 @@ export function generateProposalPDF(
   y += 14;
 
   // ─── PAYMENT CONDITIONS ───
-  const baseParcelamento = subtotalComDesconto + freight;
-
+  // No PIX/Boleto o pagamento também é considerado com 10% de desconto
+  const metade = totalAVista * 0.5;
 
   // Helper: bold label+value, normal description
   const drawPaymentLine = (label: string, value: string, desc: string, lineY: number) => {
@@ -452,9 +454,8 @@ export function generateProposalPDF(
   drawPaymentLine(`À Vista (${discountRate * 100}% desc. no madeiramento/base):`, fmt(totalAVista), 'No PIX ou Transferência Bancária', y);
   y += 5;
 
-  // Novo modelo 50/50 (pagamento do material)
-  const metade = baseParcelamento * 0.5;
-  drawPaymentLine('Sinal (50%):', fmt(metade), 'Na assinatura do contrato', y);
+  // Novo modelo 50/50 (pagamento do material já com desconto)
+  drawPaymentLine('Sinal (50%):', fmt(metade), 'Na assinatura do contrato (PIX)', y);
   y += 5;
   drawPaymentLine('Saldo Final (50%):', fmt(metade), '24h antes do embarque do kit (Saída da fábrica)', y);
   y += 8;
@@ -475,17 +476,26 @@ export function generateProposalPDF(
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
   doc.setTextColor(...COLORS.foreground);
-  doc.text('PARCELE O SEU CHALÉ EM ATÉ 18X NO CARTÃO DE CRÉDITO', margin, y);
+  doc.text('PARCELE O SEU KIT DE MADEIRAMENTO EM ATÉ 18X', margin, y);
   
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
   doc.setTextColor(...COLORS.muted);
-  doc.text('Simulação com taxas da operadora (sujeito a aprovação de limite)', margin, y + 5);
+  doc.text('Condições de parcelamento sujeitas a aprovação de limite de crédito', margin, y + 5);
+
+  if (pixBase > 0) {
+    y += 5;
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...COLORS.accent);
+    doc.text('Complementos, frete e mão de obra não são parcelados em 18x.', margin, y + 5);
+    doc.text(`Valor Restante (Via PIX): ${fmt(pixBase)} (Sinal e Saldo ao final da obra)`, margin, y + 10);
+    y += 8;
+  }
   
   y += 10;
 
   const cardTableBody = CARD_RATES.map(([n]) => {
-    const res = calculateInstallmentValue(totalFinal, n, discount > 0);
+    const res = calculateInstallmentValue(creditCardBase, n, discount > 0);
     const label = res.isInterestFree ? `${n}x sem juros` : `${n}x`;
     return [label, fmt(res.installment)];
   });
@@ -517,12 +527,6 @@ export function generateProposalPDF(
     },
     didParseCell: (hookData) => {
       if (hookData.section === 'body') {
-        // Highlight 1x, 2x, 3x rows (indices 0,1,2) in green only if there's no discount
-        if (hookData.row.index <= 2 && discount === 0) {
-          hookData.cell.styles.textColor = COLORS.green;
-          hookData.cell.styles.fontStyle = 'bold';
-          hookData.cell.styles.fillColor = [230, 245, 230];
-        }
         // Extreme Highlight for the 18x row (index 17)
         if (hookData.row.index === 17) {
           hookData.cell.styles.textColor = COLORS.white;

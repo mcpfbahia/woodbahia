@@ -598,14 +598,45 @@ export const SimulatorSection = () => {
               {/* Total Final do Investimento */}
               <div>
                 <div className="mb-6 space-y-4">
-                  <div>
-                    <span className="text-xs uppercase tracking-wider font-bold text-gray-400 block mb-1">
-                      Investimento Parcelado (A Prazo)
-                    </span>
-                    <div className="font-serif font-black text-2xl sm:text-3xl text-stone-850 leading-none">
-                      {formatBRL(totalPrice)}
+                  {/* Cálculos de base */}
+                  {(() => {
+                    const creditCardBase = timberPrice + woodenBasePrice;
+                    const pixBase = totalPrice - creditCardBase;
+                    return (
+                      <>
+
+                  {pixBase > 0 ? (
+                    <div className="space-y-3">
+                      <div>
+                        <span className="text-xs uppercase tracking-wider font-bold text-[#8C6239] block mb-1">
+                          Parcelamento do Kit Madeiramento (Até 18x s/ juros no Cartão)
+                        </span>
+                        <div className="font-serif font-black text-2xl sm:text-3xl text-[#5C3317] leading-none">
+                          {formatBRL(creditCardBase)}
+                        </div>
+                      </div>
+                      <div className="bg-stone-50 border border-stone-200 rounded-lg p-3">
+                        <span className="text-[10px] uppercase tracking-wider font-bold text-stone-600 block mb-1">
+                          Complementos e Serviços (Via PIX)
+                        </span>
+                        <div className="font-serif font-black text-lg text-stone-800 leading-none">
+                          {formatBRL(pixBase)}
+                        </div>
+                        <span className="text-[9px] text-stone-500 font-semibold mt-1 block">
+                          Sinal e saldo pagos conforme cronograma de evolução da obra.
+                        </span>
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div>
+                      <span className="text-xs uppercase tracking-wider font-bold text-gray-400 block mb-1">
+                        Investimento Parcelado (A Prazo)
+                      </span>
+                      <div className="font-serif font-black text-2xl sm:text-3xl text-stone-850 leading-none">
+                        {formatBRL(totalPrice)}
+                      </div>
+                    </div>
+                  )}
                   
                   <div className="bg-emerald-50/60 p-4 rounded-xl border border-emerald-100">
                     <span className="text-xs uppercase tracking-wider font-bold text-emerald-800 block mb-1">
@@ -618,6 +649,9 @@ export const SimulatorSection = () => {
                       *Com desconto de {discountRate * 100}% aplicado sobre o madeiramento e base estrutural. Economia de {formatBRL((timberPrice + woodenBasePrice) * discountRate)}.
                     </span>
                   </div>
+                </>
+              );
+            })()}
 
                   <span className="text-[10px] text-gray-400 mt-2 block leading-relaxed italic">
                     *Valores aproximados. Variações podem ocorrer de acordo com a região da obra e padrão de acabamentos civis finais escolhidos.

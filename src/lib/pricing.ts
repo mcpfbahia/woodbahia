@@ -9,30 +9,20 @@ export interface CabinModel {
 }
 
 export const CABIN_MODELS: CabinModel[] = [
-  { id: 'guarajuba', name: 'Chalé Guarajuba', area: 52, kitPrice: 33800, tilesStainPrice: 12210, fixturesPrice: 5200 },
-  { id: 'itacimirim', name: 'Chalé Itacimirim', area: 35, kitPrice: 22750, tilesStainPrice: 10250, fixturesPrice: 3500 },
-  { id: 'curralinho', name: 'Cabana Camping Curralinho', area: 6.5, kitPrice: 5122, tilesStainPrice: 0, fixturesPrice: 650 },
-  { id: 'praia-do-forte', name: 'Chalé Praia do Forte', area: 21, kitPrice: 12675, tilesStainPrice: 6875, fixturesPrice: 2100 },
-  { id: 'arembepe-plus', name: 'Chalé Arembepe Plus', area: 20, kitPrice: 13000, tilesStainPrice: 6700, fixturesPrice: 0 },
-  { id: 'arembepe', name: 'Cabana Camping Arembepe', area: 10.5, kitPrice: 8334, tilesStainPrice: 0, fixturesPrice: 1050 },
-  { id: 'baixios', name: 'Chalé Baixios', area: 32, kitPrice: 20800, tilesStainPrice: 9650, fixturesPrice: 3200 },
-  { id: 'casa-caymmi', name: 'Casa Caymmi', area: 60, kitPrice: 35500, tilesStainPrice: 12850, fixturesPrice: 6000 },
-  { id: 'chale-vilas-do-atlantico', name: 'Chalé Vilas do Atlântico', area: 35, kitPrice: 21000, tilesStainPrice: 10250, fixturesPrice: 3500 },
+  { id: 'guarajuba', name: 'Chalé Guarajuba', area: 52, kitPrice: 38870, tilesStainPrice: 12210, fixturesPrice: 5200 },
+  { id: 'itacimirim', name: 'Chalé Itacimirim', area: 35, kitPrice: 26160, tilesStainPrice: 10250, fixturesPrice: 3500 },
+  { id: 'curralinho', name: 'Cabana Camping Curralinho', area: 6.5, kitPrice: 5890, tilesStainPrice: 0, fixturesPrice: 650 },
+  { id: 'praia-do-forte', name: 'Chalé Praia do Forte', area: 21, kitPrice: 14580, tilesStainPrice: 6875, fixturesPrice: 2100 },
+  { id: 'arembepe-plus', name: 'Chalé Arembepe Plus', area: 20, kitPrice: 14950, tilesStainPrice: 6700, fixturesPrice: 0 },
+  { id: 'arembepe', name: 'Cabana Camping Arembepe', area: 10.5, kitPrice: 9580, tilesStainPrice: 0, fixturesPrice: 1050 },
+  { id: 'baixios', name: 'Chalé Baixios', area: 32, kitPrice: 23920, tilesStainPrice: 9650, fixturesPrice: 3200 },
+  { id: 'casa-caymmi', name: 'Casa Caymmi', area: 60, kitPrice: 40830, tilesStainPrice: 12850, fixturesPrice: 6000 },
+  { id: 'chale-vilas-do-atlantico', name: 'Chalé Vilas do Atlântico', area: 35, kitPrice: 24150, tilesStainPrice: 10250, fixturesPrice: 3500 },
+  { id: 'chale-escandinavo-trancoso', name: 'Chalé Escandinavo Trancoso', area: 35, kitPrice: 40250, tilesStainPrice: 10250, fixturesPrice: 3500 },
 ];
 
 export function getModelDiscountRate(modelIdOrName?: string, customDiscountRate?: number | string): number {
-  if (customDiscountRate !== undefined && customDiscountRate !== null && customDiscountRate !== "") {
-    const rate = parseFloat(customDiscountRate.toString());
-    if (!isNaN(rate) && rate > 0) {
-      return rate > 1 ? rate / 100 : rate;
-    }
-  }
-  if (!modelIdOrName) return 0.05; // Geral: 5%
-  const normalized = modelIdOrName.toLowerCase();
-  if (normalized.includes('vilas') || normalized.includes('villas') || normalized.includes('atlantico')) {
-    return 0.15; // Vilas do Atlântico: 15%
-  }
-  return 0.05; // Geral: 5%
+  return 0.10; // 10% fixos para todos os kits na nova promoção (remove regras de 15% etc)
 }
 
 export const CARD_RATES: [number, number][] = [
@@ -51,8 +41,8 @@ export function calculateInstallmentValue(
   const rate = rateInfo ? rateInfo[1] : 0;
   
   // Se tem desconto, não tem parcelamento sem juros (isInterestFree = false para todas)
-  // Se não tem desconto, permite até 3x sem juros (isInterestFree = true se installments <= 3)
-  const isInterestFree = !hasDiscount && installments <= 3;
+  // Se não tem desconto, permite até 18x sem juros (isInterestFree = true se installments <= 18)
+  const isInterestFree = !hasDiscount && installments <= 18;
   
   const totalWithInterest = isInterestFree 
     ? total 
@@ -69,9 +59,9 @@ export function calculateInstallmentValue(
 
 // Per-m² rates for custom kit
 export function getTimberRate(area: number): number {
-  if (area <= 12) return 788;
-  if (area <= 80) return 650;
-  return 600;
+  if (area <= 12) return 906;
+  if (area <= 80) return 748;
+  return 690;
 }
 /** Telhas e Stain — precificação progressiva em 3 faixas */
 export const TILES_BASE = 2000;
@@ -349,7 +339,7 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
     } else if (state.foundationType === 'wooden_eucalyptus') {
       items.push({ 
         label: `Base Estrutural de Madeira + Assoalho${isInc ? ' (Incluso)' : ''}`, 
-        value: isInc ? 0 : (area * 150) 
+        value: isInc ? 0 : (area * 173) 
       });
       items.push({ 
         label: `Fundação Sapatas em Eucalipto${isInc ? ' (Incluso)' : ''}`, 
@@ -358,7 +348,7 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
     } else if (state.foundationType === 'wooden_masonry') {
       items.push({ 
         label: `Base Estrutural de Madeira + Assoalho${isInc ? ' (Incluso)' : ''}`, 
-        value: isInc ? 0 : (area * 150) 
+        value: isInc ? 0 : (area * 173) 
       });
       items.push({ 
         label: `Fundação Sapatas Manilhas de Alvenaria${isInc ? ' (Incluso)' : ''}`, 
@@ -490,7 +480,7 @@ export function calculateProposalItems(
     } else if (data.foundationType === 'wooden_eucalyptus') {
       items.push({ 
         label: `Base Estrutural de Madeira + Assoalho${isInc ? ' (Incluso)' : ''}`, 
-        value: isInc ? 0 : (area * 150) 
+        value: isInc ? 0 : (area * 173) 
       });
       let foundationValue = getEucalyptusFoundation(area);
       if (data.foundationPriceOverride !== undefined) {
@@ -503,7 +493,7 @@ export function calculateProposalItems(
     } else if (data.foundationType === 'wooden_masonry') {
       items.push({ 
         label: `Base Estrutural de Madeira + Assoalho${isInc ? ' (Incluso)' : ''}`, 
-        value: isInc ? 0 : (area * 150) 
+        value: isInc ? 0 : (area * 173) 
       });
       let foundationValue = getMasonryFoundation(area);
       if (data.foundationPriceOverride !== undefined) {
@@ -584,4 +574,28 @@ export function calculateProposalItems(
   const total = subtotal - discount + freight + additionalFreight + additionalTravelCost;
 
   return { items, freight, additionalFreight, additionalTravelCost, subtotal, total, discount, materialSubtotal, laborTotal };
+}
+
+export function getPaymentBases(
+  items: LineItem[],
+  totalFinal: number
+): { creditCardBase: number; pixBase: number } {
+  let creditCardBase = 0;
+  
+  items.forEach(item => {
+    const l = item.label.toLowerCase();
+    if (
+      l.includes('kit madeiramento') || 
+      l.includes('base estrutural')
+    ) {
+      creditCardBase += item.value;
+    }
+  });
+
+  // O PIX é o restante do totalFinal (que já embute fretes e eventuais descontos aplicados globalmente na proposta).
+  // A creditCardBase usa o valor CHEIO do kit (já que ele parcelará no cartão, não recebe o desc a vista na base do cartão).
+  let pixBase = totalFinal - creditCardBase;
+  if (pixBase < 0) pixBase = 0;
+
+  return { creditCardBase, pixBase };
 }
