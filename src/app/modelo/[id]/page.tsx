@@ -1127,8 +1127,8 @@ export default function ModelDetailPage() {
                             {/* Lógica de parcelamento híbrido */}
                             {(() => {
                               const baseParceladaCartao = includeBaseInSim || simModalidade === 'turnkey' 
-                                ? (kitFull + modelBasePrice)
-                                : kitFull;
+                                ? (kitBasePriceNum + basePrice)
+                                : kitBasePriceNum;
                               
                               const complementosPix = totalAPrazo - baseParceladaCartao;
 
@@ -1198,7 +1198,6 @@ export default function ModelDetailPage() {
                               </div>
                             </div>
                           </div>
-                        </div>
                       );
                     })()}
 
