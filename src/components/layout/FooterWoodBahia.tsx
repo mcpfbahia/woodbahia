@@ -114,7 +114,7 @@ export const FooterWoodBahia = () => {
             </p>
             <div className="rounded-2xl bg-white/5 p-5 border border-white/10">
               <span className="block text-xs font-bold uppercase tracking-widest text-primary-foreground/40 mb-2">Área de Atuação</span>
-              <p className="text-sm font-medium leading-relaxed">Atendimento para construção de casas e chalés pré-fabricados na Bahia e Sergipe.</p>
+              <p className="text-sm font-medium leading-relaxed">Kits para todo o Brasil. Chave na Mão exclusivo num raio de até 160km de nossa sede.</p>
             </div>
           </div>
 

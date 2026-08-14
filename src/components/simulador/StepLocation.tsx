@@ -120,18 +120,18 @@ export function StepLocation({ initialData, onNext, onBack }: StepLocationProps)
         <div className="space-y-2 pt-4 border-t border-border/30">
           <div className="flex justify-between items-center">
             <Label htmlFor="clientDistance" className="text-sm font-semibold">Distância de Lauro de Freitas (em km)</Label>
-            <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider bg-muted px-2 py-0.5 rounded">Opcional</span>
+            <span className="text-[10px] text-accent uppercase font-bold tracking-wider bg-accent/10 px-2 py-0.5 rounded border border-accent/20">Importante</span>
           </div>
           <Input 
             id="clientDistance" 
             type="number"
-            placeholder="Ex: 250 (Deixe em branco se for Salvador ou Região Metropolitana)" 
+            placeholder="Ex: 150 (Deixe em branco se for Lauro de Freitas ou RMS)" 
             value={distance}
             onChange={(e) => setDistance(e.target.value === '' ? '' : Number(e.target.value))}
             className="bg-background/50 h-12"
           />
           <p className="text-[11px] text-muted-foreground italic leading-relaxed">
-            *Caso a distância da obra seja maior que 200 km da fábrica, cobramos frete e deslocamento adicionais regulamentados por km.
+            *A opção de obra Chave na Mão está disponível apenas num raio de até 160km da nossa sede. Para outros locais, onde não administramos a obra, fornecemos o Kit e fazemos a indicação de carpinteiros parceiros responsáveis e capacitados (Montagem Parceira).
           </p>
         </div>
       </div>

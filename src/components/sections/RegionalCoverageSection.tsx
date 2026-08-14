@@ -39,11 +39,11 @@ export const RegionalCoverageSection = () => {
             Onde Construímos
           </span>
           <h2 className="section-title text-3xl font-bold md:text-5xl text-[#4A2B1D] mb-6">
-            Atendemos toda a <br />
-            <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent italic">Bahia e região</span>
+            Kits de madeira para todo o <br />
+            <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent italic">Brasil</span>
           </h2>
           <p className="mx-auto max-w-2xl text-base text-muted-foreground md:text-lg lg:text-xl mt-4">
-            Levamos o sonho da casa própria em madeira para diversas regiões do estado, com logística própria e equipe especializada.
+            Fornecemos kits para todo o país. Em áreas fora do nosso raio de atendimento Chave na Mão (160km da sede), fazemos a indicação de carpinteiros capacitados e responsáveis para a montagem.
           </p>
         </ScrollReveal>
       </div>

@@ -19,7 +19,7 @@ const STATUS_CONFIG: Record<'rascunho' | 'enviada' | 'fechada' | 'perdida', { la
   fechada: { label: 'Ganha', bg: 'bg-green-50', text: 'text-green-700', border: 'border-green-200/60', emoji: '🤝' },
   perdida: { label: 'Perdida', bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-200/60', emoji: '❌' },
 };
-import { CABIN_MODELS, calculateProposalItems, calculateInstallmentValue, getTilesStainPrice, getFixturesPrice, type KitType, type ProposalData, type ExtraItem, type FoundationType, type PaintType, type CabinModel } from '~/lib/pricing';
+import { CABIN_MODELS, calculateProposalItems, calculateInstallmentValue, getTilesStainPrice, getFixturesPrice, getModelDiscountRate, getPaymentBases, type KitType, type ProposalData, type ExtraItem, type FoundationType, type PaintType, type CabinModel } from '~/lib/pricing';
 import { generateProposalPDF, getIncludedItems, getNotIncludedItems } from '~/lib/proposal-pdf';
 import {
   Select,
@@ -633,6 +633,9 @@ export default function PropostasPage() {
   const proposalData = getProposalData();
   const summary = calculateProposalItems(proposalData, cabinModels);
   const selectedModel = cabinModels.find(m => m.id === modelId);
+  const CASH_DISCOUNT = getModelDiscountRate(selectedModel?.id || selectedModel?.name, selectedModel?.discountRate);
+  const { creditCardBase, pixBase } = getPaymentBases(summary.items, summary.total);
+  const kitTotalAVista = creditCardBase * (1 - CASH_DISCOUNT);
 
   // Suggested values (without overrides)
   const suggested = calculateProposalItems({
@@ -1638,12 +1641,23 @@ export default function PropostasPage() {
                              </div>
                           </div>
 
+                          <div className="space-y-2 py-3">
+                            <div className="flex justify-between items-center px-2">
+                              <span className="text-[10px] md:text-xs text-muted-foreground font-bold uppercase tracking-widest">Valor do Kit (Sem Desconto)</span>
+                              <span className="text-sm md:text-base font-bold text-foreground">{fmt(creditCardBase)}</span>
+                            </div>
+                            <div className="flex justify-between items-center px-2">
+                              <span className="text-[10px] md:text-xs text-green-700/80 font-bold uppercase tracking-widest">Kit à Vista ({CASH_DISCOUNT * 100}% desc.)</span>
+                              <span className="text-sm md:text-base font-bold text-green-700">{fmt(kitTotalAVista)}</span>
+                            </div>
+                          </div>
+
                           <div className="bg-primary p-4 md:p-5 rounded-2xl text-white text-center shadow-lg transform rotate-[-1deg] border-2 border-primary-foreground/20">
                              <p className="text-[10px] uppercase font-bold opacity-80 mb-1 tracking-widest flex items-center justify-center gap-2">
                                 <span className="inline-block w-2 h-2 bg-white rounded-full animate-pulse" />
-                                Condição Facilitada
+                                Condição Facilitada do Kit
                              </p>
-                             <p className="text-xs md:text-sm font-bold">💳 <span className="opacity-80">Parcele em 18x de</span> <span className="text-lg md:text-2xl font-black">{fmt(calculateInstallmentValue(summary.total, 18, summary.discount > 0).installment)}</span></p>
+                             <p className="text-xs md:text-sm font-bold">💳 <span className="opacity-80">Parcele o kit em 18x s/ juros de</span> <span className="text-lg md:text-2xl font-black">{fmt(calculateInstallmentValue(creditCardBase, 18).installment)}</span></p>
                           </div>
                           
                           <p className="text-[10px] text-center text-muted-foreground italic px-4">Valores sujeitos a alteração conforme tributação regional e prazos de operadora.</p>

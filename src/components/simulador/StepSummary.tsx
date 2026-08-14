@@ -36,7 +36,14 @@ export function StepSummary({ state, onBack, onReset }: Props) {
 
   const CASH_DISCOUNT = getModelDiscountRate(state.model?.id || state.model?.name, state.model?.discountRate);
   const totalAVista = Math.round(total - (creditCardBase * CASH_DISCOUNT));
-  const metadePix = total / 2;
+  
+  const isMadeiramento = state.kitType === 'madeiramento';
+  const sinalPix = isMadeiramento ? total * 0.3 : total / 2;
+  const saldoPix = isMadeiramento ? total * 0.7 : total / 2;
+  const pctSinal = isMadeiramento ? '30%' : '50%';
+  const pctSaldo = isMadeiramento ? '70%' : '50%';
+  const descSinal = isMadeiramento ? 'Na assinatura do contrato' : 'Para iniciar o projeto';
+  const descSaldo = isMadeiramento ? '24h antes do embarque do kit (Saída da fábrica)' : 'Na saída da fábrica';
 
   // Build WhatsApp message with full report
   const whatsappMessage = [
@@ -58,12 +65,12 @@ export function StepSummary({ state, onBack, onReset }: Props) {
     `💚 *À Vista (Desconto no Kit): ${fmt(totalAVista)}*`,
     ``,
     `📅 *OPÇÃO 1: PIX/BOLETO*`,
-    `• Sinal (50%): ${fmt(metadePix)} — Para iniciar o projeto`,
-    `• Saldo Final (50%): ${fmt(metadePix)} — Na saída da fábrica`,
+    `• Sinal (${pctSinal}): ${fmt(sinalPix)} — ${descSinal}`,
+    `• Saldo Final (${pctSaldo}): ${fmt(saldoPix)} — ${descSaldo}`,
     ``,
     `💳 *OPÇÃO 2: PARCELAMENTO (ATÉ 18X SEM JUROS)*`,
     pixBase > 0 ? `*⚠️ Mão de Obra e Complementos (Via PIX)*: ${fmt(pixBase)} pago durante a obra.` : ``,
-    `*18x S/ Juros do Kit Madeiramento*: ${fmt(calculateInstallmentValue(creditCardBase, 18).installment)} por mês.`,
+    `*18x Sem Juros do Kit Madeiramento*: ${fmt(calculateInstallmentValue(creditCardBase, 18).installment)} por mês.`,
     ``,
     `*Status:* Gostaria de uma análise de crédito ou tem dúvidas sobre a proposta?`,
   ].filter(Boolean).join('\n');
@@ -230,8 +237,8 @@ export function StepSummary({ state, onBack, onReset }: Props) {
               <h3 className="font-display font-semibold text-base mb-4">Condições de Pagamento (Boleto/PIX)</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {[
-                  { label: 'Sinal (50%)', value: metadePix, desc: 'Para iniciar o projeto' },
-                  { label: 'Saldo Final (50%)', value: metadePix, desc: 'Na saída da fábrica' },
+                  { label: `Sinal (${pctSinal})`, value: sinalPix, desc: descSinal },
+                  { label: `Saldo Final (${pctSaldo})`, value: saldoPix, desc: descSaldo },
                 ].map((p, i) => (
                   <motion.div
                     key={p.label}

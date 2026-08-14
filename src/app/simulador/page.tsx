@@ -347,7 +347,7 @@ export default function Index() {
             <StepKitSelect
               key="kit-standard"
               mode="standard"
-              isEligibleForFull={['BA', 'SE'].includes(clientData.state)}
+              isEligibleForTurnkey={clientData.distance === undefined || clientData.distance <= 160}
               model={model}
               kitType={kitType as Exclude<KitType, 'custom'> | null}
               kitAddons={kitAddons}
@@ -363,7 +363,7 @@ export default function Index() {
             <StepKitSelect
               key="kit-custom"
               mode="custom"
-              isEligibleForFull={['BA', 'SE'].includes(clientData.state)}
+              isEligibleForTurnkey={clientData.distance === undefined || clientData.distance <= 160}
               customArea={customArea}
               customOptions={customOptions}
               slidingDoor={slidingDoor}

@@ -432,8 +432,13 @@ export function generateProposalPDF(
   y += 14;
 
   // ─── PAYMENT CONDITIONS ───
-  // No PIX/Boleto o pagamento também é considerado com 10% de desconto
-  const metade = totalAVista * 0.5;
+  const isMadeiramento = data.kitType === 'madeiramento';
+  const pctSinal = isMadeiramento ? '30%' : '50%';
+  const pctSaldo = isMadeiramento ? '70%' : '50%';
+  const sinalPix = isMadeiramento ? totalAVista * 0.3 : totalAVista * 0.5;
+  const saldoPix = isMadeiramento ? totalAVista * 0.7 : totalAVista * 0.5;
+  const descSinal = isMadeiramento ? 'Na assinatura do contrato (PIX)' : 'Na assinatura do contrato (PIX) para iniciar projeto';
+  const descSaldo = isMadeiramento ? '24h antes do embarque do kit (Saída da fábrica)' : 'Na saída da fábrica / Conclusão';
 
   // Helper: bold label+value, normal description
   const drawPaymentLine = (label: string, value: string, desc: string, lineY: number) => {
@@ -450,14 +455,13 @@ export function generateProposalPDF(
   doc.text('CONDIÇÕES DE PAGAMENTO (PIX / BOLETO)', margin, y);
   y += 6;
 
-  // À vista com desconto no madeiramento e base
-  drawPaymentLine(`À Vista (${discountRate * 100}% desc. no madeiramento/base):`, fmt(totalAVista), 'No PIX ou Transferência Bancária', y);
+  // À vista com desconto unificado
+  drawPaymentLine(`À Vista (${discountRate * 100}% de desconto):`, fmt(totalAVista), 'No PIX ou Transferência Bancária', y);
   y += 5;
 
-  // Novo modelo 50/50 (pagamento do material já com desconto)
-  drawPaymentLine('Sinal (50%):', fmt(metade), 'Na assinatura do contrato (PIX)', y);
+  drawPaymentLine(`Sinal (${pctSinal}):`, fmt(sinalPix), descSinal, y);
   y += 5;
-  drawPaymentLine('Saldo Final (50%):', fmt(metade), '24h antes do embarque do kit (Saída da fábrica)', y);
+  drawPaymentLine(`Saldo Final (${pctSaldo}):`, fmt(saldoPix), descSaldo, y);
   y += 8;
 
   // ─── CREDIT CARD INSTALLMENT TABLE ───
@@ -476,7 +480,7 @@ export function generateProposalPDF(
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
   doc.setTextColor(...COLORS.foreground);
-  doc.text('PARCELE O SEU KIT DE MADEIRAMENTO EM ATÉ 18X', margin, y);
+  doc.text('PARCELE O SEU KIT DE MADEIRAMENTO EM ATÉ 18X SEM JUROS', margin, y);
   
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);

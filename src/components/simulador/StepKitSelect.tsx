@@ -34,7 +34,7 @@ const itemVariants = {
 
 interface StandardProps {
   mode: 'standard';
-  isEligibleForFull: boolean;
+  isEligibleForTurnkey: boolean;
   model: CabinModel;
   kitType: Exclude<KitType, 'custom'> | null;
   kitAddons: KitAddons;
@@ -48,7 +48,7 @@ interface StandardProps {
 
 interface CustomProps {
   mode: 'custom';
-  isEligibleForFull: boolean;
+  isEligibleForTurnkey: boolean;
   customArea: number;
   customOptions: CustomOptions;
   slidingDoor: boolean;
@@ -66,7 +66,7 @@ export function StepKitSelect(props: Props) {
   return <StandardMode {...props} />;
 }
 
-function StandardMode({ isEligibleForFull, model, kitType, kitAddons, slidingDoor, onKitSelect, onKitAddonsChange, onSlidingDoorChange, onBack, onNext }: StandardProps) {
+function StandardMode({ isEligibleForTurnkey, model, kitType, kitAddons, slidingDoor, onKitSelect, onKitAddonsChange, onSlidingDoorChange, onBack, onNext }: StandardProps) {
   const showSlidingDoor = kitType === 'parceira' || kitType === 'turnkey';
   return (
     <motion.div
@@ -90,7 +90,7 @@ function StandardMode({ isEligibleForFull, model, kitType, kitAddons, slidingDoo
       >
         {KIT_OPTIONS.map((opt) => {
           const isSelected = kitType === opt.id;
-          const isDisabled = !isEligibleForFull && (opt.id === 'parceira' || opt.id === 'turnkey');
+          const isDisabled = !isEligibleForTurnkey && opt.id === 'turnkey';
           return (
             <motion.button
               key={opt.id}
@@ -129,7 +129,7 @@ function StandardMode({ isEligibleForFull, model, kitType, kitAddons, slidingDoo
               <span className="text-sm text-muted-foreground mt-1">{opt.desc}</span>
               {isDisabled && (
                 <span className="text-xs text-destructive font-medium mt-2 block">
-                  * Indisponível para o seu estado (Kit com montagem apenas para Bahia e Sergipe).
+                  * Apenas para projetos de 2+ unidades (ex: pousadas), consulte-nos
                 </span>
               )}
             </motion.button>
@@ -197,7 +197,7 @@ function StandardMode({ isEligibleForFull, model, kitType, kitAddons, slidingDoo
   );
 }
 
-function CustomMode({ isEligibleForFull, customArea, customOptions, slidingDoor, onCustomAreaChange, onCustomChange, onSlidingDoorChange, onBack, onNext }: CustomProps) {
+function CustomMode({ isEligibleForTurnkey, customArea, customOptions, slidingDoor, onCustomAreaChange, onCustomChange, onSlidingDoorChange, onBack, onNext }: CustomProps) {
   return (
     <motion.div
       initial={{ opacity: 0, x: 40 }}
@@ -234,27 +234,20 @@ function CustomMode({ isEligibleForFull, customArea, customOptions, slidingDoor,
         <p className="text-sm font-semibold mb-4 font-display">Itens adicionais (Kit Madeiramento incluso):</p>
         <div className="flex flex-col gap-3">
           {CUSTOM_ADDONS.map((addon) => {
-            const isDisabled = !isEligibleForFull && addon.key === 'labor';
             return (
-              <div key={addon.key} className={cn("flex flex-col gap-1", isDisabled && "opacity-60")}>
+              <div key={addon.key} className="flex flex-col gap-1">
                 <div className="flex items-center gap-3">
                   <Checkbox
                     id={`cust-${addon.key}`}
                     checked={customOptions[addon.key]}
-                    disabled={isDisabled}
                     onCheckedChange={(checked) =>
                       onCustomChange({ ...customOptions, [addon.key]: !!checked })
                     }
                   />
-                  <Label htmlFor={`cust-${addon.key}`} className={cn("text-sm cursor-pointer", isDisabled && "cursor-not-allowed")}>
+                  <Label htmlFor={`cust-${addon.key}`} className="text-sm cursor-pointer">
                     {addon.label}
                   </Label>
                 </div>
-                {isDisabled && (
-                  <span className="text-[11px] text-destructive pl-7">
-                    * Indisponível para o seu estado
-                  </span>
-                )}
               </div>
             );
           })}
