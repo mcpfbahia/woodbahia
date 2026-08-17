@@ -5,7 +5,7 @@ export function middleware(request: NextRequest) {
   const host = request.headers.get('host');
   
   // Verifica se o acesso está sendo feito pelo domínio antigo (.site)
-  if (host && host.includes('woodbahia.com')) {
+  if (host === 'woodbahia.com') {
     const url = request.nextUrl.clone();
     url.host = 'www.woodbahia.com';
     url.protocol = 'https';
