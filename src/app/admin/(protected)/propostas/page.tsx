@@ -8,7 +8,7 @@ import { Label } from '~/components/ui/label';
 import { Card, CardContent } from '~/components/ui/card';
 import { Switch } from '~/components/ui/switch';
 import { Separator } from '~/components/ui/separator';
-import { FileDown, User, Home, Settings2, Tag, LayoutDashboard, Plus, Trash2, Layers, Paintbrush, Edit2, Loader2, ArrowLeft, Eye, FileText, Search } from 'lucide-react';
+import { FileDown, User, Home, Settings2, Tag, LayoutDashboard, Plus, Trash2, Layers, Paintbrush, Edit2, Loader2, ArrowLeft, Eye, FileText, Search, Undo2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { db } from "~/lib/firebase";
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy, serverTimestamp, limit, startAfter } from "firebase/firestore";
@@ -198,6 +198,7 @@ export default function PropostasPage() {
   const [customIncludedItems, setCustomIncludedItems] = useState<string[] | undefined>(undefined);
   const [customNotIncludedItems, setCustomNotIncludedItems] = useState<string[] | undefined>(undefined);
   const [foundationIncluded, setFoundationIncluded] = useState<boolean>(false);
+  const [itemOverrides, setItemOverrides] = useState<Record<string, { value?: number, deleted?: boolean }>>({});
 
   // Parsers de área e preço
   const parsePriceToBRL = (val: any): number => {
@@ -264,7 +265,9 @@ export default function PropostasPage() {
     setDistanceFromFactory(undefined);
     setFoundationPriceOverride(undefined);
     setMasonryBathroomPriceOverride(undefined);
-    setPaintPriceOverride(undefined);
+    setCustomNotIncludedItems(undefined);
+    setFoundationIncluded(false);
+    setItemOverrides({});
   }, [modelId, kitType, customArea]);
 
   // Seleção automática dos opcionais padrão ao alterar modalidade
@@ -496,6 +499,8 @@ export default function PropostasPage() {
     setFoundationIncluded(!!d.foundationIncluded);
     setCustomIncludedItems(d.customIncludedItems);
     setCustomNotIncludedItems(d.customNotIncludedItems);
+    setFoundationIncluded(!!d.foundationIncluded);
+    setItemOverrides(d.itemOverrides || {});
     
     setView('form');
   };
@@ -553,6 +558,7 @@ export default function PropostasPage() {
     setFoundationIncluded(false);
     setCustomIncludedItems(undefined);
     setCustomNotIncludedItems(undefined);
+    setItemOverrides({});
     
     setView('form');
   };
@@ -594,6 +600,7 @@ export default function PropostasPage() {
     customNotIncludedItems,
     status,
     observations: observations.trim() || undefined,
+    itemOverrides,
   });
 
   const handleShowSummary = () => {
@@ -655,67 +662,78 @@ export default function PropostasPage() {
 
   const getSugg = (label: string) => suggested.items.find(i => i.label.toLowerCase().includes(label.toLowerCase()))?.value ?? 0;
 
-  const renderSummaryItem = (item: { label: string, value: number }) => {
-    const label = item.label.toLowerCase();
-    
-    let setter: ((v: any) => void) | null = null;
-    let isOverridden = false;
-    let onReset = () => {};
+  const renderSummaryItem = (item: { label: string, value: number, deleted?: boolean }) => {
+    const label = item.label;
 
-    if (label.includes('madeiramento')) {
-      setter = setKitPriceOverride;
-      isOverridden = kitPriceOverride !== undefined;
-      onReset = () => setKitPriceOverride(undefined);
-    } else if (label.includes('portas') || label.includes('janelas')) {
-      setter = setFixturesPriceOverride;
-      isOverridden = fixturesPriceOverride !== undefined;
-      onReset = () => setFixturesPriceOverride(undefined);
-    } else if (label.includes('telhas') || label.includes('stain')) {
-      setter = setTilesStainPriceOverride;
-      isOverridden = tilesStainPriceOverride !== undefined;
-      onReset = () => setTilesStainPriceOverride(undefined);
-    } else if (label.includes('mão de obra')) {
-      setter = setLaborPriceOverride;
-      isOverridden = laborPriceOverride !== undefined;
-      onReset = () => setLaborPriceOverride(undefined);
-    } else if (label.includes('elétrica')) {
-      setter = setElectricalPriceOverride;
-      isOverridden = electricalPriceOverride !== undefined;
-      onReset = () => setElectricalPriceOverride(undefined);
-    } else if (label.includes('vidros')) {
-      setter = setGlassPriceOverride;
-      isOverridden = glassPriceOverride !== undefined;
-      onReset = () => setGlassPriceOverride(undefined);
-    } else if (label.includes('projeto')) {
-      setter = setProjectPriceOverride;
-      isOverridden = projectPriceOverride !== undefined;
-      onReset = () => setProjectPriceOverride(undefined);
-    } else if (label.includes('base') || label.includes('sapata') || label.includes('manilha') || label.includes('fundação') || label.includes('radier')) {
-      if (foundationIncluded) {
-        return <span className="font-bold text-green-700 bg-green-50 px-2.5 py-0.5 rounded-full text-[10px] border border-green-200 uppercase tracking-wider">Incluso</span>;
-      }
-      setter = setFoundationPriceOverride;
-      isOverridden = foundationPriceOverride !== undefined;
-      onReset = () => setFoundationPriceOverride(undefined);
-    } else if (label.includes('banheiro')) {
-      setter = setMasonryBathroomPriceOverride;
-      isOverridden = masonryBathroomPriceOverride !== undefined;
-      onReset = () => setMasonryBathroomPriceOverride(undefined);
-    } else if (label.includes('pintura')) {
-      setter = setPaintPriceOverride;
-      isOverridden = paintPriceOverride !== undefined;
-      onReset = () => setPaintPriceOverride(undefined);
+    if (label.includes('Incluso') && item.value === 0) {
+      return <span className="font-bold text-green-700 bg-green-50 px-2.5 py-0.5 rounded-full text-[10px] border border-green-200 uppercase tracking-wider">Incluso</span>;
     }
 
-    if (!setter) return <span className="font-bold text-primary/80">{fmt(item.value)}</span>;
+    if (item.deleted) {
+      return (
+        <div className="flex items-center gap-2">
+          <span className="font-bold text-red-500/80 bg-red-50 px-2.5 py-0.5 rounded-full text-[10px] border border-red-200 uppercase tracking-wider">Excluído</span>
+          <Button variant="ghost" size="icon" className="h-6 w-6 text-green-600 hover:bg-green-50" onClick={() => {
+            setItemOverrides(prev => {
+              const copy = { ...prev };
+              if (copy[label]) {
+                copy[label] = { ...copy[label], deleted: false };
+              }
+              return copy;
+            });
+          }}>
+            <Undo2 className="h-3 w-3" />
+          </Button>
+        </div>
+      );
+    }
+
+    const isOverridden = itemOverrides[label]?.value !== undefined;
+    const onReset = () => {
+      setItemOverrides(prev => {
+        const copy = { ...prev };
+        if (copy[label]) {
+          const newObj = { ...copy[label] };
+          delete newObj.value;
+          if (Object.keys(newObj).length === 0) delete copy[label];
+          else copy[label] = newObj;
+        }
+        return copy;
+      });
+    };
+
+    const onChange = (v: number) => {
+      setItemOverrides(prev => ({
+        ...prev,
+        [label]: { ...prev[label], value: v }
+      }));
+    };
+
+    const onDelete = () => {
+      setItemOverrides(prev => ({
+        ...prev,
+        [label]: { ...prev[label], deleted: true }
+      }));
+    };
 
     return (
-      <InlineEditablePrice 
-        value={item.value} 
-        onChange={setter} 
-        onReset={onReset}
-        isOverridden={isOverridden}
-      />
+      <div className="flex items-center gap-2">
+        <InlineEditablePrice 
+          value={item.value} 
+          onChange={onChange} 
+          onReset={onReset}
+          isOverridden={isOverridden}
+        />
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="h-6 w-6 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+          onClick={onDelete}
+          title="Excluir este item"
+        >
+          <Trash2 className="h-4 w-4" strokeWidth={2.5} />
+        </Button>
+      </div>
     );
   };
 
@@ -1461,8 +1479,8 @@ export default function PropostasPage() {
                               return !extraItems.some(extra => extra.description === item.label);
                             })
                             .map((item, i) => (
-                              <div key={i} className="flex justify-between text-sm py-2 border-b border-primary/5 items-center">
-                                <span className="text-muted-foreground font-medium">{item.label}</span>
+                              <div key={i} className={`flex justify-between text-sm py-2 border-b border-primary/5 items-center ${item.deleted ? 'opacity-50 grayscale' : ''}`}>
+                                <span className={`text-muted-foreground font-medium ${item.deleted ? 'line-through' : ''}`}>{item.label}</span>
                                 {renderSummaryItem(item)}
                               </div>
                             ))}

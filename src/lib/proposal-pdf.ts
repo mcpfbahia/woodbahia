@@ -313,7 +313,7 @@ export function generateProposalPDF(
   doc.text('INVESTIMENTO', margin, y);
   y += 4;
 
-  const tableBody = items.map(item => {
+  const tableBody = items.filter(i => !i.deleted).map(item => {
     const isFoundationItem = item.label.toLowerCase().includes('sapata') || 
                              item.label.toLowerCase().includes('base radier') || 
                              item.label.toLowerCase().includes('base estrutural') || 
@@ -374,64 +374,31 @@ export function generateProposalPDF(
 
   y = (doc as any).lastAutoTable.finalY + 6;
 
-  // ─── CHECK PAGE BREAK FOR TOTALS AND BANNERS ───
-  // Ensure we have enough space for the Totals box (~36), Prazos banner (~18), and padding
-  y = checkPageBreak(doc, y, 70);
+  // ─── UNIFIED PAYMENT BLOCK ───
+  y = checkPageBreak(doc, y, 160); // Ensure space for the whole block including 18 rows
+  const boxStartY = y;
 
-  // Totals box
-  const totalsHeight = discount > 0 ? 36 : 24;
+  // 1. HEADER TOTAL (Filled brown)
   doc.setFillColor(...COLORS.accent);
-  doc.roundedRect(margin, y, contentWidth, totalsHeight, 3, 3, 'F');
+  doc.roundedRect(margin, y, contentWidth, 20, 2, 2, 'F');
+  doc.rect(margin, y + 10, contentWidth, 10, 'F'); // Flat bottom
 
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10);
+  doc.setFontSize(14);
   doc.setTextColor(...COLORS.white);
+  doc.text(`TOTAL DO INVESTIMENTO: ${fmt(totalFinal)}`, margin + contentWidth / 2, y + 13, { align: 'center' });
+  
+  y += 20;
 
-  if (discount > 0) {
-    doc.text(`Subtotal Kit: ${fmt(subtotal)}  |  Frete Compartilhado: ${fmt(freight)}`, margin + 6, y + 8);
-    
-    // Destaque do Desconto Especial
-    doc.setTextColor(180, 255, 180); // Verde bem claro para contrastar com o fundo
-    doc.setFontSize(11);
-    doc.text(`DESCONTO BONUS APLICADO: -${fmt(discount)}`, margin + 6, y + 16);
-    
-    // Restaura estilo para o total
-    doc.setTextColor(...COLORS.white);
-    doc.setFontSize(14);
-    doc.text(`TOTAL FINAL: ${fmt(totalFinal)}`, margin + 6, y + 28);
-  } else {
-    doc.setFontSize(14);
-    doc.text(`TOTAL DO INVESTIMENTO: ${fmt(totalFinal)}`, margin + 6, y + 14);
-  }
-
-  y += totalsHeight + 4;
-
-  // ─── PRAZOS BANNER (right below totals) ───
-  const hasLabor = ['parceira', 'turnkey'].includes(data.kitType) || (data.kitType === 'custom' && data.includeLabor);
-  {
-    const bannerH = hasLabor ? 18 : 12;
-    doc.setFillColor(...COLORS.primary);
-    doc.roundedRect(margin, y, contentWidth, bannerH, 2, 2, 'F');
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8.5);
-    doc.setTextColor(...COLORS.white);
-    doc.text('Prazo de entrega: 15 a 60 dias uteis, conforme complexidade do projeto.', margin + 6, y + 7);
-    if (hasLabor) {
-      doc.text(`Prazo de montagem: ${area} dias uteis (1 dia por m2).`, margin + 6, y + 13);
-    }
-    y += bannerH + 2;
-  }
-
-  // ─── PROGRESSIVE DISCOUNT NOTE ───
-  doc.setFillColor(230, 245, 230);
-  doc.roundedRect(margin, y, contentWidth, 10, 2, 2, 'F');
+  // 2. À VISTA SECTION
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8);
+  doc.setFontSize(11);
   doc.setTextColor(...COLORS.green);
-  doc.text('Descontos progressivos para pedidos a partir de 2 unidades. Consulte condicoes especiais!', margin + 6, y + 6.5);
-  y += 14;
-
-  // ─── PAYMENT CONDITIONS ───
+  doc.text(`OPÇÃO 1: À VISTA NO PIX (${discountRate * 100}% DE DESCONTO) — ${fmt(totalAVista)}`, margin + 6, y + 8);
+  
+  doc.setFontSize(9);
+  doc.setTextColor(...COLORS.foreground);
+  
   const isMadeiramento = data.kitType === 'madeiramento';
   const pctSinal = isMadeiramento ? '30%' : '50%';
   const pctSaldo = isMadeiramento ? '70%' : '50%';
@@ -440,64 +407,46 @@ export function generateProposalPDF(
   const descSinal = isMadeiramento ? 'Na assinatura do contrato (PIX)' : 'Na assinatura do contrato (PIX) para iniciar projeto';
   const descSaldo = isMadeiramento ? '24h antes do embarque do kit (Saída da fábrica)' : 'Na saída da fábrica / Conclusão';
 
-  // Helper: bold label+value, normal description
-  const drawPaymentLine = (label: string, value: string, desc: string, lineY: number) => {
-    doc.setFont('helvetica', 'bold');
-    doc.text(`• ${label} ${value}`, margin + 8, lineY);
-    const boldW = doc.getTextWidth(`• ${label} ${value}`);
-    doc.setFont('helvetica', 'normal');
-    doc.text(` — ${desc}`, margin + 8 + boldW, lineY);
-  };
+  doc.text(`• Sinal (${pctSinal}): ${fmt(sinalPix)}`, margin + 6, y + 16);
+  doc.setFont('helvetica', 'normal');
+  doc.text(` — ${descSinal}`, margin + 6 + doc.getTextWidth(`• Sinal (${pctSinal}): ${fmt(sinalPix)}`), y + 16);
 
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10);
-  doc.setTextColor(...COLORS.accent);
-  doc.text('CONDIÇÕES DE PAGAMENTO (PIX / BOLETO)', margin, y);
+  doc.text(`• Saldo Final (${pctSaldo}): ${fmt(saldoPix)}`, margin + 6, y + 22);
+  doc.setFont('helvetica', 'normal');
+  doc.text(` — ${descSaldo}`, margin + 6 + doc.getTextWidth(`• Saldo Final (${pctSaldo}): ${fmt(saldoPix)}`), y + 22);
+  
+  y += 28;
+
+  // DIVIDER LINE
+  doc.setDrawColor(220, 210, 200);
+  doc.line(margin + 6, y, margin + contentWidth - 6, y);
   y += 6;
 
-  // À vista com desconto unificado
-  drawPaymentLine(`À Vista (${discountRate * 100}% de desconto):`, fmt(totalAVista), 'No PIX ou Transferência Bancária', y);
-  y += 5;
-
-  drawPaymentLine(`Sinal (${pctSinal}):`, fmt(sinalPix), descSinal, y);
-  y += 5;
-  drawPaymentLine(`Saldo Final (${pctSaldo}):`, fmt(saldoPix), descSaldo, y);
-  y += 8;
-
-  // ─── CREDIT CARD INSTALLMENT TABLE ───
-  y = checkPageBreak(doc, y, 100);
-
-  // Big Highlight Banner
-  doc.setFillColor(...COLORS.accent);
-  doc.roundedRect(margin, y, contentWidth, 12, 2, 2, 'F');
+  // 3. PARCELAMENTO SECTION
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10);
-  doc.setTextColor(...COLORS.white);
-  doc.text('CONDICAO ESPECIAL DE PARCELAMENTO', margin + 6, y + 8);
-  
-  y += 18;
-  
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(12);
-  doc.setTextColor(...COLORS.foreground);
-  doc.text('PARCELE O SEU KIT DE MADEIRAMENTO EM ATÉ 18X SEM JUROS', margin, y);
-  
-  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(11);
+  doc.setTextColor(...COLORS.accent);
+  doc.text(`OPÇÃO 2: PARCELAMENTO EM ATÉ 18X SEM JUROS`, margin + 6, y + 4);
+
   doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
   doc.setTextColor(...COLORS.muted);
-  doc.text('Condições de parcelamento sujeitas a aprovação de limite de crédito', margin, y + 5);
+  doc.text(`* Desconto e parcelamento exclusivos para Kit Madeiramento, Assoalho e Base Estrutural.`, margin + 6, y + 9);
+
+  y += 15;
 
   if (pixBase > 0) {
-    y += 5;
+    doc.setFontSize(9);
     doc.setFont('helvetica', 'bold');
-    doc.setTextColor(...COLORS.accent);
-    doc.text('Complementos, frete e mão de obra não são parcelados em 18x.', margin, y + 5);
-    doc.text(`Valor Restante (Via PIX): ${fmt(pixBase)} (Sinal e Saldo ao final da obra)`, margin, y + 10);
-    y += 8;
+    doc.setTextColor(...COLORS.foreground);
+    doc.text(`Serviços e Complementos (Via PIX): ${fmt(pixBase)}`, margin + 6, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(` — Pagos via PIX (Sinal e Saldo) ou medição da obra.`, margin + 6 + doc.getTextWidth(`Serviços e Complementos (Via PIX): ${fmt(pixBase)}`), y);
+    y += 6;
   }
-  
-  y += 10;
 
+  // 4. TABLE
   const cardTableBody = CARD_RATES.map(([n]) => {
     const res = calculateInstallmentValue(creditCardBase, n, discount > 0);
     const label = res.isInterestFree ? `${n}x sem juros` : `${n}x`;
@@ -506,19 +455,19 @@ export function generateProposalPDF(
 
   autoTable(doc, {
     startY: y,
-    margin: { left: margin, right: margin },
-    head: [['Parcelas', 'Valor da Parcela']],
+    margin: { left: margin + 6, right: margin + 6 },
+    head: [['Parcelas no Cartão de Crédito', 'Valor da Parcela']],
     body: cardTableBody,
     styles: {
       fontSize: 8,
       cellPadding: 2,
       textColor: COLORS.foreground,
       lineColor: [220, 210, 200],
-      lineWidth: 0.15,
+      lineWidth: 0.1,
     },
     headStyles: {
-      fillColor: COLORS.accent,
-      textColor: COLORS.white,
+      fillColor: [240, 232, 222],
+      textColor: COLORS.accent,
       fontStyle: 'bold',
       fontSize: 9,
     },
@@ -526,12 +475,11 @@ export function generateProposalPDF(
       fillColor: [250, 247, 242],
     },
     columnStyles: {
-      0: { cellWidth: contentWidth * 0.4, halign: 'center', fontStyle: 'bold' },
-      1: { cellWidth: contentWidth * 0.6, halign: 'center' },
+      0: { cellWidth: (contentWidth - 12) * 0.5, halign: 'center', fontStyle: 'bold' },
+      1: { cellWidth: (contentWidth - 12) * 0.5, halign: 'center' },
     },
     didParseCell: (hookData) => {
       if (hookData.section === 'body') {
-        // Extreme Highlight for the 18x row (index 17)
         if (hookData.row.index === 17) {
           hookData.cell.styles.textColor = COLORS.white;
           hookData.cell.styles.fontStyle = 'bold';
@@ -542,6 +490,38 @@ export function generateProposalPDF(
   });
 
   y = (doc as any).lastAutoTable.finalY + 6;
+
+  // OUTLINE THE WHOLE BOX
+  doc.setDrawColor(COLORS.accent[0], COLORS.accent[1], COLORS.accent[2]);
+  doc.setLineWidth(0.5);
+  doc.roundedRect(margin, boxStartY, contentWidth, y - boxStartY, 2, 2, 'S');
+
+  y += 6;
+
+  // ─── PRAZOS BANNER ───
+  const hasLabor = ['parceira', 'turnkey'].includes(data.kitType) || (data.kitType === 'custom' && data.includeLabor);
+  {
+    const bannerH = hasLabor ? 18 : 12;
+    doc.setFillColor(...COLORS.primary);
+    doc.roundedRect(margin, y, contentWidth, bannerH, 2, 2, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8.5);
+    doc.setTextColor(...COLORS.white);
+    doc.text('Prazo de entrega: 15 a 60 dias úteis, conforme complexidade do projeto.', margin + 6, y + 7);
+    if (hasLabor) {
+      doc.text(`Prazo de montagem: ${area} dias úteis (1 dia por m²).`, margin + 6, y + 13);
+    }
+    y += bannerH + 4;
+  }
+
+  // ─── PROGRESSIVE DISCOUNT NOTE ───
+  doc.setFillColor(230, 245, 230);
+  doc.roundedRect(margin, y, contentWidth, 10, 2, 2, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8);
+  doc.setTextColor(...COLORS.green);
+  doc.text('Descontos progressivos para pedidos a partir de 2 unidades. Consulte condições especiais!', margin + 6, y + 6.5);
+  y += 14;
 
   // ─── NOVO BLOCO: MODALIDADES DE CONSTRUÇÃO ───
   y = checkPageBreak(doc, y, 80);
