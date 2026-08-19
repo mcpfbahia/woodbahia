@@ -13,34 +13,7 @@ export const initialModels = [
     freight_is_promo: true,
     purposes: ["airbnb", "praia", "campo"],
   },
-  {
-    id: "chale-arembepe-plus",
-    name: "Chalé Arembepe Plus",
-    image: "/images/models/model-1.jpg",
-    area: "20m²",
-    floors: "1 Pavimento",
-    bedrooms: 1,
-    infoLabel: "20m² | 1 quarto (banheiro incluso)",
-    description: "Chalé Arembepe Plus (20m²): versão ampliada com banheiro incluso e pé-direito de 3,40m. Estrutura em madeira pinus tratada, aliando praticidade, conforto e excelente aproveitamento de espaço.",
-    kitPrice: "R$ 13.000,00",
-    freight_value: "R$ 3.500,00",
-    freight_is_promo: true,
-    purposes: ["airbnb", "praia", "campo"],
-  },
-  {
-    id: "casa-jorge-amado",
-    name: "Casa Jorge Amado",
-    image: "/images/models/model-2.jpg",
-    area: "80m²",
-    floors: "1 Pavimento",
-    bedrooms: 2,
-    infoLabel: "80m² | 2 quartos (1 suíte)",
-    description: "Casa Mod. Jorge Amado: estrutura ampla com 2 quartos sendo uma suíte, sala e cozinha conjugadas e varanda espaçosa.",
-    kitPrice: "R$ 52.000,00",
-    freight_value: "R$ 11.500,00",
-    freight_is_promo: true,
-    purposes: ["moradia", "campo", "praia"],
-  },
+
   {
     id: "chale-baixios",
     name: "Chalé Baixios",
@@ -125,20 +98,7 @@ export const initialModels = [
     freight_is_promo: true,
     purposes: ["airbnb", "praia", "campo"],
   },
-  {
-    id: "chale-escandinavo-trancoso",
-    name: "Chalé Escandinavo Trancoso",
-    image: "/images/models/chale-escandinavo-trancoso.jpg",
-    area: "35m²",
-    floors: "1 Pavimento",
-    bedrooms: 1,
-    infoLabel: "35m² | 1 quarto (Parede Dupla)",
-    description: "O Chalé Escandinavo Trancoso combina o charme do design nórdico com o aconchego da madeira. Com 35m² de área total (28,75m² interna e deck de 6,25m²), possui 1 dormitório, sala de estar e cozinha integradas, e banheiro. Destaca-se por sua fachada ampla em vidro, parede dupla para maior conforto térmico e acústico, ideal para investimento ou lazer.",
-    kitPrice: "R$ 35.000,00", // Preço sugerido, favor ajustar
-    freight_value: "R$ 5.000,00", // Frete sugerido, favor ajustar
-    freight_is_promo: true,
-    purposes: ["airbnb", "praia", "campo", "moradia"],
-  },
+
 ];
 
 // ── Overrides que corrigem dados do Firebase (fonte de verdade local) ──────────
@@ -151,21 +111,13 @@ const MODEL_OVERRIDES: Record<string, Partial<{
   infoLabel: string;
   description: string;
 }>> = {
-  "arembepe-plus": {
-    kitPrice: "R$ 13.000,00",
-    freight_value: "R$ 3.500,00",
-    freight_is_promo: true,
-  },
+
   arembepe: {
     kitPrice: "R$ 8.334,09",
     freight_value: "R$ 1.800,00",
     freight_is_promo: true,
   },
-  "jorge-amado": {
-    kitPrice: "R$ 52.000,00",
-    freight_value: "R$ 11.500,00",
-    freight_is_promo: true,
-  },
+
   baixios: {
     kitPrice: "R$ 20.800,00",
     freight_value: "R$ 8.500,00",
@@ -196,11 +148,7 @@ const MODEL_OVERRIDES: Record<string, Partial<{
     freight_value: "R$ 5.500,00",
     freight_is_promo: true,
   },
-  "trancoso": {
-    kitPrice: "R$ 35.000,00",
-    freight_value: "R$ 5.000,00",
-    freight_is_promo: true,
-  },
+
 };
 
 /** Aplica os overrides locais sobre qualquer objeto de modelo (Firebase ou estático). */

@@ -38,10 +38,8 @@ interface StandardProps {
   model: CabinModel;
   kitType: Exclude<KitType, 'custom'> | null;
   kitAddons: KitAddons;
-  slidingDoor: boolean;
   onKitSelect: (kit: KitType) => void;
   onKitAddonsChange: (addons: KitAddons) => void;
-  onSlidingDoorChange: (v: boolean) => void;
   onBack: () => void;
   onNext: () => void;
 }
@@ -51,10 +49,8 @@ interface CustomProps {
   isEligibleForTurnkey: boolean;
   customArea: number;
   customOptions: CustomOptions;
-  slidingDoor: boolean;
   onCustomAreaChange: (area: number) => void;
   onCustomChange: (opts: CustomOptions) => void;
-  onSlidingDoorChange: (v: boolean) => void;
   onBack: () => void;
   onNext: () => void;
 }
@@ -66,8 +62,7 @@ export function StepKitSelect(props: Props) {
   return <StandardMode {...props} />;
 }
 
-function StandardMode({ isEligibleForTurnkey, model, kitType, kitAddons, slidingDoor, onKitSelect, onKitAddonsChange, onSlidingDoorChange, onBack, onNext }: StandardProps) {
-  const showSlidingDoor = kitType === 'parceira' || kitType === 'turnkey';
+function StandardMode({ isEligibleForTurnkey, model, kitType, kitAddons, onKitSelect, onKitAddonsChange, onBack, onNext }: StandardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, x: 40 }}
@@ -167,23 +162,7 @@ function StandardMode({ isEligibleForTurnkey, model, kitType, kitAddons, sliding
         </div>
       )}
 
-      {showSlidingDoor && (
-        <div className="max-w-xl mx-auto glass-card rounded-2xl p-6 mb-8">
-          <div className="flex items-start gap-3">
-            <Checkbox
-              id="std-sliding-door"
-              checked={slidingDoor}
-              onCheckedChange={(checked) => onSlidingDoorChange(!!checked)}
-            />
-            <div>
-              <Label htmlFor="std-sliding-door" className="text-sm cursor-pointer">
-                Prefere porta de correr de 1.8m em eucalipto?
-              </Label>
-              <p className="text-xs text-muted-foreground mt-0.5">+R$ 3.000 com 5% de desconto no total de portas/janelas</p>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* sliding door removed */}
 
       <div className="flex justify-between max-w-xl mx-auto">
         <Button variant="outline" onClick={onBack} className="gap-2 rounded-xl">
@@ -197,7 +176,7 @@ function StandardMode({ isEligibleForTurnkey, model, kitType, kitAddons, sliding
   );
 }
 
-function CustomMode({ isEligibleForTurnkey, customArea, customOptions, slidingDoor, onCustomAreaChange, onCustomChange, onSlidingDoorChange, onBack, onNext }: CustomProps) {
+function CustomMode({ isEligibleForTurnkey, customArea, customOptions, onCustomAreaChange, onCustomChange, onBack, onNext }: CustomProps) {
   return (
     <motion.div
       initial={{ opacity: 0, x: 40 }}
@@ -251,21 +230,7 @@ function CustomMode({ isEligibleForTurnkey, customArea, customOptions, slidingDo
               </div>
             );
           })}
-          {customOptions.fixtures && (
-            <div className="flex items-start gap-3 pt-2 border-t border-border/50">
-              <Checkbox
-                id="cust-sliding-door"
-                checked={slidingDoor}
-                onCheckedChange={(checked) => onSlidingDoorChange(!!checked)}
-              />
-              <div>
-                <Label htmlFor="cust-sliding-door" className="text-sm cursor-pointer">
-                  Prefere porta de correr de 1.8m em eucalipto?
-                </Label>
-                <p className="text-xs text-muted-foreground mt-0.5">+R$ 3.000 com 5% de desconto no total de portas/janelas</p>
-              </div>
-            </div>
-          )}
+          {/* sliding door removed */}
         </div>
       </div>
 

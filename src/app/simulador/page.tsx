@@ -33,7 +33,6 @@ export default function Index() {
   const [kitAddons, setKitAddons] = useState<KitAddons>(INITIAL_ADDONS);
   const [customArea, setCustomArea] = useState(20);
   const [foundationType, setFoundationType] = useState<FoundationType | null>(null);
-  const [slidingDoor, setSlidingDoor] = useState(false);
   const [showManual, setShowManual] = useState(false);
 
   const simState: SimulationState = useMemo(() => ({
@@ -44,8 +43,7 @@ export default function Index() {
     kitAddons,
     foundationType,
     customArea,
-    slidingDoor,
-  }), [clientData, model, isCustomPath, kitType, customOptions, kitAddons, foundationType, customArea, slidingDoor]);
+  }), [clientData, model, isCustomPath, kitType, customOptions, kitAddons, foundationType, customArea]);
 
   const showFoundation = needsFoundationStep(simState);
 
@@ -99,7 +97,6 @@ export default function Index() {
     setKitAddons(INITIAL_ADDONS);
     setCustomArea(20);
     setFoundationType(null);
-    setSlidingDoor(false);
   }, []);
 
   const handleBack = useCallback((target: number) => setStep(target), []);
@@ -351,10 +348,8 @@ export default function Index() {
               model={model}
               kitType={kitType as Exclude<KitType, 'custom'> | null}
               kitAddons={kitAddons}
-              slidingDoor={slidingDoor}
               onKitSelect={(k) => setKitType(k)}
               onKitAddonsChange={setKitAddons}
-              onSlidingDoorChange={setSlidingDoor}
               onBack={() => handleBack(2)}
               onNext={handleKitNext}
             />
@@ -366,10 +361,8 @@ export default function Index() {
               isEligibleForTurnkey={clientData.distance === undefined || clientData.distance <= 160}
               customArea={customArea}
               customOptions={customOptions}
-              slidingDoor={slidingDoor}
               onCustomAreaChange={setCustomArea}
               onCustomChange={setCustomOptions}
-              onSlidingDoorChange={setSlidingDoor}
               onBack={() => handleBack(2)}
               onNext={handleKitNext}
             />

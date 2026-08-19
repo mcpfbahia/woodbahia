@@ -167,7 +167,6 @@ export default function PropostasPage() {
   const [kitType, setKitType] = useState<KitType>('turnkey');
   const [customArea, setCustomArea] = useState(30);
   const [customModelDescription, setCustomModelDescription] = useState('');
-  const [slidingDoor, setSlidingDoor] = useState(false);
   const [includeGlass, setIncludeGlass] = useState(false);
   const [includeElectrical, setIncludeElectrical] = useState(false);
   const [includeFixtures, setIncludeFixtures] = useState(false);
@@ -469,7 +468,6 @@ export default function PropostasPage() {
     setModelId(d.modelId || '');
     setCustomArea(d.customArea || 30);
     setCustomModelDescription(d.customModelDescription || '');
-    setSlidingDoor(!!d.slidingDoor);
     setIncludeGlass(!!d.includeGlass);
     setIncludeElectrical(!!d.includeElectrical);
     setIncludeFixtures(!!d.includeFixtures);
@@ -528,7 +526,6 @@ export default function PropostasPage() {
     setModelId('');
     setCustomArea(30);
     setCustomModelDescription('');
-    setSlidingDoor(false);
     setIncludeGlass(false);
     setIncludeElectrical(false);
     setIncludeFixtures(false);
@@ -570,7 +567,6 @@ export default function PropostasPage() {
     customArea: kitType === 'custom' ? customArea : undefined,
     customModelDescription: kitType === 'custom' ? customModelDescription : undefined,
     kitType,
-    slidingDoor,
     includeGlass,
     includeElectrical,
     includeFixtures,
@@ -1136,21 +1132,7 @@ export default function PropostasPage() {
                     </div>
                     
                     <div className="space-y-4">
-                      <div className="flex items-center justify-between group">
-                        <div>
-                          <Label className="text-sm font-bold text-foreground">Porta de Correr (1.8m)</Label>
-                          <p className="text-[10px] text-muted-foreground">+ R$ 3.000 (c/ desc. ferragens)</p>
-                        </div>
-                        <Switch checked={slidingDoor} onCheckedChange={setSlidingDoor} className="toggle-glow data-[state=checked]:bg-primary" />
-                      </div>
-                      {slidingDoor && !(['parceira', 'turnkey'].includes(kitType)) && (
-                        <EditablePrice 
-                          label="Porta de Correr" 
-                          suggested={getSugg('Porta de Correr')} 
-                          value={fixturesPriceOverride} 
-                          onChange={setFixturesPriceOverride} 
-                        />
-                      )}
+                      {/* porta de correr removed */}
 
                       {( (['parceira', 'turnkey'].includes(kitType)) || (kitType === 'custom' && includeLabor)) && (
                         <>
