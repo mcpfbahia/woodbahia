@@ -103,11 +103,14 @@ export const FIXTURES_TIER1_EXTRA = 500;
 export const FIXTURES_TIER2 = 50;
 export const FIXTURES_TIER2_EXTRA = 700;
 
-export function getFixturesPrice(area: number, modelId?: string): number {
+export function getFixturesPrice(area: number, modelId?: string): { portasJanelas: number; ferragens: number } {
   if (modelId === 'arembepe-plus') {
-    return 0;
+    return { portasJanelas: 0, ferragens: 0 };
   }
-  return area * 100;
+  return {
+    portasJanelas: Math.round(area * 80),
+    ferragens: Math.round(area * 60),
+  };
 }
 /** Vidros — fixo até 32m², acima cobra excedente a R$ 150/m² */
 export function getGlassPrice(area: number, modelId?: string): number {
@@ -285,7 +288,7 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
       
       items.push({ 
         label: `Base Estrutural de Madeira${isInc ? ' (Incluso)' : ''}`, 
-        value: isInc ? 0 : (area * 83) 
+        value: isInc ? 0 : (area * 65) 
       });
       
       items.push({ 
@@ -295,7 +298,7 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
       
       items.push({ 
         label: `Assoalho${isInc ? ' (Incluso)' : ''}`, 
-        value: isInc ? 0 : (area * 90) 
+        value: isInc ? 0 : (area * 75) 
       });
     }
   }
@@ -303,10 +306,10 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
   // 3. Portas e Janelas / Ferragens
   const hasFixtures = kit === 'custom' ? state.customOptions.fixtures : (kit === 'parceira' || isTurnkey);
   if (hasFixtures) {
-    const fpValue = getFixturesPrice(area, kit === 'custom' ? 'custom' : modelId);
+    const fp = getFixturesPrice(area, kit === 'custom' ? 'custom' : modelId);
     
-    const portasJanelasValue = Math.round(fpValue * 0.8);
-    const ferragensValue = fpValue - portasJanelasValue;
+    const portasJanelasValue = fp.portasJanelas;
+    const ferragensValue = fp.ferragens;
 
     items.push({ 
       label: 'Portas e Janelas', 
@@ -421,7 +424,7 @@ export function calculateProposalItems(
       // 1. Base Estrutural de Madeira
       items.push({ 
         label: `Base Estrutural de Madeira${isInc ? ' (Incluso)' : ''}`, 
-        value: isInc ? 0 : (area * 83) 
+        value: isInc ? 0 : (area * 65) 
       });
       
       // 2. Sapatas
@@ -438,7 +441,7 @@ export function calculateProposalItems(
       // 3. Assoalho
       items.push({ 
         label: `Assoalho${isInc ? ' (Incluso)' : ''}`, 
-        value: isInc ? 0 : (area * 90) 
+        value: isInc ? 0 : (area * 75) 
       });
     }
   }
@@ -446,12 +449,19 @@ export function calculateProposalItems(
   // 3. Portas e Janelas / Ferragens
   const hasFixtures = data.kitType === 'custom' ? data.includeFixtures : ['parceira', 'turnkey'].includes(data.kitType);
   if (hasFixtures) {
-    let fpValue = getFixturesPrice(area, data.modelId);
-    if (data.fixturesPriceOverride !== undefined) fpValue = data.fixturesPriceOverride;
-    
-    // Split 80/20
-    const portasJanelasValue = Math.round(fpValue * 0.8);
-    const ferragensValue = fpValue - portasJanelasValue;
+    let portasJanelasValue = 0;
+    let ferragensValue = 0;
+
+    if (data.fixturesPriceOverride !== undefined) {
+      // Split proporcional (80 e 60 = 140 total)
+      const ratio = 80 / 140;
+      portasJanelasValue = Math.round(data.fixturesPriceOverride * ratio);
+      ferragensValue = data.fixturesPriceOverride - portasJanelasValue;
+    } else {
+      const fp = getFixturesPrice(area, data.modelId);
+      portasJanelasValue = fp.portasJanelas;
+      ferragensValue = fp.ferragens;
+    }
     
     items.push({ 
       label: 'Portas e Janelas', 
