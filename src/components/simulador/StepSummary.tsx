@@ -12,8 +12,9 @@ interface Props {
   onReset: () => void;
 }
 
-function fmt(v: number) {
-  return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+function fmt(v: any) {
+  if (v == null || isNaN(Number(v))) return "R$ 0,00";
+  return Number(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
 const KIT_NAMES: Record<string, string> = {

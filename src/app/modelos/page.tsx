@@ -23,8 +23,9 @@ function parsePriceToBRL(val: any): number {
   return parseFloat(str.replace(/[^\d.]/g, "")) || 0;
 }
 
-function formatBRL(val: number): string {
-  return val.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+function formatBRL(val: any): string {
+  if (val == null || isNaN(Number(val))) return "R$ 0,00";
+  return Number(val).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
 export default function ModelsGalleryPage() {

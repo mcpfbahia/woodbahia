@@ -173,8 +173,9 @@ export const SimulatorSection = () => {
     includePaint
   ]);
 
-  const formatBRL = (val: number) => {
-    return val.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  const formatBRL = (val: any) => {
+    if (val == null || isNaN(Number(val))) return "R$ 0,00";
+    return Number(val).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
   };
 
   // Montagem do texto do WhatsApp

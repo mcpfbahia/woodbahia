@@ -448,8 +448,9 @@ export default function ModelDetailPage() {
   };
 
   // Cálculos das Modalidades Comerciais
-  const formatBRL = (val: number) => {
-    return val.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  const formatBRL = (val: any) => {
+    if (val == null || isNaN(Number(val))) return "R$ 0,00";
+    return Number(val).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
   };
 
   const staticModel = initialModels.find(m => m.id === id || id.includes(m.id) || m.id.includes(id));
