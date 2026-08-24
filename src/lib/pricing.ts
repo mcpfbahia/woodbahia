@@ -328,7 +328,7 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
     const stainValue = tsValue - telhasValue;
 
     items.push({ label: `Telhas (${area}m²)`, value: telhasValue });
-    items.push({ label: `Stain (Madeiramento e Forro)`, value: stainValue });
+    items.push({ label: `Stain protetor`, value: stainValue });
   }
 
   // 5. Mão de Obra
@@ -481,7 +481,7 @@ export function calculateProposalItems(
     const stainValue = tsValue - telhasValue;
     
     items.push({ label: `Telhas (${area}m²)`, value: telhasValue });
-    items.push({ label: `Stain (Madeiramento e Forro)`, value: stainValue });
+    items.push({ label: `Stain protetor`, value: stainValue });
   }
 
   // 5. Mão de Obra
