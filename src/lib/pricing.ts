@@ -103,13 +103,16 @@ export const FIXTURES_TIER1_EXTRA = 500;
 export const FIXTURES_TIER2 = 50;
 export const FIXTURES_TIER2_EXTRA = 700;
 
-export function getFixturesPrice(area: number, modelId?: string): { portasJanelas: number; ferragens: number } {
+export function getFixturesPrice(area: number, modelId?: string): { portasJanelas: number; ferragens: number; base: number } {
   if (modelId === 'arembepe-plus') {
-    return { portasJanelas: 0, ferragens: 0 };
+    return { portasJanelas: 0, ferragens: 0, base: 0 };
   }
+  const portasJanelas = Math.round(area * 80);
+  const ferragens = Math.round(area * 60);
   return {
-    portasJanelas: Math.round(area * 80),
-    ferragens: Math.round(area * 60),
+    portasJanelas,
+    ferragens,
+    base: portasJanelas + ferragens,
   };
 }
 /** Vidros — fixo até 32m², acima cobra excedente a R$ 150/m² */
