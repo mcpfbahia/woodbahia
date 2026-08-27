@@ -17,7 +17,7 @@ import { cn } from "~/lib/utils";
 
 // Utilitários de preço
 function parsePriceToBRL(val: any): number {
-  if (typeof val === "number") return val;
+  if (typeof val === "number") return isNaN(val) ? 0 : val;
   if (!val) return 0;
   const str = val.toString().replace(/[R$\s]/gi, "");
   if (str.includes(",")) return parseFloat(str.replace(/\./g, "").replace(",", ".")) || 0;
@@ -134,20 +134,21 @@ export const ModelsSection = () => {
               const adminCost = Math.round(laborCost * 0.25); // 25% de coordenação
 
               const discountRate = getModelDiscountRate(model.id || model.name, model.discountRate);
+              const safeNum = (n: any) => isNaN(Number(n)) ? 0 : Number(n);
 
               // 1. Kit Madeiramento (Completo com Frete)
-              const kitEstimation = kitFull + getFreight(numericArea);
-              const kitPriceDiscounted = kitEstimation - (kitFull * discountRate);
+              const kitEstimation = safeNum(kitFull) + safeNum(getFreight(numericArea));
+              const kitPriceDiscounted = kitEstimation - (safeNum(kitFull) * safeNum(discountRate));
 
               // 2. Montagem Parceira (Completo com Frete + Fundação Eucalipto)
-              const partnerEstimation = kitFull + laborCost + getEucalyptusFoundation(numericArea) + getFreight(numericArea);
-              const partnerEstimationDiscounted = partnerEstimation - (kitFull * discountRate);
+              const partnerEstimation = safeNum(kitFull) + safeNum(laborCost) + safeNum(getEucalyptusFoundation(numericArea)) + safeNum(getFreight(numericArea));
+              const partnerEstimationDiscounted = partnerEstimation - (safeNum(kitFull) * safeNum(discountRate));
 
               // 3. Chave na Mão (Obra Completa)
               const paintCost = numericArea <= 25 ? 2000 : numericArea <= 55 ? 3000 : 4500;
               const basePrice = numericArea * 150;
-              const turnkeyEstimation = kitFull + basePrice + laborCost + adminCost + getEucalyptusFoundation(numericArea) + modelTilesPrice + modelFixturesPrice + modelGlassPrice + paintCost + getElectricalKit(numericArea) + getFreight(numericArea);
-              const turnkeyEstimationDiscounted = turnkeyEstimation - ((kitFull + basePrice) * discountRate);
+              const turnkeyEstimation = safeNum(kitFull) + safeNum(basePrice) + safeNum(laborCost) + safeNum(adminCost) + safeNum(getEucalyptusFoundation(numericArea)) + safeNum(modelTilesPrice) + safeNum(modelFixturesPrice) + safeNum(modelGlassPrice) + safeNum(paintCost) + safeNum(getElectricalKit(numericArea)) + safeNum(getFreight(numericArea));
+              const turnkeyEstimationDiscounted = turnkeyEstimation - ((safeNum(kitFull) + safeNum(basePrice)) * safeNum(discountRate));
 
               return (
                 <StaggerItem key={model.id} index={idx}>
