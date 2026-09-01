@@ -524,27 +524,47 @@ export function generateProposalPDF(
   y += 6;
 
   if (data.kitType === 'parceira' && partnerLaborValue > 0) {
-    y = checkPageBreak(doc, y, 32);
-    doc.setFillColor(250, 247, 242);
-    doc.setDrawColor(220, 210, 200);
-    doc.roundedRect(margin, y, contentWidth, 24, 2, 2, 'FD');
+    const titleText = 'MÃO DE OBRA DE MONTADOR PARCEIRO (CONTRATO E PAGAMENTO DIRETO)';
+    const descText = '* Este valor é uma referência de mercado para a montagem do kit. O contrato e o pagamento são realizados diretamente entre você e o carpinteiro/montador parceiro credenciado (com isenção total de taxas Wood Bahia).';
 
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(9);
-    doc.setTextColor(...COLORS.accent);
-    doc.text(`🤝 MÃO DE OBRA DE MONTADOR PARCEIRO (CONTRATO E PAGAMENTO DIRETO)`, margin + 6, y + 6.5);
+    const titleLines = doc.splitTextToSize(titleText, contentWidth - 12);
 
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    const descLines = doc.splitTextToSize(descText, contentWidth - 12);
+
+    const boxHeight = 10 + (titleLines.length * 4.5) + 5 + (descLines.length * 3.5);
+
+    y = checkPageBreak(doc, y, boxHeight + 6);
+
+    doc.setFillColor(250, 247, 242);
+    doc.setDrawColor(220, 210, 200);
+    doc.roundedRect(margin, y, contentWidth, boxHeight, 2, 2, 'FD');
+
+    let internalY = y + 5.5;
+
+    // Title
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(...COLORS.accent);
+    doc.text(titleLines, margin + 6, internalY);
+    internalY += titleLines.length * 4.5;
+
+    // Valor Estimado
     doc.setFontSize(8.5);
     doc.setTextColor(...COLORS.foreground);
-    doc.text(`• Valor Estimado da Montagem: ${fmt(partnerLaborValue)}`, margin + 6, y + 13);
+    doc.text(`• Valor Estimado da Montagem: ${fmt(partnerLaborValue)}`, margin + 6, internalY);
+    internalY += 5;
 
-    doc.setFontSize(7.5);
+    // Explicação
     doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
     doc.setTextColor(...COLORS.muted);
-    doc.text(`* Este valor é uma referência de mercado para a montagem do kit. O contrato e o pagamento são realizados`, margin + 6, y + 18);
-    doc.text(`  diretamente entre você e o carpinteiro/montador credenciado indicado pela fábrica (com isenção total de taxas Wood Bahia).`, margin + 6, y + 21.5);
+    doc.text(descLines, margin + 6, internalY);
 
-    y += 28;
+    y += boxHeight + 6;
   }
 
   // ─── PRAZOS BANNER ───
