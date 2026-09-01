@@ -1043,9 +1043,9 @@ export default function ModelDetailPage() {
                     )}
 
                     {/* Item 7: Portas e Janelas */}
-                    {simModalidade === 'turnkey' || simModalidade === 'parceira' ? (
+                    {simModalidade === 'turnkey' ? (
                       <div className="flex justify-between pb-3 border-b border-stone-100">
-                        <span className="text-stone-700 font-medium">7. Portas, Janelas e Ferragens (Incluso no Parceira/Chave na Mão):</span>
+                        <span className="text-stone-700 font-medium">7. Portas, Janelas e Ferragens (Incluso no Chave na Mão):</span>
                         <span className="font-bold text-stone-850">{formatBRL(modelFixturesPrice)}</span>
                       </div>
                     ) : (
@@ -1111,8 +1111,8 @@ export default function ModelDetailPage() {
                       const kitDesconto = Math.round(kitDiscountable * discountRate);
                       const kitAVista = kitAPrazo - kitDesconto;
                       
-                      // 2. Parceira
-                      const partnerAPrazo = kitBasePriceNum + laborCost + getEucalyptusFoundation(numericArea) + getFreight(numericArea) + (includeBaseInSim ? basePrice : 0);
+                      // 2. Parceira (isolando mão de obra para pagamento direto ao carpinteiro)
+                      const partnerAPrazo = kitBasePriceNum + getEucalyptusFoundation(numericArea) + getFreight(numericArea) + (includeBaseInSim ? basePrice : 0);
                       const partnerDiscountable = kitBasePriceNum + (includeBaseInSim ? basePrice : 0);
                       const partnerDesconto = Math.round(partnerDiscountable * discountRate);
                       const partnerAVista = partnerAPrazo - partnerDesconto;
@@ -1159,15 +1159,29 @@ export default function ModelDetailPage() {
                                     
                                     <div className="bg-stone-50 p-4 rounded-xl border border-stone-200 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
                                       <div>
-                                        <span className="text-[10px] text-stone-600 font-bold uppercase tracking-wider block">Complementos e Serviços (Via PIX)</span>
+                                        <span className="text-[10px] text-stone-600 font-bold uppercase tracking-wider block">Frete e Complementos (Via PIX Wood Bahia)</span>
                                         <span className="text-[11px] text-stone-500 italic mt-0.5 block">
-                                          Sinal e saldo conforme cronograma de evolução da obra
+                                          Sinal (30%) no contrato e saldo (70%) 24h antes do embarque
                                         </span>
                                       </div>
                                       <span className="font-serif font-black text-xl text-stone-800">
                                         {formatBRL(complementosPix)}
                                       </span>
                                     </div>
+
+                                    {simModalidade === 'parceira' && (
+                                      <div className="bg-amber-50/60 p-4 rounded-xl border border-amber-200/80 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                                        <div>
+                                          <span className="text-[10px] text-amber-900 font-bold uppercase tracking-wider block">🤝 Mão de Obra de Montador Parceiro (Estimado)</span>
+                                          <span className="text-[11px] text-amber-800 italic mt-0.5 block">
+                                            Negociado e pago diretamente ao carpinteiro/montador parceiro (isento de taxas Wood Bahia)
+                                          </span>
+                                        </div>
+                                        <span className="font-serif font-black text-xl text-amber-950">
+                                          {formatBRL(laborCost)}
+                                        </span>
+                                      </div>
+                                    )}
                                   </div>
                                 );
                               }
@@ -1193,9 +1207,9 @@ export default function ModelDetailPage() {
 
                             <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 bg-emerald-50/50 p-3 rounded-xl border border-emerald-100">
                               <div>
-                                <span className="text-[10px] text-emerald-800 font-bold uppercase tracking-wider block">Investimento à Vista (PIX/Boleto)</span>
+                                <span className="text-[10px] text-emerald-800 font-bold uppercase tracking-wider block">Investimento à Vista (PIX/Boleto Wood Bahia)</span>
                                 <span className="text-[11px] text-emerald-700 italic mt-0.5 block">
-                                  Com desconto de 5% aplicado sobre o madeiramento {includeBaseInSim || simModalidade === 'turnkey' ? "e base estrutural" : ""}
+                                  Com desconto de {discountRate * 100}% aplicado sobre o madeiramento {includeBaseInSim || simModalidade === 'turnkey' ? "e base estrutural" : ""}
                                 </span>
                               </div>
                               <div className="text-right">
