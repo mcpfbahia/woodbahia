@@ -9,7 +9,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 const KIT_OPTIONS: { id: Exclude<KitType, 'custom'>; name: string; desc: string; highlight?: boolean }[] = [
   { id: 'madeiramento', name: '🪵 1. Apenas o Kit Madeiramento', desc: 'Madeiramento estrutural completo em Pinus tratado em autoclave (pilares, vigas, paredes, forro, estrutura de telhado). A montagem e demais materiais são de responsabilidade do cliente.' },
-  { id: 'parceira', name: '🔨 2. Kit + Montagem Parceira', desc: 'Madeiramento + esquadrias (portas/janelas/ferragens) + mão de obra de carpintaria credenciada, com isenção de taxas administrativas da Wood Bahia. A cobertura, vidros e elétrica são contratados à parte.' },
+  { id: 'parceira', name: '🔨 2. Kit + Montagem Parceira', desc: 'Madeiramento estrutural em Pinus + indicação de mão de obra de montador parceiro credenciado (com isenção de taxas da fábrica). Esquadrias, cobertura, vidros e elétrica são adquiridos à parte.' },
   { id: 'turnkey', name: '🔑 3. Wood Bahia Chave na Mão', desc: 'Estrutura de madeira montada e acabada com responsabilidade única da Wood Bahia. Inclui madeiramento, esquadrias, cobertura completa (telhas ecológicas e manta térmica), vidros fachada, pintura em Stain (protetor), mão de obra própria e coordenação/gestão técnica total.', highlight: true },
 ];
 

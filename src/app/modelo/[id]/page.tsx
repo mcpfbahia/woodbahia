@@ -389,9 +389,6 @@ export default function ModelDetailPage() {
           "Estrutura do telhado e forros",
           "Madeira Pinus tratada sob pressão",
           "Projeto estrutural e manual técnico",
-          "Portas e janelas (esquadrias)",
-          "Ferragens, pregos e parafusos",
-          "Barras roscadas e fixadores",
           "Mão de obra de montagem credenciada",
           "Fundação estimada (Sapatas Eucalipto)",
           ...(hasBase ? [
@@ -400,6 +397,8 @@ export default function ModelDetailPage() {
           ] : [])
         ],
         exclusions: [
+          "Portas e janelas (esquadrias)",
+          "Ferragens, pregos e parafusos",
           "Telhas e manta térmica (cobertura)",
           "Vidros fachada",
           "Stain e pintura protetora",

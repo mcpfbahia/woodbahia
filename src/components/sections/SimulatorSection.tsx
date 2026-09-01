@@ -70,7 +70,7 @@ export const SimulatorSection = () => {
       setIncludeElectrical(false);
       setIncludePaint(false);
     } else if (mod === "parceira") {
-      setIncludeFixtures(true);
+      setIncludeFixtures(false);
       setIncludeTiles(false);
       setIncludeLabor(true);
       setIncludeAdmin(false);
@@ -91,7 +91,7 @@ export const SimulatorSection = () => {
   // Sincroniza os switches com o botão de modalidade comercial selecionado
   useEffect(() => {
     const isMadeiramento = !includeFixtures && !includeTiles && !includeLabor && !includeAdmin && !includeGlass && !includeElectrical && !includePaint;
-    const isParceira = includeFixtures && !includeTiles && includeLabor && !includeAdmin && !includeGlass && !includeElectrical && !includePaint;
+    const isParceira = !includeFixtures && !includeTiles && includeLabor && !includeAdmin && !includeGlass && !includeElectrical && !includePaint;
     const isTurnkey = includeFixtures && includeTiles && includeLabor && includeAdmin && includeGlass && !includeElectrical && includePaint;
 
     if (isMadeiramento) {

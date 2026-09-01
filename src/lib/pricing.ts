@@ -307,7 +307,7 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
   }
 
   // 3. Portas e Janelas / Ferragens
-  const hasFixtures = kit === 'custom' ? state.customOptions.fixtures : (kit === 'parceira' || isTurnkey);
+  const hasFixtures = kit === 'custom' ? state.customOptions.fixtures : isTurnkey;
   if (hasFixtures) {
     const fp = getFixturesPrice(area, kit === 'custom' ? 'custom' : modelId);
     
@@ -450,7 +450,7 @@ export function calculateProposalItems(
   }
 
   // 3. Portas e Janelas / Ferragens
-  const hasFixtures = data.kitType === 'custom' ? data.includeFixtures : ['parceira', 'turnkey'].includes(data.kitType);
+  const hasFixtures = data.kitType === 'custom' ? data.includeFixtures : data.kitType === 'turnkey';
   if (hasFixtures) {
     let portasJanelasValue = 0;
     let ferragensValue = 0;

@@ -278,7 +278,7 @@ export default function PropostasPage() {
       setIncludeGlass(true);
       setPaintType('1cor');
     } else if (kitType === 'parceira') {
-      setIncludeFixtures(true);
+      setIncludeFixtures(false);
       setIncludeTilesStain(false);
       setIncludeLabor(true);
       setIncludeGlass(false);

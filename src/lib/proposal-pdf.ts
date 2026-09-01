@@ -34,7 +34,7 @@ const KIT_NAMES: Record<string, string> = {
 
 const KIT_DESCRIPTIONS: Record<string, string> = {
   madeiramento: 'Madeiramento estrutural completo em Pinus tratado em autoclave (pilares, vigas, paredes, forro, estrutura de telhado). A montagem e demais materiais são de responsabilidade do cliente.',
-  parceira: 'Madeiramento + esquadrias (portas/janelas/ferragens) + mão de obra de carpintaria credenciada, com isenção de taxas administrativas da Wood Bahia. A cobertura, vidros e elétrica são contratados à parte.',
+  parceira: 'Madeiramento estrutural em Pinus + indicação de mão de obra de montador parceiro credenciado, com isenção total de taxas da fábrica. Esquadrias (portas/janelas), cobertura, vidros e elétrica são adquiridos à parte.',
   turnkey: 'Estrutura de madeira montada e acabada com responsabilidade única da Wood Bahia. Inclui madeiramento, esquadrias, cobertura completa (telhas ecológicas e manta térmica), vidros fachada, pintura em Stain (protetor), mão de obra própria e coordenação/gestão técnica total.',
   custom: 'Kit personalizado montado sob medida para o seu projeto.',
 };
@@ -52,7 +52,7 @@ export function getIncludedItems(data: ProposalData): string[] {
     'Manual de montagem detalhado e suporte técnico',
   ];
   
-  const hasFixtures = data.kitType === 'custom' ? data.includeFixtures : ['parceira', 'turnkey'].includes(data.kitType);
+  const hasFixtures = data.kitType === 'custom' ? data.includeFixtures : data.kitType === 'turnkey';
   if (hasFixtures) {
     items.push('Portas e janelas em madeira');
     items.push('Ferragens completas');
@@ -117,7 +117,7 @@ export function getNotIncludedItems(data: ProposalData): string[] {
     items.push('Mão de obra de montagem');
   }
 
-  const hasFixtures = data.kitType === 'custom' ? data.includeFixtures : ['parceira', 'turnkey'].includes(data.kitType);
+  const hasFixtures = data.kitType === 'custom' ? data.includeFixtures : data.kitType === 'turnkey';
   if (!hasFixtures) {
     items.push('Portas, janelas e ferragens');
   }
@@ -585,7 +585,7 @@ export function generateProposalPDF(
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
   doc.setTextColor(...COLORS.foreground);
-  const mod2Desc = 'Você adquire o Kit de madeiramento e esquadrias de fábrica, e nós indicamos equipes de montagem parceiras credenciadas com preço de mão de obra tabelado. Você contrata e paga o carpinteiro diretamente, o que garante ISENÇÃO TOTAL de taxas administrativas e intermediação de construtora. É a melhor forma de economizar até 30% na obra, sem abrir mão da garantia de 15 anos da madeira!';
+  const mod2Desc = 'Você adquire o Kit de madeiramento estrutural de fábrica e nós indicamos equipes de montagem parceiras credenciadas com preço de mão de obra tabelado. Você contrata e paga o carpinteiro diretamente, o que garante ISENÇÃO TOTAL de taxas administrativas e intermediação de construtora. Esquadrias (portas e janelas), cobertura, vidros e instalações são por conta do cliente.';
   const mod2Lines = doc.splitTextToSize(mod2Desc, contentWidth - 8);
   doc.text(mod2Lines, margin + 4, y + 12);
   y += 33;
