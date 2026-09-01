@@ -223,7 +223,7 @@ export default function Index() {
               {[
                 { value: '+100', label: 'Projetos entregues' },
                 { value: '15 anos', label: 'Garantia na madeira' },
-                { value: '+ 49MIL', label: 'Seguidores no Instagram' },
+                { value: '+ 48MIL', label: 'Seguidores no Instagram' },
               ].map((stat, i) => (
                 <motion.div
                   key={i}

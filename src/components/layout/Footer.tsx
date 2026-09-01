@@ -180,7 +180,7 @@ export const Footer = () => {
                   <a href="https://www.instagram.com/woodbahiacasasprefabricadas/" target="_blank" rel="noopener noreferrer" className="font-medium transition-colors hover:text-white">
                     @woodbahia
                   </a>
-                  <span className="mt-1 block text-sm text-primary-foreground/50">+49 mil seguidores</span>
+                  <span className="mt-1 block text-sm text-primary-foreground/50">+48 mil seguidores</span>
                 </div>
               </li>
             </ul>

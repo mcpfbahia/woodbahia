@@ -698,10 +698,11 @@ export default function PropostasPage() {
       });
     };
 
-    const onChange = (v: number) => {
+    const onChange = (v: string | number | undefined) => {
+      const numVal = typeof v === 'number' ? v : (v ? Number(v) : 0);
       setItemOverrides(prev => ({
         ...prev,
-        [label]: { ...prev[label], value: v }
+        [label]: { ...prev[label], value: numVal }
       }));
     };
 

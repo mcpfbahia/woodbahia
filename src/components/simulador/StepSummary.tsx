@@ -70,8 +70,8 @@ export function StepSummary({ state, onBack, onReset }: Props) {
     `• Saldo Final (${pctSaldo}): ${fmt(saldoPix)} — ${descSaldo}`,
     ``,
     `💳 *OPÇÃO 2: PARCELAMENTO (ATÉ 18X SEM JUROS)*`,
-    pixBase > 0 ? `*⚠️ Mão de Obra e Complementos (Via PIX)*: ${fmt(pixBase)} pago durante a obra.` : ``,
-    `*18x Sem Juros do Kit Madeiramento*: ${fmt(calculateInstallmentValue(creditCardBase, 18).installment)} por mês.`,
+    pixBase > 0 ? `*• Frete e Serviços Complementares (Via PIX)*: ${fmt(pixBase)} (30% no sinal e 70% 24h antes do embarque).` : ``,
+    `*• 18x Sem Juros no Cartão*: ${fmt(calculateInstallmentValue(creditCardBase, 18).installment)} por mês (exclusivo para Kit Madeiramento, Base Estrutural e Assoalho).`,
     ``,
     `*Status:* Gostaria de uma análise de crédito ou tem dúvidas sobre a proposta?`,
   ].filter(Boolean).join('\n');
@@ -272,9 +272,9 @@ export function StepSummary({ state, onBack, onReset }: Props) {
                   <div className="bg-accent/10 border border-accent/20 rounded-xl p-3 mb-4 flex items-start gap-3">
                     <div className="bg-accent/20 p-2 rounded-full text-accent mt-0.5"><Info size={16} /></div>
                     <p className="text-[11px] text-foreground/80 leading-snug">
-                      Na modalidade <b>Chave na Mão</b> ou <b>Parceira</b>, os itens complementares e a mão de obra (<span className="font-bold text-accent">{fmt(pixBase)}</span>) 
-                      são pagos de forma independente via PIX (Sinal + Saldo no andamento da obra). <br/>
-                      A tabela de 18x abaixo é baseada <b>exclusivamente</b> no valor do Kit Madeiramento (<b>{fmt(creditCardBase)}</b>).
+                      Frete e serviços complementares (<span className="font-bold text-accent">{fmt(pixBase)}</span>) 
+                      são quitados à parte via PIX (30% no sinal e 70% 24h antes do embarque do kit).<br/>
+                      A condição de 18x sem juros aplica-se <b>exclusivamente</b> ao valor da estrutura de madeira (Kit, Base e Assoalho = <b>{fmt(creditCardBase)}</b>).
                     </p>
                   </div>
                 )}

@@ -204,11 +204,8 @@ export function generateProposalPDF(
   const { creditCardBase, pixBase } = getPaymentBases(items, totalFinal);
 
   const subtotalComDesconto = subtotal - discount;
-  const timberItem = items.find(i => i.label.toLowerCase().includes('madeiramento'));
-  const woodenBaseItem = items.find(i => i.label.toLowerCase().includes('base de madeira') || i.label.toLowerCase().includes('base estrutural'));
-  const discountableBase = (timberItem ? timberItem.value : 0) + (woodenBaseItem ? woodenBaseItem.value : 0);
   const discountRate = getModelDiscountRate(data.modelId, model?.discountRate);
-  const discountableBaseNet = Math.max(0, discountableBase - discount);
+  const discountableBaseNet = Math.max(0, creditCardBase - discount);
   const totalAVista = Math.round(totalFinal - (discountableBaseNet * discountRate));
 
   let y = 0;
@@ -430,19 +427,22 @@ export function generateProposalPDF(
   doc.text(`OPÇÃO 2: PARCELAMENTO EM ATÉ 18X SEM JUROS`, margin + 6, y + 4);
 
   doc.setFontSize(8);
-  doc.setFont('helvetica', 'normal');
+  doc.setFont('helvetica', 'bold');
   doc.setTextColor(...COLORS.muted);
-  doc.text(`* Desconto e parcelamento exclusivos para Kit Madeiramento, Assoalho e Base Estrutural.`, margin + 6, y + 9);
+  doc.text(`* Condição de 18x sem juros exclusiva para a estrutura de madeira (Kit Madeiramento, Assoalho e Base Estrutural).`, margin + 6, y + 9);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`* Frete e serviços complementares são quitados à parte via PIX (30% no sinal e 70% 24h antes do embarque).`, margin + 6, y + 13);
 
-  y += 15;
+  y += 18;
 
   if (pixBase > 0) {
     doc.setFontSize(9);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...COLORS.foreground);
-    doc.text(`Serviços e Complementos (Via PIX): ${fmt(pixBase)}`, margin + 6, y);
+    const pixLabel = `Frete e Serviços Complementares (Via PIX): ${fmt(pixBase)}`;
+    doc.text(pixLabel, margin + 6, y);
     doc.setFont('helvetica', 'normal');
-    doc.text(` — Pagos via PIX (Sinal e Saldo) ou medição da obra.`, margin + 6 + doc.getTextWidth(`Serviços e Complementos (Via PIX): ${fmt(pixBase)}`), y);
+    doc.text(` — 30% no sinal de contrato e 70% 24h antes do embarque do kit.`, margin + 6 + doc.getTextWidth(pixLabel), y);
     y += 6;
   }
 

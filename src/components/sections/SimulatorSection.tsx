@@ -618,13 +618,13 @@ export const SimulatorSection = () => {
                       </div>
                       <div className="bg-stone-50 border border-stone-200 rounded-lg p-3">
                         <span className="text-[10px] uppercase tracking-wider font-bold text-stone-600 block mb-1">
-                          Complementos e Serviços (Via PIX)
+                          Frete e Serviços Complementares (Via PIX)
                         </span>
                         <div className="font-serif font-black text-lg text-stone-800 leading-none">
                           {formatBRL(pixBase)}
                         </div>
                         <span className="text-[9px] text-stone-500 font-semibold mt-1 block">
-                          Sinal e saldo pagos conforme cronograma de evolução da obra.
+                          Quitados via PIX (30% no sinal e 70% antes do embarque do kit).
                         </span>
                       </div>
                     </div>

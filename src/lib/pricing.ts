@@ -565,14 +565,16 @@ export function calculateProposalItems(
   // Apply itemOverrides
   if (data.itemOverrides) {
     for (let i = items.length - 1; i >= 0; i--) {
-      const label = items[i].label;
+      const item = items[i];
+      if (!item) continue;
+      const label = item.label;
       const override = data.itemOverrides[label];
       if (override) {
         if (override.deleted) {
-          items[i].deleted = true;
-          items[i].value = 0;
+          item.deleted = true;
+          item.value = 0;
         } else if (override.value !== undefined) {
-          items[i].value = override.value;
+          item.value = override.value;
         }
       }
     }
@@ -618,17 +620,17 @@ export function getPaymentBases(
   let creditCardBase = 0;
   
   items.forEach(item => {
+    if (item.deleted) return;
     const l = item.label.toLowerCase();
     if (
       l.includes('kit madeiramento') || 
-      l.includes('base estrutural')
+      l.includes('base estrutural') ||
+      l.includes('assoalho')
     ) {
       creditCardBase += item.value;
     }
   });
 
-  // O PIX é o restante do totalFinal (que já embute fretes e eventuais descontos aplicados globalmente na proposta).
-  // A creditCardBase usa o valor CHEIO do kit (já que ele parcelará no cartão, não recebe o desc a vista na base do cartão).
   let pixBase = totalFinal - creditCardBase;
   if (pixBase < 0) pixBase = 0;
 
