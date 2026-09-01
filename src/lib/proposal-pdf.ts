@@ -202,12 +202,18 @@ export function generateProposalPDF(
   const kitDesc = data.kitType === 'custom' && data.customModelDescription ? data.customModelDescription : (KIT_DESCRIPTIONS[data.kitType] || '');
   const modelName = model?.name || 'Kit Personalizado';
   const { items, freight, additionalFreight, additionalTravelCost, subtotal, total: totalFinal, discount, materialSubtotal } = calculateProposalItems(data, modelsList);
-  const { creditCardBase, pixBase } = getPaymentBases(items, totalFinal);
+  
+  // Isolamento da Mão de Obra de Montador Parceiro (contratada direto com o profissional)
+  const partnerLaborItem = items.find(i => i.label.toLowerCase().includes('montador parceiro'));
+  const partnerLaborValue = (data.kitType === 'parceira' && partnerLaborItem) ? partnerLaborItem.value : 0;
+  const woodBahiaTotal = data.kitType === 'parceira' ? Math.max(0, totalFinal - partnerLaborValue) : totalFinal;
+
+  const { creditCardBase, pixBase } = getPaymentBases(items, woodBahiaTotal);
 
   const subtotalComDesconto = subtotal - discount;
   const discountRate = getModelDiscountRate(data.modelId, model?.discountRate);
   const discountableBaseNet = Math.max(0, creditCardBase - discount);
-  const totalAVista = Math.round(totalFinal - (discountableBaseNet * discountRate));
+  const totalAVista = Math.round(woodBahiaTotal - (discountableBaseNet * discountRate));
 
   let y = 0;
 
@@ -317,7 +323,12 @@ export function generateProposalPDF(
                              item.label.toLowerCase().includes('base estrutural') || 
                              item.label.toLowerCase().includes('fundação') ||
                              item.label.toLowerCase().includes('alicerce');
-    const displayValue = (item.value === 0 && isFoundationItem) ? 'Incluso' : fmt(item.value);
+    const isPartnerLabor = data.kitType === 'parceira' && item.label.toLowerCase().includes('montador parceiro');
+    const displayValue = (item.value === 0 && isFoundationItem) 
+      ? 'Incluso' 
+      : isPartnerLabor 
+      ? `${fmt(item.value)} *` 
+      : fmt(item.value);
     return [item.label, displayValue];
   });
   
@@ -392,9 +403,12 @@ export function generateProposalPDF(
   doc.rect(margin, y + 10, contentWidth, 10, 'F'); // Flat bottom
 
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(14);
+  doc.setFontSize(13);
   doc.setTextColor(...COLORS.white);
-  doc.text(`TOTAL DO INVESTIMENTO: ${fmt(totalFinal)}`, margin + contentWidth / 2, y + 13, { align: 'center' });
+  const totalTitleText = data.kitType === 'parceira' 
+    ? `TOTAL DO CONTRATO WOOD BAHIA (KIT & FRETE): ${fmt(woodBahiaTotal)}` 
+    : `TOTAL DO INVESTIMENTO: ${fmt(totalFinal)}`;
+  doc.text(totalTitleText, margin + contentWidth / 2, y + 13, { align: 'center' });
   
   y += 20;
 
@@ -407,12 +421,12 @@ export function generateProposalPDF(
   doc.setFontSize(9);
   doc.setTextColor(...COLORS.foreground);
   
-  const isMadeiramento = data.kitType === 'madeiramento';
+  const isMadeiramento = data.kitType === 'madeiramento' || data.kitType === 'parceira';
   const pctSinal = isMadeiramento ? '30%' : '50%';
   const pctSaldo = isMadeiramento ? '70%' : '50%';
   const sinalPix = isMadeiramento ? totalAVista * 0.3 : totalAVista * 0.5;
   const saldoPix = isMadeiramento ? totalAVista * 0.7 : totalAVista * 0.5;
-  const descSinal = isMadeiramento ? 'Na assinatura do contrato (PIX)' : 'Na assinatura do contrato (PIX) para iniciar projeto';
+  const descSinal = isMadeiramento ? 'Na assinatura do contrato (PIX Wood Bahia)' : 'Na assinatura do contrato (PIX) para iniciar projeto';
   const descSaldo = isMadeiramento ? '24h antes do embarque do kit (Saída da fábrica)' : 'Na saída da fábrica / Conclusão';
 
   doc.text(`• Sinal (${pctSinal}): ${fmt(sinalPix)}`, margin + 6, y + 16);
@@ -508,6 +522,30 @@ export function generateProposalPDF(
   doc.roundedRect(margin, boxStartY, contentWidth, y - boxStartY, 2, 2, 'S');
 
   y += 6;
+
+  if (data.kitType === 'parceira' && partnerLaborValue > 0) {
+    y = checkPageBreak(doc, y, 32);
+    doc.setFillColor(250, 247, 242);
+    doc.setDrawColor(220, 210, 200);
+    doc.roundedRect(margin, y, contentWidth, 24, 2, 2, 'FD');
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(...COLORS.accent);
+    doc.text(`🤝 MÃO DE OBRA DE MONTADOR PARCEIRO (CONTRATO E PAGAMENTO DIRETO)`, margin + 6, y + 6.5);
+
+    doc.setFontSize(8.5);
+    doc.setTextColor(...COLORS.foreground);
+    doc.text(`• Valor Estimado da Montagem: ${fmt(partnerLaborValue)}`, margin + 6, y + 13);
+
+    doc.setFontSize(7.5);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...COLORS.muted);
+    doc.text(`* Este valor é uma referência de mercado para a montagem do kit. O contrato e o pagamento são realizados`, margin + 6, y + 18);
+    doc.text(`  diretamente entre você e o carpinteiro/montador credenciado indicado pela fábrica (com isenção total de taxas Wood Bahia).`, margin + 6, y + 21.5);
+
+    y += 28;
+  }
 
   // ─── PRAZOS BANNER ───
   const hasLabor = ['parceira', 'turnkey'].includes(data.kitType) || (data.kitType === 'custom' && data.includeLabor);

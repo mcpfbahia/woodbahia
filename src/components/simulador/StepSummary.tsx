@@ -27,7 +27,11 @@ const KIT_NAMES: Record<string, string> = {
 export function StepSummary({ state, onBack, onReset }: Props) {
   const { items, freight, additionalFreight, additionalTravelCost, total } = calculateSummary(state);
   const area = getEffectiveArea(state);
-  const { creditCardBase, pixBase } = getPaymentBases(items, total);
+  const partnerLaborItem = items.find(i => i.label.toLowerCase().includes('montador parceiro'));
+  const partnerLaborValue = (state.kitType === 'parceira' && partnerLaborItem) ? partnerLaborItem.value : 0;
+  const woodBahiaTotal = state.kitType === 'parceira' ? Math.max(0, total - partnerLaborValue) : total;
+
+  const { creditCardBase, pixBase } = getPaymentBases(items, woodBahiaTotal);
   
   const isCustom = state.kitType === 'custom';
   const modelLabel = isCustom
@@ -36,14 +40,14 @@ export function StepSummary({ state, onBack, onReset }: Props) {
   const kitLabel = state.kitType ? KIT_NAMES[state.kitType] || state.kitType : '';
 
   const CASH_DISCOUNT = getModelDiscountRate(state.model?.id || state.model?.name, state.model?.discountRate);
-  const totalAVista = Math.round(total - (creditCardBase * CASH_DISCOUNT));
+  const totalAVista = Math.round(woodBahiaTotal - (creditCardBase * CASH_DISCOUNT));
   
-  const isMadeiramento = state.kitType === 'madeiramento';
-  const sinalPix = isMadeiramento ? total * 0.3 : total / 2;
-  const saldoPix = isMadeiramento ? total * 0.7 : total / 2;
+  const isMadeiramento = state.kitType === 'madeiramento' || state.kitType === 'parceira';
+  const sinalPix = isMadeiramento ? totalAVista * 0.3 : totalAVista / 2;
+  const saldoPix = isMadeiramento ? totalAVista * 0.7 : totalAVista / 2;
   const pctSinal = isMadeiramento ? '30%' : '50%';
   const pctSaldo = isMadeiramento ? '70%' : '50%';
-  const descSinal = isMadeiramento ? 'Na assinatura do contrato' : 'Para iniciar o projeto';
+  const descSinal = isMadeiramento ? 'Na assinatura do contrato (PIX Wood Bahia)' : 'Na assinatura do contrato (PIX) para iniciar projeto';
   const descSaldo = isMadeiramento ? '24h antes do embarque do kit (Saída da fábrica)' : 'Na saída da fábrica';
 
   // Build WhatsApp message with full report
@@ -62,8 +66,9 @@ export function StepSummary({ state, onBack, onReset }: Props) {
     additionalFreight > 0 ? `• Frete Adicional (> 200km): ${fmt(additionalFreight)}` : ``,
     additionalTravelCost > 0 ? `• Deslocamento Adicional Chave na Mão (> 200km): ${fmt(additionalTravelCost)}` : ``,
     ``,
-    `💰 *Total do Investimento: ${fmt(total)}*`,
-    `💚 *À Vista (Desconto no Kit): ${fmt(totalAVista)}*`,
+    `💰 *${state.kitType === 'parceira' ? 'Total Contrato Wood Bahia (Kit & Frete)' : 'Total do Investimento'}: ${fmt(woodBahiaTotal)}*`,
+    `💚 *À Vista no PIX (Desconto na Madeira): ${fmt(totalAVista)}*`,
+    ...(partnerLaborValue > 0 ? [`🤝 *Mão de Obra Montador Parceiro (Estimado)*: ${fmt(partnerLaborValue)} (Contrato e pagamento direto ao carpinteiro)`] : []),
     ``,
     `📅 *OPÇÃO 1: PIX/BOLETO*`,
     `• Sinal (${pctSinal}): ${fmt(sinalPix)} — ${descSinal}`,
@@ -223,8 +228,15 @@ export function StepSummary({ state, onBack, onReset }: Props) {
                 transition={{ delay: 0.4 }}
                 className="flex justify-between items-center bg-accent/5 rounded-xl p-4 -mx-1"
               >
-                <span className="text-lg font-bold font-display">Total do Investimento</span>
-                <span className="text-2xl md:text-3xl font-bold text-accent font-display">{fmt(total)}</span>
+                <div>
+                  <span className="text-base md:text-lg font-bold font-display block">
+                    {state.kitType === 'parceira' ? 'Total Contrato Wood Bahia (Kit & Frete)' : 'Total do Investimento'}
+                  </span>
+                  {state.kitType === 'parceira' && (
+                    <span className="text-xs text-muted-foreground">Exclui montagem (paga direto ao carpinteiro)</span>
+                  )}
+                </div>
+                <span className="text-2xl md:text-3xl font-bold text-accent font-display">{fmt(woodBahiaTotal)}</span>
               </motion.div>
 
               {/* Cash discount highlight */}
