@@ -538,12 +538,19 @@ export const SimulatorSection = () => {
                   )}
 
                   {includeLabor && (
-                    <div className="flex justify-between text-sm">
-                      <span className="text-[#5C3317] font-medium flex items-center gap-1.5">
-                        <Hammer className="w-3.5 h-3.5 text-stone-400" />
-                        Mão de Obra de Montagem:
-                      </span>
-                      <span className="font-bold text-stone-800">{formatBRL(laborPrice)}</span>
+                    <div className="space-y-0.5">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-[#5C3317] font-medium flex items-center gap-1.5">
+                          <Hammer className="w-3.5 h-3.5 text-stone-400" />
+                          {modalidade === "parceira" ? "Mão de Obra de Montador Parceiro:" : "Mão de Obra de Montagem:"}
+                        </span>
+                        <span className="font-bold text-stone-800">{formatBRL(laborPrice)}</span>
+                      </div>
+                      {modalidade === "parceira" && (
+                        <span className="text-[10px] text-stone-500 italic block pl-5">
+                          (Negociado e pago diretamente ao montador parceiro)
+                        </span>
+                      )}
                     </div>
                   )}
 

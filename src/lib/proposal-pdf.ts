@@ -370,7 +370,17 @@ export function generateProposalPDF(
     }
   });
 
-  y = (doc as any).lastAutoTable.finalY + 6;
+  y = (doc as any).lastAutoTable.finalY + 3;
+
+  if (data.kitType === 'parceira') {
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(7.5);
+    doc.setTextColor(...COLORS.muted);
+    doc.text('* Mão de Obra de Montador Parceiro: Valor estimado. Serviço negociado e pago diretamente ao profissional parceiro.', margin, y);
+    y += 5;
+  } else {
+    y += 3;
+  }
 
   // ─── UNIFIED PAYMENT BLOCK ───
   y = checkPageBreak(doc, y, 160); // Ensure space for the whole block including 18 rows

@@ -493,7 +493,10 @@ export function calculateProposalItems(
   if (hasLabor) {
     laborValue = getLaborCost(area);
     if (data.laborPriceOverride !== undefined) laborValue = data.laborPriceOverride;
-    items.push({ label: 'Mão de Obra', value: laborValue });
+    const laborLabel = data.kitType === 'parceira' 
+      ? 'Mão de Obra de Montador Parceiro (Estimado)' 
+      : 'Mão de Obra de Montagem';
+    items.push({ label: laborLabel, value: laborValue });
   }
 
   // 6. Instalação Elétrica e Hidráulica

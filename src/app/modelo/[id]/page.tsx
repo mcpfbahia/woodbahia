@@ -980,9 +980,19 @@ export default function ModelDetailPage() {
                     )}
 
                     {/* Item 3: Mão de Obra de Montagem */}
-                    {simModalidade !== 'kit' ? (
+                    {simModalidade === 'parceira' ? (
+                      <div className="pb-3 border-b border-stone-100 space-y-0.5">
+                        <div className="flex justify-between">
+                          <span className="text-stone-700 font-medium">3. Mão de Obra de Montador Parceiro:</span>
+                          <span className="font-bold text-stone-850">{formatBRL(laborCost)}</span>
+                        </div>
+                        <span className="text-[10px] text-stone-500 italic block">
+                          (Negociado e pago diretamente ao montador parceiro)
+                        </span>
+                      </div>
+                    ) : simModalidade === 'turnkey' ? (
                       <div className="flex justify-between pb-3 border-b border-stone-100">
-                        <span className="text-stone-700 font-medium">3. Mão de Obra de Montagem (Incluso no Parceira/Chave na Mão):</span>
+                        <span className="text-stone-700 font-medium">3. Mão de Obra de Montagem:</span>
                         <span className="font-bold text-stone-850">{formatBRL(laborCost)}</span>
                       </div>
                     ) : (

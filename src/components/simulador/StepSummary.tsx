@@ -183,15 +183,23 @@ export function StepSummary({ state, onBack, onReset }: Props) {
                           item.label.toLowerCase().includes('fundação') ||
                           item.label.toLowerCase().includes('alicerce')
                         );
+                        const isPartnerLabor = item.label.toLowerCase().includes('montador parceiro');
                         return (
-                          <div key={i} className="flex justify-between items-center text-sm py-0.5">
-                            <span className="text-muted-foreground">{item.label}</span>
-                            {isIncFoundation ? (
-                              <span className="font-semibold text-green-700 bg-green-50 px-2.5 py-0.5 rounded-full text-[10px] border border-green-100 uppercase tracking-wider">
-                                Incluso
+                          <div key={i} className="py-0.5">
+                            <div className="flex justify-between items-center text-sm">
+                              <span className="text-muted-foreground">{item.label}</span>
+                              {isIncFoundation ? (
+                                <span className="font-semibold text-green-700 bg-green-50 px-2.5 py-0.5 rounded-full text-[10px] border border-green-100 uppercase tracking-wider">
+                                  Incluso
+                                </span>
+                              ) : (
+                                <span className="font-semibold tabular-nums text-stone-850">{fmt(item.value)}</span>
+                              )}
+                            </div>
+                            {isPartnerLabor && (
+                              <span className="text-[10px] text-stone-500 italic block mt-0.5">
+                                (Negociar e pagar diretamente ao montador parceiro)
                               </span>
-                            ) : (
-                              <span className="font-semibold tabular-nums text-stone-850">{fmt(item.value)}</span>
                             )}
                           </div>
                         );
