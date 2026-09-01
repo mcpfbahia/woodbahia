@@ -49,6 +49,7 @@ export function getIncludedItems(data: ProposalData): string[] {
     'Estrutura completa em madeira Pinus autoclavada',
     'Paredes, forros e estrutura do telhado',
     'Ripas, canaletas, rodapés, molduras',
+    'Manual de montagem detalhado e suporte técnico',
   ];
   
   const hasFixtures = data.kitType === 'custom' ? data.includeFixtures : ['parceira', 'turnkey'].includes(data.kitType);

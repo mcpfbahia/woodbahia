@@ -171,24 +171,28 @@ export default function ModalitiesPage() {
                     </li>
                     <li className="flex items-center gap-2.5 text-xs text-stone-700">
                       <Check className="w-4 h-4 text-emerald-600 shrink-0" strokeWidth={3} />
-                      IndicaÃ§Ã£o de carpinteiros homologados e experientes
+                      Manual de montagem e suporte técnico por vídeo chamada
                     </li>
                     <li className="flex items-center gap-2.5 text-xs text-stone-700">
                       <Check className="w-4 h-4 text-emerald-600 shrink-0" strokeWidth={3} />
-                      Economia real sem intermediÃ¡rios e taxas extras
+                      Indicação de carpinteiros homologados e experientes
+                    </li>
+                    <li className="flex items-center gap-2.5 text-xs text-stone-700">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" strokeWidth={3} />
+                      Economia real sem intermediários e taxas extras
                     </li>
                   </ul>
                   <p className="text-[10px] text-stone-500 italic mt-4 border-t border-stone-100 pt-3">
-                    Obs: O cliente compra Ã  parte os complementos como telhas, vidros, fiaÃ§Ã£o, encanamento, portas e janelas.
+                    Obs: O cliente compra à parte os complementos como telhas, vidros, fiação, encanamento, portas e janelas.
                   </p>
                 </div>
                 <a
-                  href="https://wa.me/5571992936290?text=OlÃ¡! Gostaria de entender mais sobre a modalidade de Montagem Parceira."
+                  href="https://wa.me/5571992936290?text=Olá! Gostaria de entender mais sobre a modalidade de Montagem Parceira."
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full py-4 text-center rounded-2xl bg-[#8A3A1B] hover:bg-[#732F14] text-white font-bold text-sm transition-all shadow flex items-center justify-center gap-2"
                 >
-                  <span>OrÃ§amento de Montagem</span>
+                  <span>Orçamento de Montagem</span>
                   <ArrowRight className="w-4 h-4" />
                 </a>
               </div>
@@ -201,12 +205,16 @@ export default function ModalitiesPage() {
                   <div className="w-14 h-14 rounded-2xl bg-stone-50 text-[#8A3A1B] flex items-center justify-center mb-6">
                     <Home className="w-7 h-7" />
                   </div>
-                  <h3 className="text-2xl font-bold text-stone-900 mb-2">3. Wood Bahia Chave na MÃ£o</h3>
+                  <h3 className="text-2xl font-bold text-stone-900 mb-2">3. Wood Bahia Chave na Mão</h3>
                   <span className="text-xs uppercase tracking-wider font-bold text-emerald-700 block mb-6">Comodidade Total e Garantia Unificada</span>
                   <p className="text-sm text-gray-500 leading-relaxed mb-6">
-                    Assuma zero preocupaÃ§Ã£o de obra. A Wood Bahia gerencia a montagem estrutural completa de ponta a ponta e entrega o chalÃ© estruturado pronto e acabado externamente.
+                    Assuma zero preocupação de obra. A Wood Bahia gerencia a montagem estrutural completa de ponta a ponta e entrega o chalé estruturado pronto e acabado externamente.
                   </p>
                   <ul className="space-y-3 mb-8 border-t border-[#E8DCCF] pt-6">
+                    <li className="flex items-center gap-2.5 text-xs text-stone-700">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" strokeWidth={3} />
+                      Manual de montagem e projeto estrutural técnico
+                    </li>
                     <li className="flex items-center gap-2.5 text-xs text-stone-700">
                       <Check className="w-4 h-4 text-emerald-600 shrink-0" strokeWidth={3} />
                       Portas, janelas, vidros e cobertura instalados

@@ -29,9 +29,9 @@ export const ModalitiesHomeSection = () => {
       description: "Economize até 30% contratando carpinteiros parceiros credenciados indicados pela Wood Bahia.",
       features: [
         "Todo o material do Kit Madeiramento",
+        "Manual técnico detalhado de montagem",
         "Indicação de carpinteiros homologados",
         "Contrato direto com o profissional (sem taxas)",
-        "Esquadrias, telhas e elétrica pelo cliente",
       ],
       btnText: "Saiba mais",
       btnLink: "/modalidades",
@@ -45,9 +45,9 @@ export const ModalitiesHomeSection = () => {
       description: "Receba o chalé pronto e acabado externamente com total coordenação da construtora.",
       features: [
         "Madeiramento, montagem e gestão de obra",
+        "Manual técnico detalhado de montagem",
         "Cobertura, vidros, portas e janelas inclusos",
         "Instalações elétricas e hidráulicas básicas",
-        "Pintura externa em Stain e garantia global",
       ],
       btnText: "Solicitar orçamento",
       btnLink: "https://wa.me/5571992936290?text=Olá! Gostaria de um orçamento para a modalidade Chave na Mão.",
