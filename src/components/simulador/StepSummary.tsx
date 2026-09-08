@@ -27,9 +27,8 @@ const KIT_NAMES: Record<string, string> = {
 export function StepSummary({ state, onBack, onReset }: Props) {
   const { items, freight, additionalFreight, additionalTravelCost, total } = calculateSummary(state);
   const area = getEffectiveArea(state);
-  const partnerLaborItem = items.find(i => i.label.toLowerCase().includes('montador parceiro'));
-  const partnerLaborValue = (state.kitType === 'parceira' && partnerLaborItem) ? partnerLaborItem.value : 0;
-  const woodBahiaTotal = state.kitType === 'parceira' ? Math.max(0, total - partnerLaborValue) : total;
+  const complementsTotal = items.filter(i => !i.deleted && i.isComplement).reduce((sum, i) => sum + i.value, 0);
+  const woodBahiaTotal = Math.max(0, total - complementsTotal);
 
   const { creditCardBase, pixBase } = getPaymentBases(items, woodBahiaTotal);
   
@@ -61,14 +60,21 @@ export function StepSummary({ state, onBack, onReset }: Props) {
     `📦 Kit: ${kitLabel}`,
     ``,
     `📊 *Detalhamento:*`,
-    ...items.map((item: LineItem) => `• ${item.label}: ${fmt(item.value)}`),
+    ...(items.filter(i => !i.isComplement).length > 0 ? [`*Itens Wood Bahia:*`] : []),
+    ...items.filter(i => !i.isComplement).map((item: LineItem) => `• ${item.label}: ${fmt(item.value)}`),
     `• Frete Estimado: ${fmt(freight)}`,
     additionalFreight > 0 ? `• Frete Adicional (> 200km): ${fmt(additionalFreight)}` : ``,
     additionalTravelCost > 0 ? `• Deslocamento Adicional Chave na Mão (> 200km): ${fmt(additionalTravelCost)}` : ``,
+    ...(items.filter(i => i.isComplement).length > 0 ? [
+      ``,
+      `*Complementos Estimados (Adquiridos à parte):*`,
+      ...items.filter(i => i.isComplement).map((item: LineItem) => `• ${item.label}: ${fmt(item.value)}`),
+      ``,
+      `💰 *Total Estimado do Projeto: ${fmt(total)}*`
+    ] : []),
     ``,
     `💰 *${state.kitType === 'parceira' ? 'Total Contrato Wood Bahia (Kit & Frete)' : 'Total do Investimento'}: ${fmt(woodBahiaTotal)}*`,
     `💚 *À Vista no PIX (Desconto na Madeira): ${fmt(totalAVista)}*`,
-    ...(partnerLaborValue > 0 ? [`🤝 *Mão de Obra Montador Parceiro (Estimado)*: ${fmt(partnerLaborValue)} (Contrato e pagamento direto ao carpinteiro)`] : []),
     ``,
     `📅 *OPÇÃO 1: PIX/BOLETO*`,
     `• Sinal (${pctSinal}): ${fmt(sinalPix)} — ${descSinal}`,
@@ -84,23 +90,17 @@ export function StepSummary({ state, onBack, onReset }: Props) {
   const whatsappUrl = `https://wa.me/5571992936290?text=${encodeURIComponent(whatsappMessage)}`;
 
   // Filtragem de itens por categoria
-  const materialItems = items.filter(item => {
-    const label = item.label.toLowerCase();
-    const isService = label.includes('mão de obra') || 
-                      label.includes('gestão') || 
-                      label.includes('coordenação') || 
-                      label.includes('deslocamento');
-    return !isService;
-  });
+  const isService = (label: string) => {
+    const l = label.toLowerCase();
+    return l.includes('mão de obra') || 
+           l.includes('gestão') || 
+           l.includes('coordenação') || 
+           l.includes('deslocamento');
+  };
 
-  const serviceItems = items.filter(item => {
-    const label = item.label.toLowerCase();
-    const isService = label.includes('mão de obra') || 
-                      label.includes('gestão') || 
-                      label.includes('coordenação') || 
-                      label.includes('deslocamento');
-    return isService;
-  });
+  const wbMaterialItems = items.filter(item => !item.isComplement && !isService(item.label));
+  const wbServiceItems = items.filter(item => !item.isComplement && isService(item.label));
+  const complementItems = items.filter(item => item.isComplement);
 
   return (
     <motion.div
@@ -136,10 +136,10 @@ export function StepSummary({ state, onBack, onReset }: Props) {
                 {/* 1. Materiais do Kit & Logística */}
                 <div>
                   <h4 className="text-xs font-black uppercase tracking-widest text-[#B06D46] mb-3 flex items-center gap-1.5 border-b border-stone-100 pb-1.5">
-                    <span>🪵</span> Materiais do Kit & Logística
+                    <span>🪵</span> Materiais do Kit & Logística (Wood Bahia)
                   </h4>
                   <div className="flex flex-col gap-2.5 pl-1">
-                    {materialItems.map((item: LineItem, i: number) => {
+                    {wbMaterialItems.map((item: LineItem, i: number) => {
                       const isIncFoundation = item.value === 0 && (
                         item.label.toLowerCase().includes('sapata') || 
                         item.label.toLowerCase().includes('base radier') || 
@@ -173,14 +173,14 @@ export function StepSummary({ state, onBack, onReset }: Props) {
                   </div>
                 </div>
 
-                {/* 2. Serviços & Montagem de Obra */}
-                {(serviceItems.length > 0 || additionalTravelCost > 0) && (
+                {/* 2. Complementos */}
+                {complementItems.length > 0 && (
                   <div>
                     <h4 className="text-xs font-black uppercase tracking-widest text-[#B06D46] mb-3 flex items-center gap-1.5 border-b border-stone-100 pb-1.5">
-                      <span>🔨</span> Montagem & Serviços de Obra
+                      <span>🛒</span> Itens Complementares (Adquiridos à parte)
                     </h4>
                     <div className="flex flex-col gap-2.5 pl-1">
-                      {serviceItems.map((item: LineItem, i: number) => {
+                      {complementItems.map((item: LineItem, i: number) => {
                         const isIncFoundation = item.value === 0 && (
                           item.label.toLowerCase().includes('sapata') || 
                           item.label.toLowerCase().includes('base radier') || 
@@ -209,6 +209,27 @@ export function StepSummary({ state, onBack, onReset }: Props) {
                           </div>
                         );
                       })}
+                    </div>
+                  </div>
+                )}
+
+                {/* 3. Serviços & Montagem de Obra Wood Bahia */}
+                {(wbServiceItems.length > 0 || additionalTravelCost > 0) && (
+                  <div>
+                    <h4 className="text-xs font-black uppercase tracking-widest text-[#B06D46] mb-3 flex items-center gap-1.5 border-b border-stone-100 pb-1.5">
+                      <span>🔨</span> Serviços e Mão de Obra (Wood Bahia)
+                    </h4>
+                    <div className="flex flex-col gap-2.5 pl-1">
+                      {wbServiceItems.map((item: LineItem, i: number) => {
+                        return (
+                          <div key={i} className="py-0.5">
+                            <div className="flex justify-between items-center text-sm">
+                              <span className="text-muted-foreground">{item.label}</span>
+                              <span className="font-semibold tabular-nums text-stone-850">{fmt(item.value)}</span>
+                            </div>
+                          </div>
+                        );
+                      })}
                       {additionalTravelCost > 0 && (
                         <div className="flex justify-between items-center text-sm py-0.5 text-amber-600 font-semibold">
                           <span>Deslocamento Adicional Chave na Mão (&gt; 200km)</span>
@@ -233,7 +254,7 @@ export function StepSummary({ state, onBack, onReset }: Props) {
                     {state.kitType === 'parceira' ? 'Total Contrato Wood Bahia (Kit & Frete)' : 'Total do Investimento'}
                   </span>
                   {state.kitType === 'parceira' && (
-                    <span className="text-xs text-muted-foreground">Exclui montagem (paga direto ao carpinteiro)</span>
+                    <span className="text-xs text-muted-foreground">Considerando Kit Madeiramento, Frete e Base (se houver)</span>
                   )}
                 </div>
                 <span className="text-2xl md:text-3xl font-bold text-accent font-display">{fmt(woodBahiaTotal)}</span>

@@ -1015,12 +1015,20 @@ export default function ModelDetailPage() {
                     )}
 
                     {/* Item 5: Fundação Estimada (Sapatas Eucalipto) */}
-                    {simModalidade !== 'kit' ? (
+                    {simModalidade === 'turnkey' ? (
                       <div className="flex justify-between pb-3 border-b border-stone-100">
                         <span className="text-stone-700 font-medium">
-                          5. Fundação Estimada (Incluso no Parceira/Chave na Mão):
+                          5. Fundação Estimada (Incluso no Chave na Mão):
                         </span>
                         <span className="font-bold text-stone-850">{formatBRL(getEucalyptusFoundation(numericArea))}</span>
+                      </div>
+                    ) : simModalidade === 'parceira' ? (
+                      <div className="flex justify-between pb-3 border-b border-stone-100 text-stone-600">
+                        <span className="font-medium">5. Fundação Estimada (Sapatas Eucalipto):</span>
+                        <div className="flex flex-col items-end">
+                          <span className="font-bold text-stone-850">{formatBRL(getEucalyptusFoundation(numericArea))}</span>
+                          <span className="italic text-[10px] text-stone-500">Complemento (Adquirido à parte)</span>
+                        </div>
                       </div>
                     ) : (
                       <div className="flex justify-between pb-3 border-b border-stone-100 text-stone-300">
@@ -1035,6 +1043,14 @@ export default function ModelDetailPage() {
                         <span className="text-stone-700 font-medium">6. Cobertura Premium (Incluso apenas no Chave na Mão):</span>
                         <span className="font-bold text-stone-850">{formatBRL(modelTilesPrice)}</span>
                       </div>
+                    ) : simModalidade === 'parceira' ? (
+                      <div className="flex justify-between pb-3 border-b border-stone-100 text-stone-600">
+                        <span className="font-medium">6. Cobertura Premium Estimada (Telhas e Manta):</span>
+                        <div className="flex flex-col items-end">
+                          <span className="font-bold text-stone-850">{formatBRL(modelTilesPrice)}</span>
+                          <span className="italic text-[10px] text-stone-500">Complemento (Adquirido à parte)</span>
+                        </div>
+                      </div>
                     ) : (
                       <div className="flex justify-between pb-3 border-b border-stone-100 text-stone-300">
                         <span className="font-medium">6. Cobertura Premium (Telhas e Manta):</span>
@@ -1048,6 +1064,14 @@ export default function ModelDetailPage() {
                         <span className="text-stone-700 font-medium">7. Portas, Janelas e Ferragens (Incluso no Chave na Mão):</span>
                         <span className="font-bold text-stone-850">{formatBRL(modelFixturesPrice)}</span>
                       </div>
+                    ) : simModalidade === 'parceira' ? (
+                      <div className="flex justify-between pb-3 border-b border-stone-100 text-stone-600">
+                        <span className="font-medium">7. Portas, Janelas e Ferragens Estimados:</span>
+                        <div className="flex flex-col items-end">
+                          <span className="font-bold text-stone-850">{formatBRL(modelFixturesPrice)}</span>
+                          <span className="italic text-[10px] text-stone-500">Complemento (Adquirido à parte)</span>
+                        </div>
+                      </div>
                     ) : (
                       <div className="flex justify-between pb-3 border-b border-stone-100 text-stone-300">
                         <span className="font-medium">7. Portas, Janelas e Ferragens:</span>
@@ -1060,6 +1084,14 @@ export default function ModelDetailPage() {
                       <div className="flex justify-between pb-3 border-b border-stone-100">
                         <span className="text-stone-700 font-medium">8. Vidros Fachada (Incluso apenas no Chave na Mão):</span>
                         <span className="font-bold text-stone-850">{formatBRL(modelGlassPrice)}</span>
+                      </div>
+                    ) : simModalidade === 'parceira' ? (
+                      <div className="flex justify-between pb-3 border-b border-stone-100 text-stone-600">
+                        <span className="font-medium">8. Vidros Fachada Estimados:</span>
+                        <div className="flex flex-col items-end">
+                          <span className="font-bold text-stone-850">{formatBRL(modelGlassPrice)}</span>
+                          <span className="italic text-[10px] text-stone-500">Complemento (Adquirido à parte)</span>
+                        </div>
                       </div>
                     ) : (
                       <div className="flex justify-between pb-3 border-b border-stone-100 text-stone-300">
@@ -1087,6 +1119,14 @@ export default function ModelDetailPage() {
                         <span className="text-stone-700 font-medium">10. Instalações Elétrica/Hidro (Incluso apenas no Chave na Mão):</span>
                         <span className="font-bold text-stone-850">{formatBRL(getElectricalKit(numericArea))}</span>
                       </div>
+                    ) : simModalidade === 'parceira' ? (
+                      <div className="flex justify-between pb-3 border-b border-stone-100 text-stone-600">
+                        <span className="font-medium">10. Kit Elétrica/Hidráulica Estimado:</span>
+                        <div className="flex flex-col items-end">
+                          <span className="font-bold text-stone-850">{formatBRL(getElectricalKit(numericArea))}</span>
+                          <span className="italic text-[10px] text-stone-500">Complemento (Adquirido à parte)</span>
+                        </div>
+                      </div>
                     ) : (
                       <div className="flex justify-between pb-3 border-b border-stone-100 text-stone-300">
                         <span className="font-medium">10. Instalações de Elétrica/Hidráulica Básica:</span>
@@ -1112,7 +1152,7 @@ export default function ModelDetailPage() {
                       const kitAVista = kitAPrazo - kitDesconto;
                       
                       // 2. Parceira (isolando mão de obra para pagamento direto ao carpinteiro)
-                      const partnerAPrazo = kitBasePriceNum + getEucalyptusFoundation(numericArea) + getFreight(numericArea) + (includeBaseInSim ? basePrice : 0);
+                      const partnerAPrazo = kitBasePriceNum + getFreight(numericArea) + (includeBaseInSim ? basePrice : 0);
                       const partnerDiscountable = kitBasePriceNum + (includeBaseInSim ? basePrice : 0);
                       const partnerDesconto = Math.round(partnerDiscountable * discountRate);
                       const partnerAVista = partnerAPrazo - partnerDesconto;
@@ -1126,6 +1166,9 @@ export default function ModelDetailPage() {
                       const totalAPrazo = simModalidade === 'kit' ? kitAPrazo : simModalidade === 'parceira' ? partnerAPrazo : turnkeyAPrazo;
                       const totalAVista = simModalidade === 'kit' ? kitAVista : simModalidade === 'parceira' ? partnerAVista : turnkeyAVista;
                       const descontoAVista = simModalidade === 'kit' ? kitDesconto : simModalidade === 'parceira' ? partnerDesconto : turnkeyDesconto;
+
+                      const partnerComplementsTotal = laborCost + modelTilesPrice + modelFixturesPrice + modelGlassPrice + getElectricalKit(numericArea) + getEucalyptusFoundation(numericArea);
+                      const partnerTotalEstimadoGeral = partnerAPrazo + partnerComplementsTotal;
 
                       return (
                         <div className="space-y-4">
@@ -1168,18 +1211,28 @@ export default function ModelDetailPage() {
                                         {formatBRL(complementosPix)}
                                       </span>
                                     </div>
-
+                                    
                                     {simModalidade === 'parceira' && (
-                                      <div className="bg-amber-50/60 p-4 rounded-xl border border-amber-200/80 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
-                                        <div>
-                                          <span className="text-[10px] text-amber-900 font-bold uppercase tracking-wider block">🤝 Mão de Obra de Montador Parceiro (Estimado)</span>
-                                          <span className="text-[11px] text-amber-800 italic mt-0.5 block">
-                                            Negociado e pago diretamente ao carpinteiro/montador parceiro (isento de taxas Wood Bahia)
+                                      <div className="bg-amber-50/60 p-4 rounded-xl border border-amber-200/80 flex flex-col justify-between gap-4">
+                                        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-amber-200/50 pb-3">
+                                          <div>
+                                            <span className="text-[10px] text-amber-900 font-bold uppercase tracking-wider block">🛒 Total de Complementos Estimados (Adquiridos à parte)</span>
+                                            <span className="text-[11px] text-amber-800 italic mt-0.5 block">
+                                              Mão de Obra, Fundações, Telhas, Vidros, Portas/Janelas, Elétrica
+                                            </span>
+                                          </div>
+                                          <span className="font-serif font-bold text-lg text-amber-950">
+                                            {formatBRL(partnerComplementsTotal)}
                                           </span>
                                         </div>
-                                        <span className="font-serif font-black text-xl text-amber-950">
-                                          {formatBRL(laborCost)}
-                                        </span>
+                                        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 pt-1">
+                                          <div>
+                                            <span className="text-[11px] text-amber-950 font-black uppercase tracking-wider block">💰 Total Estimado do Projeto Completo</span>
+                                          </div>
+                                          <span className="font-serif font-black text-xl text-amber-950">
+                                            {formatBRL(partnerTotalEstimadoGeral)}
+                                          </span>
+                                        </div>
                                       </div>
                                     )}
                                   </div>

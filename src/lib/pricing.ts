@@ -252,6 +252,7 @@ export interface LineItem {
   label: string;
   value: number;
   deleted?: boolean;
+  isComplement?: boolean;
 }
 
 export function getEffectiveArea(state: SimulationState): number {
@@ -284,7 +285,8 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
     if (state.foundationType === 'radier') {
       items.push({ 
         label: `Base Radier + Banheiro Alvenaria${isInc ? ' (Incluso)' : ''}`, 
-        value: isInc ? 0 : getRadierFoundation(area) 
+        value: isInc ? 0 : getRadierFoundation(area),
+        isComplement: ['parceira', 'kit', 'basico', 'madeiramento'].includes(kit as string)
       });
     } else if (state.foundationType === 'wooden_eucalyptus' || state.foundationType === 'wooden_masonry') {
       const isEuc = state.foundationType === 'wooden_eucalyptus';
@@ -296,7 +298,8 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
       
       items.push({ 
         label: `Fundação Sapatas ${isEuc ? 'em Eucalipto' : 'Manilhas de Alvenaria'}${isInc ? ' (Incluso)' : ''}`, 
-        value: isInc ? 0 : (isEuc ? getEucalyptusFoundation(area) : getMasonryFoundation(area))
+        value: isInc ? 0 : (isEuc ? getEucalyptusFoundation(area) : getMasonryFoundation(area)),
+        isComplement: ['parceira', 'kit', 'basico', 'madeiramento'].includes(kit as string)
       });
       
       items.push({ 
@@ -304,10 +307,30 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
         value: isInc ? 0 : (area * 75) 
       });
     }
+  } else if (['parceira', 'kit', 'basico', 'madeiramento'].includes(kit as string)) {
+    // Se o cliente optou por não comprar a fundação da Wood Bahia (ou não preencheu), 
+    // os itens de base estrutural, assoalho e sapatas são essenciais e vão aparecer como Complementos Estimados.
+    items.push({ 
+      label: `Base Estrutural de Madeira (Estimada)`, 
+      value: area * 65,
+      isComplement: true
+    });
+    
+    items.push({ 
+      label: `Fundação Sapatas em Eucalipto (Estimada)`, 
+      value: getEucalyptusFoundation(area),
+      isComplement: true
+    });
+    
+    items.push({ 
+      label: `Assoalho (Estimado)`, 
+      value: area * 75,
+      isComplement: true
+    });
   }
 
   // 3. Portas e Janelas / Ferragens
-  const hasFixtures = kit === 'custom' ? state.customOptions.fixtures : isTurnkey;
+  const hasFixtures = kit === 'custom' ? state.customOptions.fixtures : ['turnkey', 'parceira'].includes(kit as string);
   if (hasFixtures) {
     const fp = getFixturesPrice(area, kit === 'custom' ? 'custom' : modelId);
     
@@ -316,13 +339,14 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
 
     items.push({ 
       label: 'Portas e Janelas', 
-      value: portasJanelasValue 
+      value: portasJanelasValue,
+      isComplement: kit === 'parceira'
     });
-    items.push({ label: 'Ferragens', value: ferragensValue });
+    items.push({ label: 'Ferragens', value: ferragensValue, isComplement: kit === 'parceira' });
   }
 
   // 4. Telhas / Stain
-  const hasTiles = kit === 'custom' ? state.customOptions.tilesStain : isTurnkey;
+  const hasTiles = kit === 'custom' ? state.customOptions.tilesStain : ['turnkey', 'parceira'].includes(kit as string);
   if (hasTiles) {
     const ts = getTilesStainPrice(area, kit === 'custom' ? 'custom' : modelId);
     const tsValue = ts.total;
@@ -330,20 +354,20 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
     const telhasValue = Math.round(tsValue * 0.75);
     const stainValue = tsValue - telhasValue;
 
-    items.push({ label: `Telhas (${area}m²)`, value: telhasValue });
-    items.push({ label: `Stain protetor`, value: stainValue });
+    items.push({ label: `Telhas (${area}m²)`, value: telhasValue, isComplement: kit === 'parceira' });
+    items.push({ label: `Stain protetor`, value: stainValue, isComplement: kit === 'parceira' });
   }
 
   // 5. Mão de Obra
   const hasLabor = kit === 'custom' ? state.customOptions.labor : (kit === 'parceira' || isTurnkey);
   if (hasLabor) {
-    items.push({ label: `Mão de Obra (${area}m² × R$ ${getLaborRate(area).toLocaleString('pt-BR')})`, value: getLaborCost(area) });
+    items.push({ label: `Mão de Obra (${area}m² × R$ ${getLaborRate(area).toLocaleString('pt-BR')})`, value: getLaborCost(area), isComplement: kit === 'parceira' });
   }
 
   // 6. Elétrica
-  const hasElec = kit === 'custom' ? state.customOptions.electrical : state.kitAddons.electrical;
+  const hasElec = kit === 'custom' ? state.customOptions.electrical : (kit === 'parceira' || state.kitAddons.electrical);
   if (hasElec) {
-    items.push({ label: `Kit Elétrica/Hidráulica`, value: getElectricalKit(area) });
+    items.push({ label: `Kit Elétrica/Hidráulica`, value: getElectricalKit(area), isComplement: kit === 'parceira' });
   }
 
   // 7. Pintura Completa
@@ -353,9 +377,9 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
   }
 
   // 8. Vidros
-  const hasGlass = kit === 'custom' ? state.customOptions.glass : (isTurnkey || state.kitAddons.glass);
+  const hasGlass = kit === 'custom' ? state.customOptions.glass : (['turnkey', 'parceira'].includes(kit as string) || state.kitAddons.glass);
   if (hasGlass) {
-    items.push({ label: `Vidros`, value: getGlassPrice(area, kit === 'custom' ? 'custom' : modelId) });
+    items.push({ label: `Vidros`, value: getGlassPrice(area, kit === 'custom' ? 'custom' : modelId), isComplement: kit === 'parceira' });
   }
 
   // 9. Gestão e Coordenação Obra
@@ -419,7 +443,8 @@ export function calculateProposalItems(
       }
       items.push({ 
         label: `Base Radier${isInc ? ' (Incluso)' : ''}`, 
-        value: isInc ? 0 : foundationValue 
+        value: isInc ? 0 : foundationValue,
+        isComplement: ['parceira', 'kit', 'basico', 'madeiramento'].includes(data.kitType as string)
       });
     } else if (data.foundationType === 'wooden_eucalyptus' || data.foundationType === 'wooden_masonry') {
       const isEuc = data.foundationType === 'wooden_eucalyptus';
@@ -438,7 +463,8 @@ export function calculateProposalItems(
       const sapataLabel = isEuc ? 'Sapatas de Eucalipto Tratado' : 'Sapatas de Manilhas em Alvenaria';
       items.push({ 
         label: `${sapataLabel}${isInc ? ' (Incluso)' : ''}`, 
-        value: isInc ? 0 : foundationValue 
+        value: isInc ? 0 : foundationValue,
+        isComplement: ['parceira', 'kit', 'basico', 'madeiramento'].includes(data.kitType as string)
       });
       
       // 3. Assoalho
@@ -447,10 +473,28 @@ export function calculateProposalItems(
         value: isInc ? 0 : (area * 75) 
       });
     }
+  } else if (['parceira', 'kit', 'basico', 'madeiramento'].includes(data.kitType as string)) {
+    items.push({ 
+      label: `Base Estrutural de Madeira (Estimada)`, 
+      value: area * 65,
+      isComplement: true
+    });
+    
+    items.push({ 
+      label: `Fundação Sapatas em Eucalipto (Estimada)`, 
+      value: getEucalyptusFoundation(area),
+      isComplement: true
+    });
+    
+    items.push({ 
+      label: `Assoalho (Estimado)`, 
+      value: area * 75,
+      isComplement: true
+    });
   }
 
   // 3. Portas e Janelas / Ferragens
-  const hasFixtures = data.kitType === 'custom' ? data.includeFixtures : data.kitType === 'turnkey';
+  const hasFixtures = data.kitType === 'custom' ? data.includeFixtures : ['turnkey', 'parceira'].includes(data.kitType);
   if (hasFixtures) {
     let portasJanelasValue = 0;
     let ferragensValue = 0;
@@ -468,13 +512,14 @@ export function calculateProposalItems(
     
     items.push({ 
       label: 'Portas e Janelas', 
-      value: portasJanelasValue 
+      value: portasJanelasValue,
+      isComplement: data.kitType === 'parceira'
     });
-    items.push({ label: 'Ferragens', value: ferragensValue });
+    items.push({ label: 'Ferragens', value: ferragensValue, isComplement: data.kitType === 'parceira' });
   }
 
   // 4. Telhas / Stain
-  const hasTiles = data.kitType === 'custom' ? data.includeTilesStain : ['turnkey'].includes(data.kitType);
+  const hasTiles = data.kitType === 'custom' ? data.includeTilesStain : ['turnkey', 'parceira'].includes(data.kitType);
   if (hasTiles) {
     let tsValue = getTilesStainPrice(area, data.modelId).total;
     if (data.tilesStainPriceOverride !== undefined) tsValue = data.tilesStainPriceOverride;
@@ -483,8 +528,8 @@ export function calculateProposalItems(
     const telhasValue = Math.round(tsValue * 0.75);
     const stainValue = tsValue - telhasValue;
     
-    items.push({ label: `Telhas (${area}m²)`, value: telhasValue });
-    items.push({ label: `Stain protetor`, value: stainValue });
+    items.push({ label: `Telhas (${area}m²)`, value: telhasValue, isComplement: data.kitType === 'parceira' });
+    items.push({ label: `Stain protetor`, value: stainValue, isComplement: data.kitType === 'parceira' });
   }
 
   // 5. Mão de Obra
@@ -496,14 +541,14 @@ export function calculateProposalItems(
     const laborLabel = data.kitType === 'parceira' 
       ? 'Mão de Obra de Montador Parceiro (Estimado)' 
       : 'Mão de Obra de Montagem';
-    items.push({ label: laborLabel, value: laborValue });
+    items.push({ label: laborLabel, value: laborValue, isComplement: data.kitType === 'parceira' });
   }
 
   // 6. Instalação Elétrica e Hidráulica
   if (data.includeElectrical) {
     let elecValue = getElectricalKit(area);
     if (data.electricalPriceOverride !== undefined) elecValue = data.electricalPriceOverride;
-    items.push({ label: 'Instalação Elétrica e Hidráulica Básica', value: elecValue });
+    items.push({ label: 'Instalação Elétrica e Hidráulica Básica', value: elecValue, isComplement: data.kitType === 'parceira' });
   }
 
   // 7. Pintura Completa
@@ -516,17 +561,17 @@ export function calculateProposalItems(
     const paintLabel = effectivePaintType === '1cor' 
       ? 'Pintura Completa com Stain (1 Cor)' 
       : 'Pintura Completa com Stain (2 Cores)';
-    items.push({ label: paintLabel, value: paintValue });
+    items.push({ label: paintLabel, value: paintValue, isComplement: data.kitType === 'parceira' });
   }
 
   // 8. Vidros
-  const hasGlass = data.includeGlass || data.kitType === 'turnkey';
+  const hasGlass = data.includeGlass || ['turnkey', 'parceira'].includes(data.kitType);
   if (hasGlass) {
     let glassValue = getGlassPrice(area, data.modelId);
     if (data.glassPriceOverride !== undefined) {
       glassValue = data.glassPriceOverride;
     }
-    items.push({ label: 'Vidros', value: glassValue });
+    items.push({ label: 'Vidros', value: glassValue, isComplement: data.kitType === 'parceira' });
   }
 
   // 9. Gestão e Coordenação Obra
@@ -553,7 +598,7 @@ export function calculateProposalItems(
       bathroomValue = data.masonryBathroomPriceOverride;
     }
     const label = data.masonryBathroomCount === 1 ? '1 Banheiro em Alvenaria' : `${data.masonryBathroomCount} Banheiros em Alvenaria`;
-    items.push({ label, value: bathroomValue });
+    items.push({ label, value: bathroomValue, isComplement: data.kitType === 'parceira' });
   }
 
   // 12. Extra items

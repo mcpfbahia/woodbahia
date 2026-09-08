@@ -206,7 +206,10 @@ export function generateProposalPDF(
   // Isolamento da Mão de Obra de Montador Parceiro (contratada direto com o profissional)
   const partnerLaborItem = items.find(i => i.label.toLowerCase().includes('montador parceiro'));
   const partnerLaborValue = (data.kitType === 'parceira' && partnerLaborItem) ? partnerLaborItem.value : 0;
-  const woodBahiaTotal = data.kitType === 'parceira' ? Math.max(0, totalFinal - partnerLaborValue) : totalFinal;
+
+  // Isolamento de todos os complementos (não vendidos pela Wood Bahia)
+  const complementsTotal = items.filter(i => !i.deleted && i.isComplement).reduce((sum, i) => sum + i.value, 0);
+  const woodBahiaTotal = Math.max(0, totalFinal - complementsTotal);
 
   const { creditCardBase, pixBase } = getPaymentBases(items, woodBahiaTotal);
 
@@ -317,7 +320,15 @@ export function generateProposalPDF(
   doc.text('INVESTIMENTO', margin, y);
   y += 4;
 
-  const tableBody = items.filter(i => !i.deleted).map(item => {
+  let tableBody: any[] = [];
+  const wbItems = items.filter(i => !i.deleted && !i.isComplement);
+  const compItems = items.filter(i => !i.deleted && i.isComplement);
+
+  if (compItems.length > 0) {
+    tableBody.push([{ content: '--- ITENS WOOD BAHIA ---', colSpan: 2, styles: { halign: 'center', fillColor: [240, 232, 222], textColor: COLORS.accent, fontStyle: 'bold' } }]);
+  }
+
+  const formatItem = (item: any) => {
     const isFoundationItem = item.label.toLowerCase().includes('sapata') || 
                              item.label.toLowerCase().includes('base radier') || 
                              item.label.toLowerCase().includes('base estrutural') || 
@@ -330,7 +341,9 @@ export function generateProposalPDF(
       ? `${fmt(item.value)} *` 
       : fmt(item.value);
     return [item.label, displayValue];
-  });
+  };
+
+  wbItems.forEach(item => tableBody.push(formatItem(item)));
   
   const freightBase = freight * 2;
   tableBody.push(['Frete Base Estimado (' + area + 'm² × R$ 180)', fmt(freightBase)]);
@@ -342,6 +355,12 @@ export function generateProposalPDF(
 
   if (additionalTravelCost > 0) {
     tableBody.push(['Adicional Deslocamento Chave na Mão (> 200km)', '+' + fmt(additionalTravelCost)]);
+  }
+
+  if (compItems.length > 0) {
+    tableBody.push([{ content: '--- COMPLEMENTOS ESTIMADOS (ADQUIRIDOS À PARTE) ---', colSpan: 2, styles: { halign: 'center', fillColor: [255, 240, 230], textColor: [180, 60, 30], fontStyle: 'bold' } }]);
+    compItems.forEach(item => tableBody.push(formatItem(item)));
+    tableBody.push([{ content: `TOTAL ESTIMADO DO PROJETO (Wood Bahia + Complementos): ${fmt(totalFinal)}`, colSpan: 2, styles: { halign: 'right', fillColor: [230, 230, 230], fontStyle: 'bold' } }]);
   }
 
   autoTable(doc, {
@@ -372,8 +391,8 @@ export function generateProposalPDF(
     didParseCell: (hookData) => {
       // Highlight the freight discount row in green
       if (hookData.section === 'body') {
-        const rowData = hookData.row.raw as string[];
-        if (rowData[0] && rowData[0].includes('Promoção: Frete Compartilhado')) {
+        const rowData = hookData.row.raw as any[];
+        if (rowData[0] && typeof rowData[0] === 'string' && rowData[0].includes('Promoção: Frete Compartilhado')) {
           hookData.cell.styles.textColor = [46, 125, 50]; // Green
           hookData.cell.styles.fontStyle = 'bold';
         }

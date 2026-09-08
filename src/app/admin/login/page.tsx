@@ -5,13 +5,14 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "~/lib/firebase";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Lock, Mail, Loader2 } from "lucide-react";
+import { Lock, Mail, Loader2, Eye, EyeOff } from "lucide-react";
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -79,13 +80,24 @@ export default function AdminLoginPage() {
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-10 py-3 text-slate-800 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                   placeholder="••••••••"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
               </div>
             </div>
 
