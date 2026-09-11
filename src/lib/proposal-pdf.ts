@@ -441,21 +441,22 @@ export function generateProposalPDF(
   doc.setTextColor(...COLORS.foreground);
   
   const isMadeiramento = data.kitType === 'madeiramento' || data.kitType === 'parceira';
-  const pctSinal = isMadeiramento ? '30%' : '50%';
-  const pctSaldo = isMadeiramento ? '70%' : '50%';
-  const sinalPix = isMadeiramento ? totalAVista * 0.3 : totalAVista * 0.5;
-  const saldoPix = isMadeiramento ? totalAVista * 0.7 : totalAVista * 0.5;
-  const descSinal = isMadeiramento ? 'Na assinatura do contrato (PIX Wood Bahia)' : 'Na assinatura do contrato (PIX) para iniciar projeto';
-  const descSaldo = isMadeiramento ? '24h antes do embarque do kit (Saída da fábrica)' : 'Na saída da fábrica / Conclusão';
+  const sinalPix = totalAVista * 0.3;
+  const saldoPix = totalAVista * 0.7;
+  
+  const descSinal = 'Na assinatura do contrato (PIX Wood Bahia)';
+  const descSaldo = isMadeiramento 
+    ? '24h antes do embarque do kit (Saída da fábrica)' 
+    : 'Pago proporcionalmente ao andamento da obra (Conforme cronograma)';
 
-  doc.text(`• Sinal (${pctSinal}): ${fmt(sinalPix)}`, margin + 6, y + 16);
+  doc.text(`• Sinal (30%): ${fmt(sinalPix)}`, margin + 6, y + 16);
   doc.setFont('helvetica', 'normal');
-  doc.text(` — ${descSinal}`, margin + 6 + doc.getTextWidth(`• Sinal (${pctSinal}): ${fmt(sinalPix)}`), y + 16);
+  doc.text(` — ${descSinal}`, margin + 6 + doc.getTextWidth(`• Sinal (30%): ${fmt(sinalPix)}`), y + 16);
 
   doc.setFont('helvetica', 'bold');
-  doc.text(`• Saldo Final (${pctSaldo}): ${fmt(saldoPix)}`, margin + 6, y + 22);
+  doc.text(`• Saldo Restante (70%): ${fmt(saldoPix)}`, margin + 6, y + 22);
   doc.setFont('helvetica', 'normal');
-  doc.text(` — ${descSaldo}`, margin + 6 + doc.getTextWidth(`• Saldo Final (${pctSaldo}): ${fmt(saldoPix)}`), y + 22);
+  doc.text(` — ${descSaldo}`, margin + 6 + doc.getTextWidth(`• Saldo Restante (70%): ${fmt(saldoPix)}`), y + 22);
   
   y += 28;
 
