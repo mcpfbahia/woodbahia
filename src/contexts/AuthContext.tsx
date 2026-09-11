@@ -10,6 +10,8 @@ export interface OperadorData {
   name: string;
   email: string;
   role: "admin" | "vendedor" | "consultor";
+  phone?: string;
+  address?: string;
 }
 
 interface AuthContextType {

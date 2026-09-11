@@ -94,11 +94,24 @@ export function AdminSidebar({
         <div className="mb-4 px-3 text-xs font-medium text-slate-500">
           <p className="truncate">{user?.email}</p>
         </div>
+
+        <Link 
+          href="/admin/perfil"
+          onClick={handleLinkClick}
+          className={`group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+            currentPath === "/admin/perfil"
+              ? "bg-primary text-white"
+              : "text-slate-400 hover:bg-slate-800 hover:text-white"
+          }`}
+        >
+          <UserCog className="h-5 w-5 flex-shrink-0" />
+          Meu Perfil
+        </Link>
         
         <Link 
           href="/"
           onClick={handleLinkClick}
-          className="group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-400 transition-colors hover:bg-slate-800 hover:text-white"
+          className="group mt-1 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-400 transition-colors hover:bg-slate-800 hover:text-white"
         >
           <ChevronLeft className="h-5 w-5 flex-shrink-0" />
           Voltar ao Site

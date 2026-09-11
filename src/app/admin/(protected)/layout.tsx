@@ -25,7 +25,7 @@ export default function ProtectedAdminLayout({
       router.push("/admin/login");
     } else if (!loading && user && operador?.role === "consultor") {
       // Protect routes for consultor
-      if (pathname !== "/admin" && !pathname.startsWith("/admin/propostas")) {
+      if (pathname !== "/admin" && !pathname.startsWith("/admin/propostas") && !pathname.startsWith("/admin/perfil")) {
         router.push("/admin/propostas");
       }
     }
@@ -88,6 +88,7 @@ export default function ProtectedAdminLayout({
               {pathname.includes("/admin/diario-de-obras") && "Diário de Obras"}
               {pathname.includes("/admin/leads") && "Leads e Contatos"}
               {pathname.includes("/admin/propostas") && "Gerador de Propostas"}
+              {pathname.includes("/admin/perfil") && "Meu Perfil"}
             </h1>
           </div>
         </header>
