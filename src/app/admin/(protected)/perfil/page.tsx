@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "~/contexts/AuthContext";
 import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 import { db } from "~/lib/firebase";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -41,11 +41,11 @@ export default function PerfilPage() {
     setIsSavingData(true);
     try {
       const docRef = doc(db, "operadores", user.uid);
-      await updateDoc(docRef, {
+      await setDoc(docRef, {
         name: name.trim(),
         phone: phone.trim(),
         address: address.trim()
-      });
+      }, { merge: true });
       toast.success("Dados atualizados com sucesso!");
     } catch (error) {
       console.error("Erro ao atualizar dados:", error);
