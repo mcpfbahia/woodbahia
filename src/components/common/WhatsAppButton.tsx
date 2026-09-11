@@ -3,6 +3,8 @@
 
 import { motion } from "framer-motion";
 
+import { trackGenerateLead } from "~/lib/analytics";
+
 const WhatsAppIcon = () => (
   <svg
     viewBox="0 0 32 32"
@@ -15,8 +17,13 @@ const WhatsAppIcon = () => (
 );
 
 export const WhatsAppButton = () => {
+  const handleClick = () => {
+    trackGenerateLead("whatsapp_fab");
+  };
+
   return (
     <motion.a
+      onClick={handleClick}
       href="https://wa.me/5571992936290?text=Olá! Gostaria de saber mais sobre os chalés da Wood Bahia."
       target="_blank"
       rel="noopener noreferrer"

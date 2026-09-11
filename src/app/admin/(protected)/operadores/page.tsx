@@ -23,7 +23,7 @@ interface Operador {
   id: string; // The doc ID (also the user UID usually)
   name: string;
   email: string;
-  role: "admin" | "vendedor";
+  role: "admin" | "vendedor" | "consultor";
   createdAt: any;
 }
 
@@ -39,7 +39,7 @@ export default function OperadoresPage() {
     name: "",
     email: "",
     password: "",
-    role: "vendedor" as "admin" | "vendedor",
+    role: "vendedor" as "admin" | "vendedor" | "consultor",
   });
 
   const fetchOperadores = async () => {
@@ -178,7 +178,7 @@ export default function OperadoresPage() {
                     <td className="px-6 py-4 text-slate-500">{op.email}</td>
                     <td className="px-6 py-4">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                        op.role === 'admin' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600'
+                        op.role === 'admin' ? 'bg-amber-100 text-amber-700' : op.role === 'consultor' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'
                       }`}>
                         {op.role}
                       </span>
@@ -244,13 +244,14 @@ export default function OperadoresPage() {
                 <Label htmlFor="role">Nível de Acesso</Label>
                 <Select
                   value={formData.role}
-                  onValueChange={(val) => setFormData({ ...formData, role: (val || "vendedor") as "admin" | "vendedor" })}
+                  onValueChange={(val) => setFormData({ ...formData, role: (val || "vendedor") as "admin" | "vendedor" | "consultor" })}
                 >
                   <SelectTrigger id="role">
                     <SelectValue placeholder="Selecione" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="vendedor">Vendedor</SelectItem>
+                    <SelectItem value="consultor">Consultor</SelectItem>
                     <SelectItem value="admin">Administrador</SelectItem>
                   </SelectContent>
                 </Select>

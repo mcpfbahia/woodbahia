@@ -14,7 +14,7 @@ export default function ProtectedAdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, loading } = useAuth();
+  const { user, operador, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -23,8 +23,13 @@ export default function ProtectedAdminLayout({
   useEffect(() => {
     if (!loading && !user) {
       router.push("/admin/login");
+    } else if (!loading && user && operador?.role === "consultor") {
+      // Protect routes for consultor
+      if (pathname !== "/admin" && !pathname.startsWith("/admin/propostas")) {
+        router.push("/admin/propostas");
+      }
     }
-  }, [user, loading, router]);
+  }, [user, loading, operador, pathname, router]);
 
   if (loading) {
     return (

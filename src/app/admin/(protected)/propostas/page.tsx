@@ -10,8 +10,9 @@ import { Switch } from '~/components/ui/switch';
 import { Separator } from '~/components/ui/separator';
 import { FileDown, User, Home, Settings2, Tag, LayoutDashboard, Plus, Trash2, Layers, Paintbrush, Edit2, Loader2, ArrowLeft, Eye, FileText, Search, Undo2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '~/contexts/AuthContext';
 import { db } from "~/lib/firebase";
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy, serverTimestamp, limit, startAfter } from "firebase/firestore";
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy, serverTimestamp, limit, startAfter, where } from "firebase/firestore";
 
 const STATUS_CONFIG: Record<'rascunho' | 'enviada' | 'fechada' | 'perdida', { label: string; bg: string; text: string; border: string; emoji: string }> = {
   rascunho: { label: 'Rascunho', bg: 'bg-stone-50', text: 'text-stone-600', border: 'border-stone-200/60', emoji: '📝' },
@@ -148,6 +149,7 @@ const InlineEditablePrice = ({
 
 export default function PropostasPage() {
   const router = useRouter();
+  const { user, operador } = useAuth();
   const [cabinModels, setCabinModels] = useState<CabinModel[]>(CABIN_MODELS);
   const [view, setView] = useState<'list' | 'form' | 'summary'>('list');
   const [currentProposalId, setCurrentProposalId] = useState<string | null>(null);
@@ -320,7 +322,9 @@ export default function PropostasPage() {
     if (!db) return;
     setLoadingProposals(true);
     try {
-      const q = query(collection(db, "proposals"), orderBy("updatedAt", "desc"), limit(20));
+      const q = operador?.role === 'consultor' 
+        ? query(collection(db, "proposals"), where("operadorId", "==", user?.uid), orderBy("updatedAt", "desc"), limit(20))
+        : query(collection(db, "proposals"), orderBy("updatedAt", "desc"), limit(20));
       const querySnapshot = await getDocs(q);
       const data = querySnapshot.docs.map(doc => ({
         id: doc.id,
@@ -347,12 +351,20 @@ export default function PropostasPage() {
     if (!db || !lastVisible || loadingMore) return;
     setLoadingMore(true);
     try {
-      const q = query(
-        collection(db, "proposals"),
-        orderBy("updatedAt", "desc"),
-        startAfter(lastVisible),
-        limit(20)
-      );
+      const q = operador?.role === 'consultor'
+        ? query(
+            collection(db, "proposals"),
+            where("operadorId", "==", user?.uid),
+            orderBy("updatedAt", "desc"),
+            startAfter(lastVisible),
+            limit(20)
+          )
+        : query(
+            collection(db, "proposals"),
+            orderBy("updatedAt", "desc"),
+            startAfter(lastVisible),
+            limit(20)
+          );
       const querySnapshot = await getDocs(q);
       const data = querySnapshot.docs.map(doc => ({
         id: doc.id,
@@ -379,7 +391,9 @@ export default function PropostasPage() {
     const loadAllForSearch = async () => {
       if (!db || !searchTerm.trim() || hasLoadedAllForSearch) return;
       try {
-        const q = query(collection(db, "proposals"), orderBy("updatedAt", "desc"));
+        const q = operador?.role === 'consultor'
+          ? query(collection(db, "proposals"), where("operadorId", "==", user?.uid), orderBy("updatedAt", "desc"))
+          : query(collection(db, "proposals"), orderBy("updatedAt", "desc"));
         const querySnapshot = await getDocs(q);
         const data = querySnapshot.docs.map(doc => ({
           id: doc.id,
@@ -430,6 +444,8 @@ export default function PropostasPage() {
         status,
         observations: observations.trim() || undefined,
         updatedAt: serverTimestamp(),
+        operadorId: user?.uid,
+        operadorName: operador?.name || user?.email,
         data: currentData
       };
 

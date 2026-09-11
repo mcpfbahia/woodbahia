@@ -14,6 +14,7 @@ import {
   StaggerItem,
 } from "../common/ScrollReveal";
 import { cn } from "~/lib/utils";
+import { trackBeginSimulation, trackViewModel } from "~/lib/analytics";
 
 // Utilitários de preço
 function parsePriceToBRL(val: any): number {
@@ -29,9 +30,12 @@ function formatBRL(val: any): string {
   return Number(val).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
-export const ModelsSection = () => {
-  const [models, setModels] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+export const ModelsSection = ({ initialModelsData }: { initialModelsData?: any[] }) => {
+  const [models, setModels] = useState<any[]>(() => {
+    if (initialModelsData && initialModelsData.length > 0) return initialModelsData.map(applyModelOverrides);
+    return initialModels.map(applyModelOverrides);
+  });
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedModalidade, setSelectedModalidade] = useState<'kit' | 'parceira' | 'turnkey'>('kit');
 
   useEffect(() => {
@@ -84,8 +88,8 @@ export const ModelsSection = () => {
           </p>
 
           {/* Seletor de Modalidade Dinâmico */}
-          <div className="mt-8 flex justify-center">
-            <div className="inline-flex flex-col sm:flex-row rounded-2xl bg-muted/65 p-1.5 border border-border/50 gap-1.5 shadow-inner backdrop-blur-sm">
+          <div className="mt-8 flex justify-center w-full">
+            <div className="flex w-full overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:w-auto sm:overflow-visible sm:inline-flex rounded-2xl bg-muted/65 p-1.5 border border-border/50 gap-1.5 shadow-inner backdrop-blur-sm">
               {[
                 { id: 'kit', label: '1. Kit Madeiramento', emoji: '🪵', desc: 'Apenas a estrutura' },
                 { id: 'parceira', label: '2. Kit + Montagem Parceira', emoji: '🔨', desc: 'Indicação credenciada' },
@@ -95,17 +99,17 @@ export const ModelsSection = () => {
                   key={tab.id}
                   onClick={() => setSelectedModalidade(tab.id as any)}
                   className={cn(
-                    "flex flex-col items-center sm:items-start rounded-xl px-4 py-2.5 text-center sm:text-left transition-all duration-300 min-w-[150px] md:min-w-[190px]",
+                    "flex flex-col items-center sm:items-start rounded-xl px-4 py-2.5 text-center sm:text-left transition-all duration-300 min-w-[200px] shrink-0 md:min-w-[190px]",
                     selectedModalidade === tab.id
-                      ? "bg-white text-primary shadow-md scale-105 border border-primary/5 font-bold"
-                      : "text-muted-foreground hover:text-foreground hover:bg-white/30 font-medium"
+                      ? "bg-white text-primary shadow-md scale-[1.02] sm:scale-105 border border-primary/5 font-bold"
+                      : "text-muted-foreground hover:text-foreground hover:bg-white/30 font-medium opacity-80 hover:opacity-100"
                   )}
                 >
-                  <div className="flex items-center gap-1.5 text-xs md:text-sm">
+                  <div className="flex items-center gap-1.5 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none rounded-md">
                     <span>{tab.emoji}</span>
-                    <span>{tab.label}</span>
+                    <span className="whitespace-nowrap">{tab.label}</span>
                   </div>
-                  <span className="hidden sm:inline text-[9px] opacity-70 mt-0.5 font-medium">
+                  <span className="inline text-xs opacity-70 mt-0.5 font-medium whitespace-nowrap">
                     {tab.desc}
                   </span>
                 </button>
@@ -155,7 +159,11 @@ export const ModelsSection = () => {
                   <div className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-sm transition-all duration-300 hover:border-primary/40 hover:shadow-xl">
 
                     {/* Imagem */}
-                    <Link href={`/modelo/${model.id}`} className="relative block h-48 shrink-0 overflow-hidden sm:h-52">
+                    <Link 
+                      href={`/modelo/${model.id}`} 
+                      className="relative block h-48 shrink-0 overflow-hidden sm:h-52"
+                      onClick={() => trackViewModel(model.id, model.name)}
+                    >
                       <Image
                         src={model.image || "/placeholder.svg"}
                         alt={`${model.name} - Kit pré-fabricado de madeira`}
@@ -167,7 +175,7 @@ export const ModelsSection = () => {
 
                       {/* Badge */}
                       <div className="absolute top-3 left-3 z-10">
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-700/90 backdrop-blur-sm px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-white shadow">
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-700/90 backdrop-blur-sm px-2.5 py-1 text-[11px] font-bold uppercase tracking-widest text-white shadow">
                           <Package className="h-3 w-3" />
                           Kit Premium
                         </span>
@@ -226,106 +234,41 @@ export const ModelsSection = () => {
                       </p>
 
                       {/* Bloco de preços dinâmico por modalidade */}
-                      <div className="mt-auto border-t border-border pt-3">
-                        <div className="grid grid-cols-2 gap-3">
-                          {/* Coluna Esquerda: Kit Madeiramento sempre */}
-                          <div className="flex flex-col justify-between border-r border-border/60 pr-2">
-                            <div>
-                              <p className="text-[9px] font-black uppercase tracking-widest text-primary/60 mb-0.5 leading-none">
-                                🪵 Kit Madeiramento
-                              </p>
-                              {kitFull > 0 ? (
-                                <div className="flex flex-col mt-1">
-                                  <span className="text-[9px] text-muted-foreground line-through leading-none mb-0.5">
-                                    {formatBRL(kitEstimation)}
-                                  </span>
-                                  <span className="font-serif text-sm font-bold text-primary leading-tight sm:text-base">
-                                    {formatBRL(kitPriceDiscounted)}
-                                  </span>
-                                </div>
-                              ) : (
-                                <p className="font-serif text-xs font-bold text-primary mt-1">Consulte</p>
-                              )}
+                      <div className="mt-auto border-t border-border pt-4">
+                        <div className="flex flex-col">
+                          <p className="text-[11px] font-black uppercase tracking-widest text-muted-foreground mb-1">
+                            {selectedModalidade === 'kit' && "🪵 Kit Madeiramento"}
+                            {selectedModalidade === 'parceira' && "🔨 Montagem Parceira"}
+                            {selectedModalidade === 'turnkey' && "🔑 Chave na Mão"}
+                          </p>
+                          
+                          {kitFull > 0 ? (
+                            <div className="flex flex-col">
+                               <span className="text-xs text-muted-foreground line-through decoration-primary/30">
+                                 {formatBRL(
+                                   selectedModalidade === 'kit' ? kitEstimation :
+                                   selectedModalidade === 'parceira' ? partnerEstimation :
+                                   turnkeyEstimation
+                                 )}
+                               </span>
+                               <div className="flex items-baseline gap-2">
+                                 <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">A partir de</span>
+                                 <span className="font-serif text-xl sm:text-2xl font-bold text-primary">
+                                   {formatBRL(
+                                     selectedModalidade === 'kit' ? kitPriceDiscounted :
+                                     selectedModalidade === 'parceira' ? partnerEstimationDiscounted :
+                                     turnkeyEstimationDiscounted
+                                   )}
+                                 </span>
+                               </div>
+                               <span className="text-xs font-bold text-emerald-700 mt-1">
+                                 {discountRate * 100}% desc. à vista ou parcelado em 18x
+                               </span>
                             </div>
-                            {kitFull > 0 && (
-                              <div className="flex flex-col mt-1">
-                                <span className="text-[8px] sm:text-[9px] text-emerald-700 font-bold block">
-                                  {discountRate * 100}% desc. à vista
-                                </span>
-                                <span className="text-[8px] font-medium text-slate-500 mt-0.5 block leading-tight">
-                                  ou 18x s/ juros de {formatBRL(kitEstimation / 18)}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Coluna Direita: Depende da modalidade selecionada (Parceira ou Chave na Mão) */}
-                          <div className="flex flex-col justify-between pl-1">
-                            {selectedModalidade === 'parceira' ? (
-                              <>
-                                <div>
-                                  <p className="text-[9px] font-black uppercase tracking-widest text-[#8C6239] mb-0.5 leading-none">
-                                    🔨 Montagem Parceira
-                                  </p>
-                                  {kitFull > 0 ? (
-                                    <div className="flex flex-col mt-1">
-                                      <span className="text-[9px] text-muted-foreground line-through leading-none mb-0.5">
-                                        {formatBRL(partnerEstimation)}
-                                      </span>
-                                      <span className="font-serif text-sm font-bold text-[#8C6239] leading-tight sm:text-base">
-                                        {formatBRL(partnerEstimationDiscounted)}
-                                      </span>
-                                    </div>
-                                  ) : (
-                                    <p className="font-serif text-xs font-bold text-[#8C6239] mt-1">Consulte</p>
-                                  )}
-                                </div>
-                                  <div className="flex flex-col mt-1">
-                                    <span className="text-[8px] sm:text-[9px] text-[#8C6239] font-bold block">
-                                      {discountRate * 100}% desc. à vista
-                                    </span>
-                                    <span className="text-[8px] font-medium text-slate-500 mt-0.5 block leading-tight">
-                                      ou Kit em 18x s/ juros de {formatBRL(kitEstimation / 18)}
-                                    </span>
-                                  </div>
-                              </>
-                            ) : (
-                              <>
-                                <div>
-                                  <p className="text-[9px] font-black uppercase tracking-widest text-emerald-700 mb-0.5 leading-none">
-                                    🔑 Chave na Mão
-                                  </p>
-                                  {kitFull > 0 ? (
-                                    <div className="flex flex-col mt-1">
-                                      <span className="text-[9px] text-muted-foreground line-through leading-none mb-0.5">
-                                        {formatBRL(turnkeyEstimation)}
-                                      </span>
-                                      <span className="font-serif text-sm font-bold text-emerald-700 leading-tight sm:text-base">
-                                        {formatBRL(turnkeyEstimationDiscounted)}
-                                      </span>
-                                    </div>
-                                  ) : (
-                                    <p className="font-serif text-xs font-bold text-emerald-700 mt-1">Consulte</p>
-                                  )}
-                                </div>
-                                  <div className="flex flex-col mt-1">
-                                    <span className="text-[8px] sm:text-[9px] text-emerald-700 font-bold block">
-                                      {discountRate * 100}% desc. à vista
-                                    </span>
-                                    <span className="text-[8px] font-medium text-slate-500 mt-0.5 block leading-tight">
-                                      ou Kit em 18x s/ juros de {formatBRL(kitEstimation / 18)}
-                                    </span>
-                                  </div>
-                              </>
-                            )}
-                          </div>
+                          ) : (
+                            <p className="font-serif text-lg font-bold text-primary">Consulte</p>
+                          )}
                         </div>
-
-                        {selectedModalidade === 'kit' && kitFull > 0 && (
-                          <div className="text-[9px] text-[#8C6239] font-bold bg-[#E8DCCF]/20 px-2 py-1 rounded-lg border border-[#E8DCCF]/45 mt-2.5 inline-block">
-                            🪵 Opcional Kit Base + Assoalho: {formatBRL(numericArea * 150)}
-                          </div>
-                        )}
                       </div>
                     </div>
 
@@ -339,6 +282,7 @@ export const ModelsSection = () => {
                       <Link
                         href={`/modelo/${model.id}`}
                         className="group/btn inline-flex w-full items-center justify-center gap-2 rounded-xl bg-secondary/10 px-4 py-2.5 text-sm font-bold text-secondary transition-all hover:bg-secondary hover:text-white sm:w-auto sm:shrink-0"
+                        onClick={() => trackBeginSimulation(model.id, model.name)}
                       >
                         Simular
                         <ArrowRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-1" />

@@ -23,7 +23,7 @@ export function AdminSidebar({
   currentPath: string;
   onClose?: () => void;
 }) {
-  const { logout, user } = useAuth();
+  const { logout, user, operador } = useAuth();
 
   const menuItems = [
     { name: "Dashboard", path: "/admin", icon: LayoutDashboard },
@@ -34,6 +34,13 @@ export function AdminSidebar({
     { name: "Leads (Contatos)", path: "/admin/leads", icon: Users },
     { name: "Operadores", path: "/admin/operadores", icon: UserCog },
   ];
+
+  const visibleMenuItems = menuItems.filter(item => {
+    if (operador?.role === "consultor") {
+      return item.path === "/admin" || item.path === "/admin/propostas";
+    }
+    return true; // admin e vendedor veem tudo, ou você pode restringir vendedor também
+  });
 
   const handleLinkClick = () => {
     if (onClose) onClose();
@@ -60,7 +67,7 @@ export function AdminSidebar({
 
       <div className="flex-1 overflow-y-auto py-6">
         <nav className="space-y-1 px-3">
-          {menuItems.map((item) => {
+          {visibleMenuItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentPath === item.path || (item.path !== "/admin" && currentPath.startsWith(item.path));
             

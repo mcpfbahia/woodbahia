@@ -2,22 +2,33 @@
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { type User, onAuthStateChanged, signOut as firebaseSignOut } from "firebase/auth";
-import { auth } from "~/lib/firebase";
+import { auth, db } from "~/lib/firebase";
+import { doc, getDoc } from "firebase/firestore";
+
+export interface OperadorData {
+  uid: string;
+  name: string;
+  email: string;
+  role: "admin" | "vendedor" | "consultor";
+}
 
 interface AuthContextType {
   user: User | null;
+  operador: OperadorData | null;
   loading: boolean;
   logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
+  operador: null,
   loading: true,
   logout: async () => {},
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [operador, setOperador] = useState<OperadorData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -26,8 +37,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
+      
+      if (user && db) {
+        try {
+          const docRef = doc(db, "operadores", user.uid);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            setOperador(docSnap.data() as OperadorData);
+          } else {
+            setOperador(null);
+          }
+        } catch (error) {
+          console.error("Erro ao buscar dados do operador:", error);
+          setOperador(null);
+        }
+      } else {
+        setOperador(null);
+      }
+      
       setLoading(false);
     });
 
@@ -41,7 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, logout }}>
+    <AuthContext.Provider value={{ user, operador, loading, logout }}>
       {children}
     </AuthContext.Provider>
   );

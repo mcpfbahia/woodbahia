@@ -26,6 +26,7 @@ import {
   getFreight,
   getModelDiscountRate
 } from "~/lib/pricing";
+import { trackGenerateLead } from "~/lib/analytics";
 import { ScrollReveal } from "~/components/common/ScrollReveal";
 
 export const SimulatorSection = () => {
@@ -668,6 +669,7 @@ export const SimulatorSection = () => {
 
                 {/* WhatsApp CTA */}
                 <a
+                  onClick={() => trackGenerateLead("simulator_btn", modalidade, totalPrice)}
                   href={handleWhatsappLink()}
                   target="_blank"
                   rel="noopener noreferrer"
