@@ -36,10 +36,11 @@ export function AdminSidebar({
   ];
 
   const visibleMenuItems = menuItems.filter(item => {
-    if (operador?.role === "consultor") {
+    // Se não houver operador carregado ou a role não for admin/vendedor, restringe ao básico
+    if (!operador || operador.role !== "admin" && operador.role !== "vendedor") {
       return item.path === "/admin" || item.path === "/admin/propostas";
     }
-    return true; // admin e vendedor veem tudo, ou você pode restringir vendedor também
+    return true; // admin e vendedor veem tudo
   });
 
   const handleLinkClick = () => {

@@ -23,10 +23,12 @@ export default function ProtectedAdminLayout({
   useEffect(() => {
     if (!loading && !user) {
       router.push("/admin/login");
-    } else if (!loading && user && operador?.role === "consultor") {
-      // Protect routes for consultor
-      if (pathname !== "/admin" && !pathname.startsWith("/admin/propostas") && !pathname.startsWith("/admin/perfil")) {
-        router.push("/admin/propostas");
+    } else if (!loading && user) {
+      // Protect routes for any role that is not admin or vendedor (e.g. consultor, unknown, or null)
+      if (!operador || (operador.role !== "admin" && operador.role !== "vendedor")) {
+        if (pathname !== "/admin" && !pathname.startsWith("/admin/propostas") && !pathname.startsWith("/admin/perfil")) {
+          router.push("/admin/propostas");
+        }
       }
     }
   }, [user, loading, operador, pathname, router]);
