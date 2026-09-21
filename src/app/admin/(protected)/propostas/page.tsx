@@ -171,8 +171,14 @@ export default function PropostasPage() {
   const [customModelDescription, setCustomModelDescription] = useState('');
   const [includeGlass, setIncludeGlass] = useState(false);
   const [includeElectrical, setIncludeElectrical] = useState(false);
+  const [includeElectricalMaterial, setIncludeElectricalMaterial] = useState(false);
+  const [includeElectricalLabor, setIncludeElectricalLabor] = useState(false);
   const [includeFixtures, setIncludeFixtures] = useState(false);
+  const [includeDoorsWindows, setIncludeDoorsWindows] = useState(false);
+  const [includeHardware, setIncludeHardware] = useState(false);
   const [includeTilesStain, setIncludeTilesStain] = useState(false);
+  const [includeTiles, setIncludeTiles] = useState(false);
+  const [includeStain, setIncludeStain] = useState(false);
   const [includeLabor, setIncludeLabor] = useState(false);
   const [includeProject, setIncludeProject] = useState(false);
   const [discountType, setDiscountType] = useState<'none' | 'percentage' | 'fixed'>('none');
@@ -181,9 +187,15 @@ export default function PropostasPage() {
   
   const [kitPriceOverride, setKitPriceOverride] = useState<number | string | undefined>(undefined);
   const [fixturesPriceOverride, setFixturesPriceOverride] = useState<number | string | undefined>(undefined);
+  const [doorsWindowsPriceOverride, setDoorsWindowsPriceOverride] = useState<number | string | undefined>(undefined);
+  const [hardwarePriceOverride, setHardwarePriceOverride] = useState<number | string | undefined>(undefined);
   const [tilesStainPriceOverride, setTilesStainPriceOverride] = useState<number | string | undefined>(undefined);
+  const [tilesPriceOverride, setTilesPriceOverride] = useState<number | string | undefined>(undefined);
+  const [stainPriceOverride, setStainPriceOverride] = useState<number | string | undefined>(undefined);
   const [laborPriceOverride, setLaborPriceOverride] = useState<number | string | undefined>(undefined);
   const [electricalPriceOverride, setElectricalPriceOverride] = useState<number | string | undefined>(undefined);
+  const [electricalMaterialPriceOverride, setElectricalMaterialPriceOverride] = useState<number | string | undefined>(undefined);
+  const [electricalLaborPriceOverride, setElectricalLaborPriceOverride] = useState<number | string | undefined>(undefined);
   const [glassPriceOverride, setGlassPriceOverride] = useState<number | string | undefined>(undefined);
   const [projectPriceOverride, setProjectPriceOverride] = useState<number | string | undefined>(undefined);
   const [freightOverride, setFreightOverride] = useState<number | string | undefined>(undefined);
@@ -236,15 +248,27 @@ export default function PropostasPage() {
         if (modelsData.length > 0) {
           const merged = [...CABIN_MODELS];
           modelsData.forEach(firestoreModel => {
-            const index = merged.findIndex(m => m.id === firestoreModel.id);
+            const index = merged.findIndex(m => m.id === firestoreModel.id || m.name.trim().toLowerCase() === firestoreModel.name.trim().toLowerCase());
             if (index !== -1) {
               merged[index] = firestoreModel;
             } else {
               merged.push(firestoreModel);
             }
           });
-          merged.sort((a, b) => a.name.localeCompare(b.name));
-          setCabinModels(merged);
+          
+          // Deduplicar caso ainda existam itens com mesmo nome
+          const uniqueMerged: CabinModel[] = [];
+          const seenNames = new Set<string>();
+          for (const m of merged) {
+            const normalizedName = m.name.trim().toLowerCase();
+            if (!seenNames.has(normalizedName)) {
+              seenNames.add(normalizedName);
+              uniqueMerged.push(m);
+            }
+          }
+          
+          uniqueMerged.sort((a, b) => a.name.localeCompare(b.name));
+          setCabinModels(uniqueMerged);
         }
       } catch (err) {
         console.error("Erro ao carregar modelos do Firestore:", err);
@@ -486,8 +510,14 @@ export default function PropostasPage() {
     setCustomModelDescription(d.customModelDescription || '');
     setIncludeGlass(!!d.includeGlass);
     setIncludeElectrical(!!d.includeElectrical);
+    setIncludeElectricalMaterial(d.includeElectricalMaterial ?? !!d.includeElectrical);
+    setIncludeElectricalLabor(d.includeElectricalLabor ?? !!d.includeElectrical);
     setIncludeFixtures(!!d.includeFixtures);
+    setIncludeDoorsWindows(d.includeDoorsWindows ?? !!d.includeFixtures);
+    setIncludeHardware(d.includeHardware ?? !!d.includeFixtures);
     setIncludeTilesStain(!!d.includeTilesStain);
+    setIncludeTiles(d.includeTiles ?? !!d.includeTilesStain);
+    setIncludeStain(d.includeStain ?? !!d.includeTilesStain);
     setIncludeLabor(!!d.includeLabor);
     setIncludeProject(!!d.includeProject);
     setDiscountType(d.discountType || 'none');
@@ -496,9 +526,15 @@ export default function PropostasPage() {
     
     setKitPriceOverride(d.kitPriceOverride);
     setFixturesPriceOverride(d.fixturesPriceOverride);
+    setDoorsWindowsPriceOverride(d.doorsWindowsPriceOverride);
+    setHardwarePriceOverride(d.hardwarePriceOverride);
     setTilesStainPriceOverride(d.tilesStainPriceOverride);
+    setTilesPriceOverride(d.tilesPriceOverride);
+    setStainPriceOverride(d.stainPriceOverride);
     setLaborPriceOverride(d.laborPriceOverride);
     setElectricalPriceOverride(d.electricalPriceOverride);
+    setElectricalMaterialPriceOverride(d.electricalMaterialPriceOverride);
+    setElectricalLaborPriceOverride(d.electricalLaborPriceOverride);
     setGlassPriceOverride(d.glassPriceOverride);
     setProjectPriceOverride(d.projectPriceOverride);
     setFreightOverride(d.freightOverride);
@@ -544,8 +580,14 @@ export default function PropostasPage() {
     setCustomModelDescription('');
     setIncludeGlass(false);
     setIncludeElectrical(false);
+    setIncludeElectricalMaterial(false);
+    setIncludeElectricalLabor(false);
     setIncludeFixtures(false);
+    setIncludeDoorsWindows(false);
+    setIncludeHardware(false);
     setIncludeTilesStain(false);
+    setIncludeTiles(false);
+    setIncludeStain(false);
     setIncludeLabor(false);
     setIncludeProject(false);
     setDiscountType('none');
@@ -554,9 +596,15 @@ export default function PropostasPage() {
     
     setKitPriceOverride(undefined);
     setFixturesPriceOverride(undefined);
+    setDoorsWindowsPriceOverride(undefined);
+    setHardwarePriceOverride(undefined);
     setTilesStainPriceOverride(undefined);
+    setTilesPriceOverride(undefined);
+    setStainPriceOverride(undefined);
     setLaborPriceOverride(undefined);
     setElectricalPriceOverride(undefined);
+    setElectricalMaterialPriceOverride(undefined);
+    setElectricalLaborPriceOverride(undefined);
     setGlassPriceOverride(undefined);
     setProjectPriceOverride(undefined);
     setFreightOverride(undefined);
@@ -585,8 +633,14 @@ export default function PropostasPage() {
     kitType,
     includeGlass,
     includeElectrical,
+    includeElectricalMaterial,
+    includeElectricalLabor,
     includeFixtures,
+    includeDoorsWindows,
+    includeHardware,
     includeTilesStain,
+    includeTiles,
+    includeStain,
     includeLabor,
     includeProject,
     discountType,
@@ -594,9 +648,15 @@ export default function PropostasPage() {
     extraItems: extraItems.filter(i => i.description.trim() && i.value > 0),
     kitPriceOverride: typeof kitPriceOverride === 'number' ? kitPriceOverride : undefined,
     fixturesPriceOverride: typeof fixturesPriceOverride === 'number' ? fixturesPriceOverride : undefined,
+    doorsWindowsPriceOverride: typeof doorsWindowsPriceOverride === 'number' ? doorsWindowsPriceOverride : undefined,
+    hardwarePriceOverride: typeof hardwarePriceOverride === 'number' ? hardwarePriceOverride : undefined,
     tilesStainPriceOverride: typeof tilesStainPriceOverride === 'number' ? tilesStainPriceOverride : undefined,
+    tilesPriceOverride: typeof tilesPriceOverride === 'number' ? tilesPriceOverride : undefined,
+    stainPriceOverride: typeof stainPriceOverride === 'number' ? stainPriceOverride : undefined,
     laborPriceOverride: typeof laborPriceOverride === 'number' ? laborPriceOverride : undefined,
     electricalPriceOverride: typeof electricalPriceOverride === 'number' ? electricalPriceOverride : undefined,
+    electricalMaterialPriceOverride: typeof electricalMaterialPriceOverride === 'number' ? electricalMaterialPriceOverride : undefined,
+    electricalLaborPriceOverride: typeof electricalLaborPriceOverride === 'number' ? electricalLaborPriceOverride : undefined,
     glassPriceOverride: typeof glassPriceOverride === 'number' ? glassPriceOverride : undefined,
     projectPriceOverride: typeof projectPriceOverride === 'number' ? projectPriceOverride : undefined,
     freightOverride: typeof freightOverride === 'number' ? freightOverride : undefined,
@@ -869,7 +929,7 @@ export default function PropostasPage() {
                           <div className="text-xs text-muted-foreground flex flex-wrap gap-x-3 gap-y-1">
                             <span>📍 <strong>Local:</strong> {proposal.workLocation}</span>
                             <span>🏡 <strong>Modelo:</strong> {proposal.modelName}</span>
-                            <span>📦 <strong>Kit:</strong> {proposal.kitTypeLabel}</span>
+                            <span>📦 <strong>Kit:</strong> {KIT_OPTIONS.find(o => o.value === (proposal.data?.kitType || proposal.kitType))?.label || proposal.kitTypeLabel || proposal.kitType}</span>
                           </div>
                         </div>
                         <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4 border-t sm:border-0 pt-3 sm:pt-0 border-stone-100">
@@ -1028,7 +1088,9 @@ export default function PropostasPage() {
                       <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Tipo de Kit</Label>
                       <Select value={kitType} onValueChange={(v) => setKitType(v as KitType)}>
                         <SelectTrigger className="h-12 recessed-input rounded-xl w-full">
-                          <SelectValue />
+                          <SelectValue placeholder="Selecione o Kit">
+                            {KIT_OPTIONS.find(k => k.value === kitType)?.emoji} {KIT_OPTIONS.find(k => k.value === kitType)?.label || kitType}
+                          </SelectValue>
                         </SelectTrigger>
                         <SelectContent className="rounded-xl border-primary/20 max-h-[500px]">
                           {KIT_OPTIONS.map(k => (
@@ -1103,10 +1165,12 @@ export default function PropostasPage() {
                         <div className="space-y-3 pt-4 border-t border-border/10">
                           <p className="text-[10px] uppercase font-bold text-primary/60 tracking-widest mb-2">Composição do Kit</p>
                           {[
-                            { id: 'f', label: 'Portas, Janelas e Ferragens', state: includeFixtures, set: setIncludeFixtures },
-                            { id: 't', label: 'Telhas e Stain', state: includeTilesStain, set: setIncludeTilesStain },
-                            { id: 'l', label: 'Mão de Obra de Montagem', state: includeLabor, set: setIncludeLabor },
-                            { id: 'p', label: 'Projeto Arquitetônico', state: includeProject, set: setIncludeProject },
+                            { id: 'dw', label: 'Portas e Janelas', state: includeDoorsWindows, set: setIncludeDoorsWindows, override: doorsWindowsPriceOverride, setOverride: setDoorsWindowsPriceOverride },
+                            { id: 'hw', label: 'Ferragens', state: includeHardware, set: setIncludeHardware, override: hardwarePriceOverride, setOverride: setHardwarePriceOverride },
+                            { id: 'tl', label: 'Telhas', state: includeTiles, set: setIncludeTiles, override: tilesPriceOverride, setOverride: setTilesPriceOverride },
+                            { id: 'st', label: 'Stain Protetor', state: includeStain, set: setIncludeStain, override: stainPriceOverride, setOverride: setStainPriceOverride },
+                            { id: 'l', label: 'Mão de Obra de Montagem', state: includeLabor, set: setIncludeLabor, override: laborPriceOverride, setOverride: setLaborPriceOverride },
+                            { id: 'p', label: 'Projeto Arquitetônico', state: includeProject, set: setIncludeProject, override: projectPriceOverride, setOverride: setProjectPriceOverride },
                           ].map((item) => (
                             <div key={item.id} className="space-y-2">
                               <div className="flex items-center justify-between group">
@@ -1121,18 +1185,8 @@ export default function PropostasPage() {
                                 <EditablePrice 
                                   label={`Valor: ${item.label}`}
                                   suggested={getSugg(item.label)} 
-                                  value={
-                                    item.id === 'f' ? fixturesPriceOverride :
-                                    item.id === 't' ? tilesStainPriceOverride :
-                                    item.id === 'l' ? laborPriceOverride :
-                                    projectPriceOverride
-                                  }
-                                  onChange={
-                                    item.id === 'f' ? setFixturesPriceOverride :
-                                    item.id === 't' ? setTilesStainPriceOverride :
-                                    item.id === 'l' ? setLaborPriceOverride :
-                                    setProjectPriceOverride
-                                  } 
+                                  value={item.override}
+                                  onChange={item.setOverride} 
                                 />
                               )}
                             </div>
@@ -1175,17 +1229,35 @@ export default function PropostasPage() {
                           <div className="pt-2">
                             <div className="flex items-center justify-between group">
                               <div>
-                                <Label className="text-sm font-bold text-foreground">Elétrica/Hidráulica Básica</Label>
-                                <p className="text-[10px] text-muted-foreground">Mão de obra inclusa</p>
+                                <Label className="text-sm font-bold text-foreground">Material Elétrico e Hidráulico</Label>
                               </div>
-                              <Switch checked={includeElectrical} onCheckedChange={setIncludeElectrical} className="toggle-glow data-[state=checked]:bg-primary" />
+                              <Switch checked={includeElectricalMaterial} onCheckedChange={setIncludeElectricalMaterial} className="toggle-glow data-[state=checked]:bg-primary" />
                             </div>
-                            {includeElectrical && (
+                            {includeElectricalMaterial && (
                               <EditablePrice 
-                                label="Valor Elétrica/Hidráulica" 
-                                suggested={getSugg('Instalação Elétrica')} 
-                                value={electricalPriceOverride} 
-                                onChange={setElectricalPriceOverride} 
+                                label="Valor Material Elétrico/Hidráulico" 
+                                suggested={getSugg('Material Elétrico e Hidráulico')} 
+                                value={electricalMaterialPriceOverride} 
+                                onChange={setElectricalMaterialPriceOverride} 
+                                className="mt-2"
+                              />
+                            )}
+                          </div>
+
+                          <div className="pt-2">
+                            <div className="flex items-center justify-between group">
+                              <div>
+                                <Label className="text-sm font-bold text-foreground">Instalação Elétrica e Hidráulica</Label>
+                                <p className="text-[10px] text-muted-foreground">Mão de obra</p>
+                              </div>
+                              <Switch checked={includeElectricalLabor} onCheckedChange={setIncludeElectricalLabor} className="toggle-glow data-[state=checked]:bg-primary" />
+                            </div>
+                            {includeElectricalLabor && (
+                              <EditablePrice 
+                                label="Valor Instalação Elétrica/Hidráulica" 
+                                suggested={getSugg('Mão de Obra Elétrica e Hidráulica')} 
+                                value={electricalLaborPriceOverride} 
+                                onChange={setElectricalLaborPriceOverride} 
                                 className="mt-2"
                               />
                             )}
@@ -1360,9 +1432,11 @@ export default function PropostasPage() {
                    <div className="space-y-2 sm:col-span-1">
                      <Label htmlFor="proposalStatus" className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Status da Proposta</Label>
                      <Select value={status} onValueChange={(v) => setStatus(v as any)}>
-                       <SelectTrigger className="h-12 recessed-input rounded-xl w-full">
-                         <SelectValue />
-                       </SelectTrigger>
+                        <SelectTrigger className="h-12 recessed-input rounded-xl w-full">
+                          <SelectValue>
+                            {STATUS_CONFIG[status as keyof typeof STATUS_CONFIG]?.emoji} {STATUS_CONFIG[status as keyof typeof STATUS_CONFIG]?.label || status}
+                          </SelectValue>
+                        </SelectTrigger>
                        <SelectContent className="rounded-xl border-primary/20">
                          <SelectItem value="rascunho">📝 Rascunho</SelectItem>
                          <SelectItem value="enviada">✉️ Enviada</SelectItem>
@@ -1448,6 +1522,10 @@ export default function PropostasPage() {
                           <div>
                             <p className="text-[10px] uppercase text-muted-foreground font-bold mb-1">Modelo Selecionado</p>
                             <p className="font-bold text-primary">{kitType === 'custom' ? 'Personalizado' : selectedModel?.name}</p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] uppercase text-muted-foreground font-bold mb-1">Modalidade (Kit)</p>
+                            <p className="font-bold text-primary">{KIT_OPTIONS.find(o => o.value === kitType)?.label || kitType}</p>
                           </div>
                           <div>
                              <p className="text-[10px] uppercase text-muted-foreground font-bold mb-1">Área Total</p>

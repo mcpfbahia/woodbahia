@@ -55,7 +55,18 @@ export const ModelsSection = ({ initialModelsData }: { initialModelsData?: any[]
           const dbIds = new Set(modelsData.map((m: any) => m.id));
           const missingModels = initialModels.filter(m => !dbIds.has(m.id));
           modelsData = [...modelsData, ...missingModels].map(applyModelOverrides);
-          setModels(modelsData);
+          
+          // Deduplicar caso ainda existam itens com mesmo nome
+          const uniqueMerged: any[] = [];
+          const seenNames = new Set<string>();
+          for (const m of modelsData) {
+            const normalizedName = (m.name || m.title || '').trim().toLowerCase();
+            if (!seenNames.has(normalizedName)) {
+              seenNames.add(normalizedName);
+              uniqueMerged.push(m);
+            }
+          }
+          setModels(uniqueMerged);
         } else {
           setModels(initialModels.map(applyModelOverrides));
         }

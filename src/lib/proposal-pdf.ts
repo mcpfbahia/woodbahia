@@ -52,16 +52,26 @@ export function getIncludedItems(data: ProposalData): string[] {
     'Manual de montagem detalhado e suporte técnico',
   ];
   
-  const hasFixtures = data.kitType === 'custom' ? data.includeFixtures : data.kitType === 'turnkey';
-  if (hasFixtures) {
+  const isCustom = data.kitType === 'custom';
+  const hasDoorsWindows = isCustom ? (data.includeDoorsWindows ?? data.includeFixtures) : data.kitType === 'turnkey';
+  const hasHardware = isCustom ? (data.includeHardware ?? data.includeFixtures) : data.kitType === 'turnkey';
+  
+  if (hasDoorsWindows) {
     items.push('Portas e janelas em madeira');
+  }
+  if (hasHardware) {
     items.push('Ferragens completas');
   }
   
-  const hasTiles = data.kitType === 'custom' ? data.includeTilesStain : ['turnkey'].includes(data.kitType);
+  const hasTiles = isCustom ? (data.includeTiles ?? data.includeTilesStain) : ['turnkey'].includes(data.kitType);
   if (hasTiles) {
     items.push('Cobertura com telhas ecológicas');
     items.push('Manta térmica subcobertura');
+  }
+  
+  const hasStain = isCustom ? (data.includeStain ?? data.includeTilesStain) : ['turnkey'].includes(data.kitType);
+  if (hasStain) {
+    items.push('Stain protetor (Material)');
   }
   
   const hasLabor = data.kitType === 'custom' ? data.includeLabor : ['parceira', 'turnkey'].includes(data.kitType);
@@ -69,8 +79,14 @@ export function getIncludedItems(data: ProposalData): string[] {
     items.push('Mão de obra completa de montagem');
   }
 
-  if (data.includeElectrical) {
-    items.push('Instalações elétricas e hidráulicas (Básica)');
+  const hasElecMat = data.includeElectricalMaterial ?? data.includeElectrical;
+  const hasElecLabor = data.includeElectricalLabor ?? data.includeElectrical;
+
+  if (hasElecMat) {
+    items.push('Material Elétrico e Hidráulico');
+  }
+  if (hasElecLabor) {
+    items.push('Mão de Obra Elétrica e Hidráulica');
   }
 
   // Vidros inclusos no Turnkey ou se selecionado
@@ -103,7 +119,7 @@ export function getIncludedItems(data: ProposalData): string[] {
 
   const effectivePaintType = data.paintType === 'none' && data.kitType === 'turnkey' ? '1cor' : data.paintType;
   if (effectivePaintType && effectivePaintType !== 'none') {
-    items.push(effectivePaintType === '1cor' ? 'Pintura Completa com Stain (1 Cor)' : 'Pintura Completa com Stain (2 Cores)');
+    items.push(effectivePaintType === '1cor' ? 'Pintura Completa (Mão de obra e insumos)' : 'Pintura Completa 2 Cores (Mão de obra e insumos)');
   }
 
   return items;
@@ -117,22 +133,41 @@ export function getNotIncludedItems(data: ProposalData): string[] {
     items.push('Mão de obra de montagem');
   }
 
-  const hasFixtures = data.kitType === 'custom' ? data.includeFixtures : data.kitType === 'turnkey';
-  if (!hasFixtures) {
+  const isCustom = data.kitType === 'custom';
+  const hasDoorsWindows = isCustom ? (data.includeDoorsWindows ?? data.includeFixtures) : data.kitType === 'turnkey';
+  const hasHardware = isCustom ? (data.includeHardware ?? data.includeFixtures) : data.kitType === 'turnkey';
+  
+  if (!hasDoorsWindows && !hasHardware) {
     items.push('Portas, janelas e ferragens');
+  } else if (!hasDoorsWindows) {
+    items.push('Portas e janelas');
+  } else if (!hasHardware) {
+    items.push('Ferragens');
   }
 
-  const hasTiles = data.kitType === 'custom' ? data.includeTilesStain : ['turnkey'].includes(data.kitType);
+  const hasTiles = isCustom ? (data.includeTiles ?? data.includeTilesStain) : ['turnkey'].includes(data.kitType);
+  const hasStain = isCustom ? (data.includeStain ?? data.includeTilesStain) : ['turnkey'].includes(data.kitType);
+  
   if (!hasTiles) {
     items.push('Cobertura e telhas ecológicas');
+  }
+  if (!hasStain) {
+    items.push('Stain protetor (Material)');
   }
 
   if (!data.foundationType || data.foundationType === 'none') {
     items.push('Fundação estrutural e base');
   }
   
-  if (!data.includeElectrical) {
+  const hasElecMat = data.includeElectricalMaterial ?? data.includeElectrical;
+  const hasElecLabor = data.includeElectricalLabor ?? data.includeElectrical;
+
+  if (!hasElecMat && !hasElecLabor) {
     items.push('Instalações elétricas e hidráulicas');
+  } else if (!hasElecMat) {
+    items.push('Material Elétrico e Hidráulico');
+  } else if (!hasElecLabor) {
+    items.push('Mão de Obra Elétrica e Hidráulica');
   }
 
   const hasGlass = data.includeGlass || data.kitType === 'turnkey';

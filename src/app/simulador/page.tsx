@@ -344,7 +344,9 @@ export default function Index() {
             <StepKitSelect
               key="kit-standard"
               mode="standard"
-              isEligibleForTurnkey={clientData.distance === undefined || clientData.distance <= 160}
+              isEligibleForTurnkey={clientData.distance === undefined || clientData.distance <= 250}
+              clientState={clientData.state}
+              clientDistance={clientData.distance}
               model={model}
               kitType={kitType as Exclude<KitType, 'custom'> | null}
               kitAddons={kitAddons}
@@ -358,7 +360,9 @@ export default function Index() {
             <StepKitSelect
               key="kit-custom"
               mode="custom"
-              isEligibleForTurnkey={clientData.distance === undefined || clientData.distance <= 160}
+              isEligibleForTurnkey={clientData.distance === undefined || clientData.distance <= 250}
+              clientState={clientData.state}
+              clientDistance={clientData.distance}
               customArea={customArea}
               customOptions={customOptions}
               onCustomAreaChange={setCustomArea}

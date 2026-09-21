@@ -131,7 +131,7 @@ export function StepLocation({ initialData, onNext, onBack }: StepLocationProps)
             className="bg-background/50 h-12"
           />
           <p className="text-[11px] text-muted-foreground italic leading-relaxed">
-            *A opção de obra Chave na Mão está disponível apenas num raio de até 160km da nossa sede. Para outros locais, onde não administramos a obra, fornecemos o Kit e fazemos a indicação de carpinteiros parceiros responsáveis e capacitados (Montagem Parceira).
+            *A opção de obra Chave na Mão está disponível apenas num raio de até 250km da nossa sede. Para outros locais, onde não administramos a obra, fornecemos o Kit e fazemos a indicação de carpinteiros parceiros responsáveis e capacitados (Montagem Parceira).
           </p>
         </div>
       </div>

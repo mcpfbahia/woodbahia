@@ -43,7 +43,9 @@ export const RegionalCoverageSection = () => {
             <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent italic">Brasil</span>
           </h2>
           <p className="mx-auto max-w-2xl text-base text-muted-foreground md:text-lg lg:text-xl mt-4">
-            Fornecemos kits para todo o país. Em áreas fora do nosso raio de atendimento Chave na Mão (160km da sede), fazemos a indicação de carpinteiros capacitados e responsáveis para a montagem.
+            Fornecemos kits para todo o país. Em áreas fora do nosso raio de atendimento Chave na Mão (250km da sede), fazemos a indicação de carpinteiros capacitados e responsáveis para a montagem. 
+            <br/><br/>
+            <strong className="text-primary/90">🌟 Novidade:</strong> Possuímos equipes parceiras dedicadas atuando em todo o <strong>Sul da Bahia (Itacaré, Serra Grande, Ilhéus)</strong> para realizar a Montagem Parceira do seu chalé com total segurança.
           </p>
         </ScrollReveal>
       </div>

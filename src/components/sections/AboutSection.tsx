@@ -63,7 +63,7 @@ export const AboutSection = () => {
                 lazer e moradia sustentável.
               </p>
               <p>
-                Fornecemos kits para <strong className="text-[#4A2B1D] font-black">todo o Brasil</strong>, com opção Chave na Mão em um raio de até <strong className="text-[#4A2B1D] font-black">160km</strong> de nossa sede em Lauro de Freitas, 
+                Fornecemos kits para <strong className="text-[#4A2B1D] font-black">todo o Brasil</strong>, com opção Chave na Mão em um raio de até <strong className="text-[#4A2B1D] font-black">250km</strong> de nossa sede em Lauro de Freitas, 
                 entregando construções rápidas, duráveis e com estética premium.
               </p>
             </div>

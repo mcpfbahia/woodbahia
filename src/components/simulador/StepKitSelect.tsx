@@ -35,6 +35,8 @@ const itemVariants = {
 interface StandardProps {
   mode: 'standard';
   isEligibleForTurnkey: boolean;
+  clientState: string;
+  clientDistance?: number;
   model: CabinModel;
   kitType: Exclude<KitType, 'custom'> | null;
   kitAddons: KitAddons;
@@ -47,6 +49,8 @@ interface StandardProps {
 interface CustomProps {
   mode: 'custom';
   isEligibleForTurnkey: boolean;
+  clientState: string;
+  clientDistance?: number;
   customArea: number;
   customOptions: CustomOptions;
   onCustomAreaChange: (area: number) => void;
@@ -62,7 +66,9 @@ export function StepKitSelect(props: Props) {
   return <StandardMode {...props} />;
 }
 
-function StandardMode({ isEligibleForTurnkey, model, kitType, kitAddons, onKitSelect, onKitAddonsChange, onBack, onNext }: StandardProps) {
+function StandardMode({ isEligibleForTurnkey, clientState, clientDistance, model, kitType, kitAddons, onKitSelect, onKitAddonsChange, onBack, onNext }: StandardProps) {
+  const isSouthBahia = clientState === 'BA' && clientDistance !== undefined && clientDistance > 250;
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 40 }}
@@ -76,6 +82,20 @@ function StandardMode({ isEligibleForTurnkey, model, kitType, kitAddons, onKitSe
         </h2>
         <p className="text-muted-foreground">Modelo selecionado: <strong className="text-foreground">{model.name}</strong> ({model.area}m²)</p>
       </div>
+
+      {isSouthBahia && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-xl mx-auto mb-6 p-4 rounded-xl border border-primary/20 bg-primary/5 flex items-start gap-3"
+        >
+          <span className="text-xl">🎉</span>
+          <p className="text-sm text-foreground/80 leading-relaxed text-left">
+            <strong className="text-primary block mb-1">Ótima notícia!</strong>
+            Temos equipes de montadores parceiros credenciados na sua região (Sul da Bahia).
+          </p>
+        </motion.div>
+      )}
 
       <motion.div
         initial="hidden"
@@ -105,7 +125,7 @@ function StandardMode({ isEligibleForTurnkey, model, kitType, kitAddons, onKitSe
             >
               <div className="flex items-center gap-3 flex-wrap">
                 <span className="font-display font-semibold text-base">{opt.name}</span>
-                {opt.highlight && (
+                {opt.highlight && isEligibleForTurnkey && (
                   <motion.span
                     initial={{ opacity: 0, scale: 0.7 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -118,6 +138,21 @@ function StandardMode({ isEligibleForTurnkey, model, kitType, kitAddons, onKitSe
                   >
                     <span>🔥</span>
                     <span>Recomendado</span>
+                  </motion.span>
+                )}
+                {isSouthBahia && opt.id === 'parceira' && (
+                  <motion.span
+                    initial={{ opacity: 0, scale: 0.7 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 20, delay: 0.15 }}
+                    className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-white text-[11px] font-bold uppercase tracking-widest"
+                    style={{
+                      background: 'linear-gradient(135deg, hsl(20 52% 38%), hsl(38 82% 50%))',
+                      boxShadow: '0 3px 10px hsl(38 82% 50% / 0.40)',
+                    }}
+                  >
+                    <span>🌟</span>
+                    <span>Recomendado para sua região</span>
                   </motion.span>
                 )}
               </div>
@@ -176,7 +211,9 @@ function StandardMode({ isEligibleForTurnkey, model, kitType, kitAddons, onKitSe
   );
 }
 
-function CustomMode({ isEligibleForTurnkey, customArea, customOptions, onCustomAreaChange, onCustomChange, onBack, onNext }: CustomProps) {
+function CustomMode({ isEligibleForTurnkey, clientState, clientDistance, customArea, customOptions, onCustomAreaChange, onCustomChange, onBack, onNext }: CustomProps) {
+  const isSouthBahia = clientState === 'BA' && clientDistance !== undefined && clientDistance > 250;
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 40 }}
@@ -190,6 +227,20 @@ function CustomMode({ isEligibleForTurnkey, customArea, customOptions, onCustomA
         </h2>
         <p className="text-muted-foreground">Defina o tamanho e monte seu kit sob medida</p>
       </div>
+
+      {isSouthBahia && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-xl mx-auto mb-6 p-4 rounded-xl border border-primary/20 bg-primary/5 flex items-start gap-3"
+        >
+          <span className="text-xl">🎉</span>
+          <p className="text-sm text-foreground/80 leading-relaxed text-left">
+            <strong className="text-primary block mb-1">Ótima notícia!</strong>
+            Temos equipes de montadores parceiros credenciados na sua região (Sul da Bahia).
+          </p>
+        </motion.div>
+      )}
 
       <div className="max-w-xl mx-auto mb-8 glass-card rounded-2xl p-6">
         <div className="flex items-center justify-between mb-4">

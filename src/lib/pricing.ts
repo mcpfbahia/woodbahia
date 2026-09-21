@@ -196,17 +196,29 @@ export interface ProposalData {
   includeGlass: boolean;
   includeElectrical: boolean;
   includeFixtures: boolean;
+  includeDoorsWindows?: boolean;
+  includeHardware?: boolean;
   includeTilesStain: boolean;
+  includeTiles?: boolean;
+  includeStain?: boolean;
   includeLabor: boolean;
+  includeElectricalMaterial?: boolean;
+  includeElectricalLabor?: boolean;
   includeProject: boolean;
   discountType: 'none' | 'percentage' | 'fixed';
   discountValue: number;
   extraItems?: ExtraItem[];
   kitPriceOverride?: number;
   fixturesPriceOverride?: number;
+  doorsWindowsPriceOverride?: number;
+  hardwarePriceOverride?: number;
   tilesStainPriceOverride?: number;
+  tilesPriceOverride?: number;
+  stainPriceOverride?: number;
   laborPriceOverride?: number;
   electricalPriceOverride?: number;
+  electricalMaterialPriceOverride?: number;
+  electricalLaborPriceOverride?: number;
   glassPriceOverride?: number;
   projectPriceOverride?: number;
   freightOverride?: number;
@@ -494,41 +506,61 @@ export function calculateProposalItems(
   }
 
   // 3. Portas e Janelas / Ferragens
-  const hasFixtures = data.kitType === 'custom' ? data.includeFixtures : ['turnkey', 'parceira'].includes(data.kitType);
-  if (hasFixtures) {
-    let portasJanelasValue = 0;
-    let ferragensValue = 0;
+  const isCustom = data.kitType === 'custom';
+  const hasDoorsWindows = isCustom ? (data.includeDoorsWindows ?? data.includeFixtures) : ['turnkey', 'parceira'].includes(data.kitType);
+  const hasHardware = isCustom ? (data.includeHardware ?? data.includeFixtures) : ['turnkey', 'parceira'].includes(data.kitType);
 
-    if (data.fixturesPriceOverride !== undefined) {
-      // Split proporcional (80 e 60 = 140 total)
-      const ratio = 80 / 140;
-      portasJanelasValue = Math.round(data.fixturesPriceOverride * ratio);
-      ferragensValue = data.fixturesPriceOverride - portasJanelasValue;
+  if (hasDoorsWindows) {
+    let portasJanelasValue = 0;
+    if (data.doorsWindowsPriceOverride !== undefined) {
+      portasJanelasValue = data.doorsWindowsPriceOverride;
+    } else if (data.fixturesPriceOverride !== undefined) {
+      portasJanelasValue = Math.round(data.fixturesPriceOverride * (80 / 140));
     } else {
-      const fp = getFixturesPrice(area, data.modelId);
-      portasJanelasValue = fp.portasJanelas;
-      ferragensValue = fp.ferragens;
+      portasJanelasValue = getFixturesPrice(area, data.modelId).portasJanelas;
     }
-    
-    items.push({ 
-      label: 'Portas e Janelas', 
-      value: portasJanelasValue,
-      isComplement: data.kitType === 'parceira'
-    });
+    items.push({ label: 'Portas e Janelas', value: portasJanelasValue, isComplement: data.kitType === 'parceira' });
+  }
+
+  if (hasHardware) {
+    let ferragensValue = 0;
+    if (data.hardwarePriceOverride !== undefined) {
+      ferragensValue = data.hardwarePriceOverride;
+    } else if (data.fixturesPriceOverride !== undefined) {
+      ferragensValue = data.fixturesPriceOverride - Math.round(data.fixturesPriceOverride * (80 / 140));
+    } else {
+      ferragensValue = getFixturesPrice(area, data.modelId).ferragens;
+    }
     items.push({ label: 'Ferragens', value: ferragensValue, isComplement: data.kitType === 'parceira' });
   }
 
   // 4. Telhas / Stain
-  const hasTiles = data.kitType === 'custom' ? data.includeTilesStain : ['turnkey', 'parceira'].includes(data.kitType);
+  const hasTiles = isCustom ? (data.includeTiles ?? data.includeTilesStain) : ['turnkey', 'parceira'].includes(data.kitType);
+  const hasStain = isCustom ? (data.includeStain ?? data.includeTilesStain) : ['turnkey', 'parceira'].includes(data.kitType);
+
   if (hasTiles) {
-    let tsValue = getTilesStainPrice(area, data.modelId).total;
-    if (data.tilesStainPriceOverride !== undefined) tsValue = data.tilesStainPriceOverride;
-    
-    // Split 75/25
-    const telhasValue = Math.round(tsValue * 0.75);
-    const stainValue = tsValue - telhasValue;
-    
+    let telhasValue = 0;
+    const tsValue = getTilesStainPrice(area, data.modelId).total;
+    if (data.tilesPriceOverride !== undefined) {
+      telhasValue = data.tilesPriceOverride;
+    } else if (data.tilesStainPriceOverride !== undefined) {
+      telhasValue = Math.round(data.tilesStainPriceOverride * 0.75);
+    } else {
+      telhasValue = Math.round(tsValue * 0.75);
+    }
     items.push({ label: `Telhas (${area}m²)`, value: telhasValue, isComplement: data.kitType === 'parceira' });
+  }
+
+  if (hasStain) {
+    let stainValue = 0;
+    const tsValue = getTilesStainPrice(area, data.modelId).total;
+    if (data.stainPriceOverride !== undefined) {
+      stainValue = data.stainPriceOverride;
+    } else if (data.tilesStainPriceOverride !== undefined) {
+      stainValue = data.tilesStainPriceOverride - Math.round(data.tilesStainPriceOverride * 0.75);
+    } else {
+      stainValue = tsValue - Math.round(tsValue * 0.75);
+    }
     items.push({ label: `Stain protetor`, value: stainValue, isComplement: data.kitType === 'parceira' });
   }
 
@@ -545,10 +577,27 @@ export function calculateProposalItems(
   }
 
   // 6. Instalação Elétrica e Hidráulica
-  if (data.includeElectrical) {
-    let elecValue = getElectricalKit(area);
-    if (data.electricalPriceOverride !== undefined) elecValue = data.electricalPriceOverride;
-    items.push({ label: 'Instalação Elétrica e Hidráulica Básica', value: elecValue, isComplement: data.kitType === 'parceira' });
+  const hasElecMat = data.includeElectricalMaterial ?? data.includeElectrical;
+  const hasElecLabor = data.includeElectricalLabor ?? data.includeElectrical;
+
+  if (hasElecMat || hasElecLabor) {
+    const totalElec = getElectricalKit(area);
+    const defaultMaterial = Math.round(totalElec * 0.6);
+    const defaultLabor = totalElec - defaultMaterial;
+
+    if (hasElecMat) {
+      let matValue = defaultMaterial;
+      if (data.electricalMaterialPriceOverride !== undefined) matValue = data.electricalMaterialPriceOverride;
+      else if (data.electricalPriceOverride !== undefined) matValue = Math.round(data.electricalPriceOverride * 0.6);
+      items.push({ label: 'Material Elétrico e Hidráulico', value: matValue, isComplement: data.kitType === 'parceira' });
+    }
+
+    if (hasElecLabor) {
+      let eleclaborValue = defaultLabor;
+      if (data.electricalLaborPriceOverride !== undefined) eleclaborValue = data.electricalLaborPriceOverride;
+      else if (data.electricalPriceOverride !== undefined) eleclaborValue = data.electricalPriceOverride - Math.round(data.electricalPriceOverride * 0.6);
+      items.push({ label: 'Mão de Obra Elétrica e Hidráulica', value: eleclaborValue, isComplement: data.kitType === 'parceira' });
+    }
   }
 
   // 7. Pintura Completa
