@@ -346,16 +346,24 @@ export default function PropostasPage() {
     if (!db) return;
     setLoadingProposals(true);
     try {
-      const q = operador?.role === 'consultor' 
-        ? query(collection(db, "proposals"), where("operadorId", "==", user?.uid), orderBy("updatedAt", "desc"), limit(20))
-        : query(collection(db, "proposals"), orderBy("updatedAt", "desc"), limit(20));
+      let q;
+      if (operador?.role === 'consultor') {
+        q = query(collection(db, "proposals"), where("operadorId", "==", user?.uid));
+      } else {
+        q = query(collection(db, "proposals"), orderBy("updatedAt", "desc"), limit(20));
+      }
       const querySnapshot = await getDocs(q);
-      const data = querySnapshot.docs.map(doc => ({
+      let data = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       }));
+      
+      if (operador?.role === 'consultor') {
+        data = data.sort((a: any, b: any) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0));
+      }
+      
       setProposals(data);
-      if (querySnapshot.docs.length > 0) {
+      if (querySnapshot.docs.length > 0 && operador?.role !== 'consultor') {
         setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
         setHasMore(querySnapshot.docs.length === 20);
       } else {
@@ -375,20 +383,19 @@ export default function PropostasPage() {
     if (!db || !lastVisible || loadingMore) return;
     setLoadingMore(true);
     try {
-      const q = operador?.role === 'consultor'
-        ? query(
-            collection(db, "proposals"),
-            where("operadorId", "==", user?.uid),
-            orderBy("updatedAt", "desc"),
-            startAfter(lastVisible),
-            limit(20)
-          )
-        : query(
-            collection(db, "proposals"),
-            orderBy("updatedAt", "desc"),
-            startAfter(lastVisible),
-            limit(20)
-          );
+      if (operador?.role === 'consultor') {
+        // Consultores já carregam todas as propostas no fetch inicial para evitar erro de índice
+        setHasMore(false);
+        setLoadingMore(false);
+        return;
+      }
+      
+      const q = query(
+        collection(db, "proposals"),
+        orderBy("updatedAt", "desc"),
+        startAfter(lastVisible),
+        limit(20)
+      );
       const querySnapshot = await getDocs(q);
       const data = querySnapshot.docs.map(doc => ({
         id: doc.id,
@@ -415,14 +422,23 @@ export default function PropostasPage() {
     const loadAllForSearch = async () => {
       if (!db || !searchTerm.trim() || hasLoadedAllForSearch) return;
       try {
-        const q = operador?.role === 'consultor'
-          ? query(collection(db, "proposals"), where("operadorId", "==", user?.uid), orderBy("updatedAt", "desc"))
-          : query(collection(db, "proposals"), orderBy("updatedAt", "desc"));
+        let q;
+        if (operador?.role === 'consultor') {
+          q = query(collection(db, "proposals"), where("operadorId", "==", user?.uid));
+        } else {
+          q = query(collection(db, "proposals"), orderBy("updatedAt", "desc"));
+        }
+        
         const querySnapshot = await getDocs(q);
-        const data = querySnapshot.docs.map(doc => ({
+        let data = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
+        
+        if (operador?.role === 'consultor') {
+          data = data.sort((a: any, b: any) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0));
+        }
+        
         setProposals(data);
         setHasMore(false);
         setHasLoadedAllForSearch(true);
@@ -922,6 +938,11 @@ export default function PropostasPage() {
                           <div className="flex flex-wrap items-center gap-2">
                             <span className="font-bold text-stone-850 text-base">{proposal.clientName}</span>
                             <span className="text-[10px] text-muted-foreground bg-stone-100 border border-stone-200 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">{dateStr}</span>
+                            {proposal.operadorName && (
+                              <span className="text-[10px] text-primary bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider flex items-center gap-1" title="Consultor responsável">
+                                👤 {proposal.operadorName.split(' ')[0]}
+                              </span>
+                            )}
                             <span className={`text-[9px] ${statusInfo.bg} ${statusInfo.text} ${statusInfo.border} border px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider flex items-center gap-1`}>
                               <span>{statusInfo.emoji}</span> {statusInfo.label}
                             </span>
