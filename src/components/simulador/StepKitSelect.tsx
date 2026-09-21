@@ -14,8 +14,10 @@ const KIT_OPTIONS: { id: Exclude<KitType, 'custom'>; name: string; desc: string;
 ];
 
 const CUSTOM_ADDONS: { key: keyof CustomOptions; label: string }[] = [
-  { key: 'fixtures', label: 'Portas, Janelas e Ferragens' },
-  { key: 'tilesStain', label: 'Telhas e Stain' },
+  { key: 'doorsWindows', label: 'Portas e Janelas' },
+  { key: 'hardware', label: 'Ferragens' },
+  { key: 'tiles', label: 'Telhas' },
+  { key: 'stain', label: 'Stain Protetor' },
   { key: 'labor', label: 'Mão de Obra' },
   { key: 'electrical', label: 'Kit Elétrica/Hidráulica' },
   { key: 'glass', label: 'Vidros' },

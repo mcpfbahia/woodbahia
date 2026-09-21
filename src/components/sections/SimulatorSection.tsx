@@ -41,7 +41,8 @@ export const SimulatorSection = () => {
   const [includeTiles, setIncludeTiles] = useState<boolean>(true);
   const [includeElectrical, setIncludeElectrical] = useState<boolean>(false);
   const [includeGlass, setIncludeGlass] = useState<boolean>(true);
-  const [includeFixtures, setIncludeFixtures] = useState<boolean>(true);
+  const [includeDoorsWindows, setIncludeDoorsWindows] = useState<boolean>(true);
+  const [includeHardware, setIncludeHardware] = useState<boolean>(true);
   const [includePaint, setIncludePaint] = useState<boolean>(true);
 
   // Valores calculados
@@ -54,7 +55,8 @@ export const SimulatorSection = () => {
   const [tilesPrice, setTilesPrice] = useState<number>(0);
   const [electricalPrice, setElectricalPrice] = useState<number>(0);
   const [glassPrice, setGlassPrice] = useState<number>(0);
-  const [fixturesPrice, setFixturesPrice] = useState<number>(0);
+  const [doorsWindowsPrice, setDoorsWindowsPrice] = useState<number>(0);
+  const [hardwarePrice, setHardwarePrice] = useState<number>(0);
   const [paintPrice, setPaintPrice] = useState<number>(0);
   const [totalPrice, setTotalPrice] = useState<number>(0);
 
@@ -63,7 +65,8 @@ export const SimulatorSection = () => {
   const handleSelectModalidade = (mod: "madeiramento" | "parceira" | "turnkey") => {
     setModalidade(mod);
     if (mod === "madeiramento") {
-      setIncludeFixtures(false);
+      setIncludeDoorsWindows(false);
+      setIncludeHardware(false);
       setIncludeTiles(false);
       setIncludeLabor(false);
       setIncludeAdmin(false);
@@ -71,7 +74,8 @@ export const SimulatorSection = () => {
       setIncludeElectrical(false);
       setIncludePaint(false);
     } else if (mod === "parceira") {
-      setIncludeFixtures(false);
+      setIncludeDoorsWindows(false);
+      setIncludeHardware(false);
       setIncludeTiles(false);
       setIncludeLabor(true);
       setIncludeAdmin(false);
@@ -79,7 +83,8 @@ export const SimulatorSection = () => {
       setIncludeElectrical(false);
       setIncludePaint(false);
     } else if (mod === "turnkey") {
-      setIncludeFixtures(true);
+      setIncludeDoorsWindows(true);
+      setIncludeHardware(true);
       setIncludeTiles(true);
       setIncludeLabor(true);
       setIncludeAdmin(true);
@@ -91,9 +96,9 @@ export const SimulatorSection = () => {
 
   // Sincroniza os switches com o botão de modalidade comercial selecionado
   useEffect(() => {
-    const isMadeiramento = !includeFixtures && !includeTiles && !includeLabor && !includeAdmin && !includeGlass && !includeElectrical && !includePaint;
-    const isParceira = !includeFixtures && !includeTiles && includeLabor && !includeAdmin && !includeGlass && !includeElectrical && !includePaint;
-    const isTurnkey = includeFixtures && includeTiles && includeLabor && includeAdmin && includeGlass && !includeElectrical && includePaint;
+    const isMadeiramento = !includeDoorsWindows && !includeHardware && !includeTiles && !includeLabor && !includeAdmin && !includeGlass && !includeElectrical && !includePaint;
+    const isParceira = !includeDoorsWindows && !includeHardware && !includeTiles && includeLabor && !includeAdmin && !includeGlass && !includeElectrical && !includePaint;
+    const isTurnkey = includeDoorsWindows && includeHardware && includeTiles && includeLabor && includeAdmin && includeGlass && !includeElectrical && includePaint;
 
     if (isMadeiramento) {
       setModalidade("madeiramento");
@@ -105,7 +110,8 @@ export const SimulatorSection = () => {
       setModalidade("custom");
     }
   }, [
-    includeFixtures,
+    includeDoorsWindows,
+    includeHardware,
     includeTiles,
     includeLabor,
     includeAdmin,
@@ -145,8 +151,11 @@ export const SimulatorSection = () => {
     const glass = includeGlass ? getGlassPrice(area) : 0;
     setGlassPrice(glass);
 
-    const fixtures = includeFixtures ? getFixturesPrice(area).base : 0;
-    setFixturesPrice(fixtures);
+    const fp = getFixturesPrice(area);
+    const doorsWindows = includeDoorsWindows ? fp.portasJanelas : 0;
+    setDoorsWindowsPrice(doorsWindows);
+    const hardware = includeHardware ? fp.ferragens : 0;
+    setHardwarePrice(hardware);
 
     // Pintura completa aproximada baseada na área
     const paint = includePaint ? (area <= 25 ? 2000 : area <= 55 ? 3000 : 4500) : 0;
@@ -157,7 +166,7 @@ export const SimulatorSection = () => {
     setWoodenBasePrice(woodenBase);
 
     // Total final
-    const total = timber + freight + foundation + labor + admin + tiles + electrical + glass + fixtures + paint + woodenBase;
+    const total = timber + freight + foundation + labor + admin + tiles + electrical + glass + doorsWindows + hardware + paint + woodenBase;
     setTotalPrice(total);
   }, [
     area,
@@ -170,7 +179,8 @@ export const SimulatorSection = () => {
     includeTiles,
     includeElectrical,
     includeGlass,
-    includeFixtures,
+    includeDoorsWindows,
+    includeHardware,
     includePaint
   ]);
 
@@ -200,7 +210,8 @@ export const SimulatorSection = () => {
       includeTiles ? `- Cobertura (Telhas/Manta): ${formatBRL(tilesPrice)}` : null,
       includeElectrical ? `- Kit Instalações Elétrica/Hidro: ${formatBRL(electricalPrice)}` : null,
       includeGlass ? `- Vidros: ${formatBRL(glassPrice)}` : null,
-      includeFixtures ? `- Portas, Janelas e Ferragens: ${formatBRL(fixturesPrice)}` : null,
+      includeDoorsWindows ? `- Portas e Janelas: ${formatBRL(doorsWindowsPrice)}` : null,
+      includeHardware ? `- Ferragens: ${formatBRL(hardwarePrice)}` : null,
       includePaint ? `- Pintura com Stain: ${formatBRL(paintPrice)}` : null,
     ].filter(Boolean).join("\n");
 
@@ -405,13 +416,29 @@ export const SimulatorSection = () => {
                     <div className="flex items-start gap-3">
                       <input 
                         type="checkbox" 
-                        checked={includeFixtures}
-                        onChange={(e) => setIncludeFixtures(e.target.checked)}
+                        checked={includeDoorsWindows}
+                        onChange={(e) => setIncludeDoorsWindows(e.target.checked)}
                         className="w-5 h-5 rounded border-stone-300 text-[#8A3A1B] focus:ring-[#8A3A1B] mt-0.5"
                       />
                       <div>
-                        <span className="text-sm font-bold text-stone-800 block">Portas, Janelas e Ferragens</span>
-                        <span className="text-xs text-gray-400">Esquadrias de madeira, fechaduras, pregos e parafusos.</span>
+                        <span className="text-sm font-bold text-stone-800 block">Portas e Janelas</span>
+                        <span className="text-xs text-gray-400">Esquadrias de madeira.</span>
+                      </div>
+                    </div>
+                  </label>
+
+                  {/* Ferragens */}
+                  <label className="flex items-start justify-between p-4 bg-white hover:bg-stone-50/50 rounded-2xl border border-stone-150 cursor-pointer transition-colors">
+                    <div className="flex items-start gap-3">
+                      <input 
+                        type="checkbox" 
+                        checked={includeHardware}
+                        onChange={(e) => setIncludeHardware(e.target.checked)}
+                        className="w-5 h-5 rounded border-stone-300 text-[#8A3A1B] focus:ring-[#8A3A1B] mt-0.5"
+                      />
+                      <div>
+                        <span className="text-sm font-bold text-stone-800 block">Ferragens</span>
+                        <span className="text-xs text-gray-400">Fechaduras, pregos e parafusos.</span>
                       </div>
                     </div>
                   </label>
@@ -586,10 +613,17 @@ export const SimulatorSection = () => {
                     </div>
                   )}
 
-                  {includeFixtures && (
+                  {includeDoorsWindows && (
                     <div className="flex justify-between text-sm">
-                      <span className="text-[#5C3317] font-medium">Portas, Janelas e Ferragens:</span>
-                      <span className="font-bold text-stone-800">{formatBRL(fixturesPrice)}</span>
+                      <span className="text-[#5C3317] font-medium">Portas e Janelas:</span>
+                      <span className="font-bold text-stone-800">{formatBRL(doorsWindowsPrice)}</span>
+                    </div>
+                  )}
+
+                  {includeHardware && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-[#5C3317] font-medium">Ferragens:</span>
+                      <span className="font-bold text-stone-800">{formatBRL(hardwarePrice)}</span>
                     </div>
                   )}
 

@@ -18,7 +18,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
 const INITIAL_CUSTOM: CustomOptions = {
-  fixtures: false, tilesStain: false, labor: false, electrical: false, glass: false, project: false,
+  doorsWindows: false, hardware: false, tiles: false, stain: false, labor: false, electrical: false, glass: false, project: false,
 };
 
 const INITIAL_ADDONS: KitAddons = { electrical: false, glass: false };

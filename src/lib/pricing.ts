@@ -178,8 +178,10 @@ export interface ExtraItem {
 }
 
 export interface CustomOptions {
-  fixtures: boolean;
-  tilesStain: boolean;
+  doorsWindows: boolean;
+  hardware: boolean;
+  tiles: boolean;
+  stain: boolean;
   labor: boolean;
   electrical: boolean;
   glass: boolean;
@@ -342,32 +344,43 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
   }
 
   // 3. Portas e Janelas / Ferragens
-  const hasFixtures = kit === 'custom' ? state.customOptions.fixtures : ['turnkey', 'parceira'].includes(kit as string);
-  if (hasFixtures) {
+  const hasDoorsWindows = kit === 'custom' ? state.customOptions.doorsWindows : ['turnkey', 'parceira'].includes(kit as string);
+  const hasHardware = kit === 'custom' ? state.customOptions.hardware : ['turnkey', 'parceira'].includes(kit as string);
+  if (hasDoorsWindows || hasHardware) {
     const fp = getFixturesPrice(area, kit === 'custom' ? 'custom' : modelId);
     
-    const portasJanelasValue = fp.portasJanelas;
-    const ferragensValue = fp.ferragens;
-
-    items.push({ 
-      label: 'Portas e Janelas', 
-      value: portasJanelasValue,
-      isComplement: kit === 'parceira'
-    });
-    items.push({ label: 'Ferragens', value: ferragensValue, isComplement: kit === 'parceira' });
+    if (hasDoorsWindows) {
+      items.push({ 
+        label: 'Portas e Janelas', 
+        value: fp.portasJanelas,
+        isComplement: kit === 'parceira'
+      });
+    }
+    if (hasHardware) {
+      items.push({ 
+        label: 'Ferragens', 
+        value: fp.ferragens, 
+        isComplement: kit === 'parceira' 
+      });
+    }
   }
 
+
   // 4. Telhas / Stain
-  const hasTiles = kit === 'custom' ? state.customOptions.tilesStain : ['turnkey', 'parceira'].includes(kit as string);
-  if (hasTiles) {
+  const hasTiles = kit === 'custom' ? state.customOptions.tiles : ['turnkey', 'parceira'].includes(kit as string);
+  const hasStain = kit === 'custom' ? state.customOptions.stain : ['turnkey', 'parceira'].includes(kit as string);
+  
+  if (hasTiles || hasStain) {
     const ts = getTilesStainPrice(area, kit === 'custom' ? 'custom' : modelId);
-    const tsValue = ts.total;
+    const telhasValue = Math.round(ts.total * 0.75);
+    const stainValue = ts.total - telhasValue;
 
-    const telhasValue = Math.round(tsValue * 0.75);
-    const stainValue = tsValue - telhasValue;
-
-    items.push({ label: `Telhas (${area}m²)`, value: telhasValue, isComplement: kit === 'parceira' });
-    items.push({ label: `Stain protetor`, value: stainValue, isComplement: kit === 'parceira' });
+    if (hasTiles) {
+      items.push({ label: `Telhas (${area}m²)`, value: telhasValue, isComplement: kit === 'parceira' });
+    }
+    if (hasStain) {
+      items.push({ label: `Stain protetor`, value: stainValue, isComplement: kit === 'parceira' });
+    }
   }
 
   // 5. Mão de Obra

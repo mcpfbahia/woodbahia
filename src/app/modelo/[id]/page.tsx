@@ -1058,25 +1058,46 @@ export default function ModelDetailPage() {
                       </div>
                     )}
 
-                    {/* Item 7: Portas e Janelas */}
+                    {/* Item 7: Portas e Janelas e Ferragens */}
                     {simModalidade === 'turnkey' ? (
-                      <div className="flex justify-between pb-3 border-b border-stone-100">
-                        <span className="text-stone-700 font-medium">7. Portas, Janelas e Ferragens (Incluso no Chave na Mão):</span>
-                        <span className="font-bold text-stone-850">{formatBRL(modelFixturesPrice)}</span>
-                      </div>
-                    ) : simModalidade === 'parceira' ? (
-                      <div className="flex justify-between pb-3 border-b border-stone-100 text-stone-600">
-                        <span className="font-medium">7. Portas, Janelas e Ferragens Estimados:</span>
-                        <div className="flex flex-col items-end">
-                          <span className="font-bold text-stone-850">{formatBRL(modelFixturesPrice)}</span>
-                          <span className="italic text-[10px] text-stone-500">Complemento (Adquirido à parte)</span>
+                      <>
+                        <div className="flex justify-between pb-3 border-b border-stone-100">
+                          <span className="text-stone-700 font-medium">7. Portas e Janelas (Incluso no Chave na Mão):</span>
+                          <span className="font-bold text-stone-850">{formatBRL(modelFixturesPrice * (80/140))}</span>
                         </div>
-                      </div>
+                        <div className="flex justify-between pb-3 border-b border-stone-100 mt-3">
+                          <span className="text-stone-700 font-medium">8. Ferragens (Incluso no Chave na Mão):</span>
+                          <span className="font-bold text-stone-850">{formatBRL(modelFixturesPrice * (60/140))}</span>
+                        </div>
+                      </>
+                    ) : simModalidade === 'parceira' ? (
+                      <>
+                        <div className="flex justify-between pb-3 border-b border-stone-100 text-stone-600">
+                          <span className="font-medium">7. Portas e Janelas Estimados:</span>
+                          <div className="flex flex-col items-end">
+                            <span className="font-bold text-stone-850">{formatBRL(modelFixturesPrice * (80/140))}</span>
+                            <span className="italic text-[10px] text-stone-500">Complemento (Adquirido à parte)</span>
+                          </div>
+                        </div>
+                        <div className="flex justify-between pb-3 border-b border-stone-100 text-stone-600 mt-3">
+                          <span className="font-medium">8. Ferragens Estimados:</span>
+                          <div className="flex flex-col items-end">
+                            <span className="font-bold text-stone-850">{formatBRL(modelFixturesPrice * (60/140))}</span>
+                            <span className="italic text-[10px] text-stone-500">Complemento (Adquirido à parte)</span>
+                          </div>
+                        </div>
+                      </>
                     ) : (
-                      <div className="flex justify-between pb-3 border-b border-stone-100 text-stone-300">
-                        <span className="font-medium">7. Portas, Janelas e Ferragens:</span>
-                        <span className="italic text-xs font-semibold">Não Incluso (Por conta do cliente nesta modalidade)</span>
-                      </div>
+                      <>
+                        <div className="flex justify-between pb-3 border-b border-stone-100 text-stone-300">
+                          <span className="font-medium">7. Portas e Janelas:</span>
+                          <span className="italic text-xs font-semibold">Não Incluso (Por conta do cliente nesta modalidade)</span>
+                        </div>
+                        <div className="flex justify-between pb-3 border-b border-stone-100 text-stone-300 mt-3">
+                          <span className="font-medium">8. Ferragens:</span>
+                          <span className="italic text-xs font-semibold">Não Incluso (Por conta do cliente nesta modalidade)</span>
+                        </div>
+                      </>
                     )}
 
                     {/* Item 8: Vidros Temperados */}
