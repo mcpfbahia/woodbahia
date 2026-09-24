@@ -80,9 +80,9 @@ export function StepSummary({ state, onBack, onReset }: Props) {
     `• Sinal (${pctSinal}): ${fmt(sinalPix)} — ${descSinal}`,
     `• Saldo Final (${pctSaldo}): ${fmt(saldoPix)} — ${descSaldo}`,
     ``,
-    `💳 *OPÇÃO 2: PARCELAMENTO (ATÉ 18X SEM JUROS)*`,
+    `💳 *OPÇÃO 2: PARCELAMENTO (ATÉ 18X NO CARTÃO)*`,
     pixBase > 0 ? `*• Frete e Serviços Complementares (Via PIX)*: ${fmt(pixBase)} (30% no sinal e 70% 24h antes do embarque).` : ``,
-    `*• 18x Sem Juros no Cartão*: ${fmt(calculateInstallmentValue(creditCardBase, 18).installment)} por mês (exclusivo para Kit Madeiramento, Base Estrutural e Assoalho).`,
+    `*• 12x Sem Juros no Cartão*: ${fmt(calculateInstallmentValue(creditCardBase, 12).installment)} por mês (exclusivo para Kit Madeiramento, Base Estrutural e Assoalho. Ou até 18x com juros da maquininha).`,
     ``,
     `*Status:* Gostaria de uma análise de crédito ou tem dúvidas sobre a proposta?`,
   ].filter(Boolean).join('\n');
@@ -315,7 +315,7 @@ export function StepSummary({ state, onBack, onReset }: Props) {
                     <p className="text-[11px] text-foreground/80 leading-snug">
                       Frete e serviços complementares (<span className="font-bold text-accent">{fmt(pixBase)}</span>) 
                       são quitados à parte via PIX (30% no sinal e 70% 24h antes do embarque do kit).<br/>
-                      A condição de 18x sem juros aplica-se <b>exclusivamente</b> ao valor da estrutura de madeira (Kit, Base e Assoalho = <b>{fmt(creditCardBase)}</b>).
+                      A condição de 12x sem juros aplica-se <b>exclusivamente</b> ao valor da estrutura de madeira (Kit, Base e Assoalho = <b>{fmt(creditCardBase)}</b>). Você pode parcelar em até 18x com juros da maquininha.
                     </p>
                   </div>
                 )}

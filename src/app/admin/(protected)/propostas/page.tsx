@@ -1824,7 +1824,7 @@ export default function PropostasPage() {
                                 <span className="inline-block w-2 h-2 bg-white rounded-full animate-pulse" />
                                 Condição Facilitada do Kit
                              </p>
-                             <p className="text-xs md:text-sm font-bold">💳 <span className="opacity-80">Parcele o kit em 18x s/ juros de</span> <span className="text-lg md:text-2xl font-black">{fmt(calculateInstallmentValue(creditCardBase, 18).installment)}</span></p>
+                             <p className="text-xs md:text-sm font-bold">💳 <span className="opacity-80">Parcele o kit em 12x s/ juros de</span> <span className="text-lg md:text-2xl font-black">{fmt(calculateInstallmentValue(creditCardBase, 12).installment)}</span></p>
                           </div>
                           
                           <p className="text-[10px] text-center text-muted-foreground italic px-4">Valores sujeitos a alteração conforme tributação regional e prazos de operadora.</p>

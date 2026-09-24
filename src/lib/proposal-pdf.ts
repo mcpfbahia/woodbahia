@@ -504,12 +504,12 @@ export function generateProposalPDF(
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
   doc.setTextColor(...COLORS.accent);
-  doc.text(`OPÇÃO 2: PARCELAMENTO EM ATÉ 18X SEM JUROS`, margin + 6, y + 4);
+  doc.text(`OPÇÃO 2: PARCELAMENTO EM ATÉ 18X NO CARTÃO`, margin + 6, y + 4);
 
   doc.setFontSize(8);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(...COLORS.muted);
-  doc.text(`* Condição de 18x sem juros exclusiva para a estrutura de madeira (Kit Madeiramento, Assoalho e Base Estrutural).`, margin + 6, y + 9);
+  doc.text(`* Condição de 12x sem juros exclusiva para a estrutura de madeira (Kit Madeiramento, Assoalho e Base Estrutural).`, margin + 6, y + 9);
   doc.setFont('helvetica', 'normal');
   doc.text(`* Frete e serviços complementares são quitados à parte via PIX (30% no sinal e 70% 24h antes do embarque).`, margin + 6, y + 13);
 

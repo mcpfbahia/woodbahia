@@ -652,7 +652,7 @@ export const SimulatorSection = () => {
                     <div className="space-y-3">
                       <div>
                         <span className="text-xs uppercase tracking-wider font-bold text-[#8C6239] block mb-1">
-                          Parcelamento do Kit Madeiramento (Até 18x s/ juros no Cartão)
+                          Parcelamento do Kit Madeiramento (Até 12x s/ juros no Cartão)
                         </span>
                         <div className="font-serif font-black text-2xl sm:text-3xl text-[#5C3317] leading-none">
                           {formatBRL(creditCardBase)}

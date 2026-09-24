@@ -189,7 +189,7 @@ export const FooterWoodBahia = () => {
                       <div className="leading-tight">
                       <span className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1">Parcelamento</span>
                       <p className="font-black text-white text-sm">
-                        Até 18x sem juros no cartão
+                        Até 12x sem juros no cartão
                       </p>
                     </div>
                     </div>

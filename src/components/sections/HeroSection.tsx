@@ -99,10 +99,10 @@ export const HeroSection = () => {
                   <span className="animate-pulse">🔥</span> Oferta Limitada
                 </div>
                 <h3 className="font-display text-xl font-black uppercase tracking-tight text-white sm:text-2xl drop-shadow-md">
-                  Compre seu chalé em até <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-amber-500">18X SEM JUROS</span>
+                  Compre seu chalé em até <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-amber-500">12X SEM JUROS</span>
                 </h3>
                 <p className="mt-1.5 text-sm font-medium text-white/90 md:text-base leading-relaxed">
-                  Condição inédita e exclusiva para você tirar seu projeto do papel. Parcele qualquer kit madeiramento em até 18x sem juros no cartão ou ganhe <strong className="text-amber-300 font-bold">10% OFF</strong> pagando à vista.
+                  Condição inédita e exclusiva para você tirar seu projeto do papel. Parcele qualquer kit madeiramento em até 12x sem juros no cartão (ou até 18x com juros) ou ganhe <strong className="text-amber-300 font-bold">10% OFF</strong> pagando à vista.
                 </p>
               </div>
             </div>

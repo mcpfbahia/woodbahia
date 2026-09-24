@@ -671,7 +671,7 @@ export default function ModelDetailPage() {
                       </div>
                     <div className="flex flex-col mt-0.5">
                       <span className="text-[9px] text-emerald-600 font-bold block">{discountRate * 100}% de desc. à vista no madeiramento</span>
-                      <span className="text-[9px] text-slate-500 font-medium block">ou 18x s/ juros de {formatBRL(kitEstimation / 18)}</span>
+                      <span className="text-[9px] text-slate-500 font-medium block">ou 12x s/ juros de {formatBRL(kitEstimation / 12)}</span>
                     </div>
                       <div className="text-[10px] text-[#8C6239] font-bold bg-[#E8DCCF]/20 px-2 py-1 rounded-lg border border-[#E8DCCF]/45 mt-2.5 self-start inline-block">
                         Consulte Kit Base + Assoalho
@@ -699,7 +699,7 @@ export default function ModelDetailPage() {
                       </div>
                     <div className="flex flex-col mt-0.5">
                       <span className="text-[9px] text-emerald-600 font-bold block">{discountRate * 100}% de desc. à vista no madeiramento</span>
-                      <span className="text-[9px] text-slate-500 font-medium block">ou 18x s/ juros de {formatBRL(partnerEstimation / 18)}</span>
+                      <span className="text-[9px] text-slate-500 font-medium block">ou 12x s/ juros de {formatBRL(partnerEstimation / 12)}</span>
                     </div>
                       <span className="text-[9px] text-stone-555 block mt-2.5 font-medium italic">*Obra Completa. Solicite proposta para valores reais do frete/fundação no seu terreno.</span>
                     </div>
@@ -736,7 +736,7 @@ export default function ModelDetailPage() {
                       </div>
                     <div className="flex flex-col mt-0.5">
                       <span className="text-[9px] text-emerald-600 font-bold block">{discountRate * 100}% de desc. à vista aplicado</span>
-                      <span className="text-[9px] text-slate-500 font-medium block">ou 18x s/ juros de {formatBRL(turnkeyEstimation / 18)}</span>
+                      <span className="text-[9px] text-slate-500 font-medium block">ou 12x s/ juros de {formatBRL(turnkeyEstimation / 12)}</span>
                     </div>
                       <span className="text-[9px] text-stone-555 block mt-2.5 font-medium italic">*Obra Completa. Solicite proposta para valores reais do frete/fundação no seu terreno.</span>
                     </div>
@@ -774,7 +774,7 @@ export default function ModelDetailPage() {
                       </div>
                       <div className="text-left">
                         <p className="text-sm font-bold text-[#B06D46] leading-none">Simular Parcelas</p>
-                        <p className="text-[10px] text-[#B06D46]/70 font-medium uppercase mt-1 tracking-wider">No cartão de crédito em até 18x</p>
+                        <p className="text-[10px] text-[#B06D46]/70 font-medium uppercase mt-1 tracking-wider">No cartão de crédito em até 12x sem juros</p>
                       </div>
                     </div>
                     <ChevronRight className="h-4 w-4 text-[#B06D46]/40 group-hover:text-[#B06D46] transition-colors" />
@@ -1213,7 +1213,7 @@ export default function ModelDetailPage() {
                                       <div>
                                         <span className="text-[10px] text-[#8C6239] font-bold uppercase tracking-wider block">Parcelamento do Kit Madeiramento</span>
                                         <span className="text-[11px] text-stone-500 italic mt-0.5 block">
-                                          Parcelável em até 18x sem juros no cartão
+                                          Parcelável em até 12x sem juros no cartão
                                         </span>
                                       </div>
                                       <span className="font-serif font-black text-2xl text-[#5C3317]">

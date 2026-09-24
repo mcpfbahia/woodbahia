@@ -194,7 +194,7 @@ export const Footer = () => {
                 <CreditCard className="h-5 w-5 text-primary-foreground/60" />
                 <div>
                   <span className="block text-[10px] uppercase tracking-wider text-primary-foreground/40">Cartão de Crédito</span>
-                  <span className="font-bold text-white text-sm">Até 18x sem juros no cartão</span>
+                  <span className="font-bold text-white text-sm">Até 12x sem juros no cartão</span>
                 </div>
               </div>
               

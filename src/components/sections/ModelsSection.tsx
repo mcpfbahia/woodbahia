@@ -273,7 +273,7 @@ export const ModelsSection = ({ initialModelsData }: { initialModelsData?: any[]
                                  </span>
                                </div>
                                <span className="text-xs font-bold text-emerald-700 mt-1">
-                                 {discountRate * 100}% desc. à vista ou parcelado em 18x
+                                 {discountRate * 100}% desc. à vista ou parcelado em até 12x s/ juros
                                </span>
                             </div>
                           ) : (

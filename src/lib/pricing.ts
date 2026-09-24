@@ -41,8 +41,8 @@ export function calculateInstallmentValue(
   const rate = rateInfo ? rateInfo[1] : 0;
   
   // Se tem desconto, não tem parcelamento sem juros (isInterestFree = false para todas)
-  // Se não tem desconto, permite até 18x sem juros (isInterestFree = true se installments <= 18)
-  const isInterestFree = !hasDiscount && installments <= 18;
+  // Se não tem desconto, permite até 12x sem juros (isInterestFree = true se installments <= 12)
+  const isInterestFree = !hasDiscount && installments <= 12;
   
   const totalWithInterest = isInterestFree 
     ? total 

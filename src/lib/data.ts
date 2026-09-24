@@ -316,7 +316,7 @@ export const faqItems = [
   {
     question: "06 — Como funciona a política de descontos e pagamentos?",
     answer:
-      "Oferecemos 10% de desconto para pagamento à vista. Importante destacar que esse desconto incide exclusivamente sobre o valor dos materiais (Kit Madeiramento e base estrutural de madeira), não sendo aplicado sobre fretes ou mão de obra de terceiros. Também facilitamos o pagamento aceitando cartões de crédito em até 18x sem juros.",
+      "Oferecemos 10% de desconto para pagamento à vista. Importante destacar que esse desconto incide exclusivamente sobre o valor dos materiais (Kit Madeiramento e base estrutural de madeira), não sendo aplicado sobre fretes ou mão de obra de terceiros. Também facilitamos o pagamento aceitando cartões de crédito em até 18x, sendo em até 12x sem juros para materiais.",
   },
   {
     question: "07 — O que preciso preparar no terreno antes da obra?",

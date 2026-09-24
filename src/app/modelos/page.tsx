@@ -282,7 +282,7 @@ export default function ModelsGalleryPage() {
                                     {discountRate * 100}% desc. à vista
                                   </span>
                                   <span className="text-[8px] font-medium text-slate-500 mt-0.5 block leading-tight">
-                                    ou 18x s/ juros de {formatBRL(kitEstimation / 18)}
+                                    ou 12x s/ juros de {formatBRL(kitEstimation / 12)}
                                   </span>
                                 </div>
                               )}
@@ -314,7 +314,7 @@ export default function ModelsGalleryPage() {
                                       {discountRate * 100}% desc. à vista
                                     </span>
                                     <span className="text-[8px] font-medium text-slate-500 mt-0.5 block leading-tight">
-                                      ou Kit em 18x s/ juros de {formatBRL(kitEstimation / 18)}
+                                      ou Kit em 12x s/ juros de {formatBRL(kitEstimation / 12)}
                                     </span>
                                   </div>
                                 </>
@@ -342,7 +342,7 @@ export default function ModelsGalleryPage() {
                                       {discountRate * 100}% desc. à vista
                                     </span>
                                     <span className="text-[8px] font-medium text-slate-500 mt-0.5 block leading-tight">
-                                      ou Kit em 18x s/ juros de {formatBRL(kitEstimation / 18)}
+                                      ou Kit em 12x s/ juros de {formatBRL(kitEstimation / 12)}
                                     </span>
                                   </div>
                                 </>
