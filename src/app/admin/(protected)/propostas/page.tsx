@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { motion } from 'framer-motion';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
@@ -12,7 +12,7 @@ import { FileDown, User, Home, Settings2, Tag, LayoutDashboard, Plus, Trash2, La
 import { useRouter } from 'next/navigation';
 import { useAuth } from '~/contexts/AuthContext';
 import { db } from "~/lib/firebase";
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy, serverTimestamp, limit, startAfter, where } from "firebase/firestore";
+import { collection, getDocs, getDoc, setDoc, deleteDoc, doc, query, orderBy, serverTimestamp, limit, startAfter, where } from "firebase/firestore";
 
 const STATUS_CONFIG: Record<'rascunho' | 'enviada' | 'fechada' | 'perdida', { label: string; bg: string; text: string; border: string; emoji: string }> = {
   rascunho: { label: 'Rascunho', bg: 'bg-stone-50', text: 'text-stone-600', border: 'border-stone-200/60', emoji: '📝' },
@@ -164,6 +164,7 @@ export default function PropostasPage() {
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasLoadedAllForSearch, setHasLoadedAllForSearch] = useState(false);
+  const [savingProposal, setSavingProposal] = useState(false);
   const [workLocation, setWorkLocation] = useState('');
   const [modelId, setModelId] = useState('');
   const [kitType, setKitType] = useState<KitType>('turnkey');
@@ -342,8 +343,8 @@ export default function PropostasPage() {
     setExtraItems(newItems);
   };
 
-  const fetchProposals = async () => {
-    if (!db) return;
+  const fetchProposals = useCallback(async () => {
+    if (!db || !user || !operador) return;
     setLoadingProposals(true);
     try {
       let q;
@@ -377,7 +378,7 @@ export default function PropostasPage() {
     } finally {
       setLoadingProposals(false);
     }
-  };
+  }, [operador, user]);
 
   const loadMoreProposals = async () => {
     if (!db || !lastVisible || loadingMore) return;
@@ -420,7 +421,7 @@ export default function PropostasPage() {
 
   useEffect(() => {
     const loadAllForSearch = async () => {
-      if (!db || !searchTerm.trim() || hasLoadedAllForSearch) return;
+      if (!db || !user || !operador || !searchTerm.trim() || hasLoadedAllForSearch) return;
       try {
         let q;
         if (operador?.role === 'consultor') {
@@ -448,7 +449,7 @@ export default function PropostasPage() {
     };
 
     loadAllForSearch();
-  }, [searchTerm, hasLoadedAllForSearch]);
+  }, [searchTerm, hasLoadedAllForSearch, operador, user]);
 
   const filteredProposals = useMemo(() => {
     return proposals.filter(p => {
@@ -467,14 +468,45 @@ export default function PropostasPage() {
   }, [proposals, searchTerm, statusFilter]);
 
   useEffect(() => {
-    fetchProposals();
-  }, []);
+    if (!user || !operador) return;
+    void fetchProposals();
+  }, [fetchProposals, operador, user]);
 
   const handleSaveProposal = async () => {
-    if (!db) return;
+    if (!db || !user || !operador) {
+      toast.error("Seu perfil de acesso ainda não foi carregado. Entre novamente e tente salvar.");
+      return;
+    }
+    if (savingProposal) return;
+
+    setSavingProposal(true);
     try {
       const currentData = getProposalData();
       const selectedModel = cabinModels.find(m => m.id === modelId);
+      const proposalRef = currentProposalId
+        ? doc(db, "proposals", currentProposalId)
+        : doc(collection(db, "proposals"));
+      const existingSnapshot = currentProposalId ? await getDoc(proposalRef) : null;
+      const existingProposal = existingSnapshot?.exists() ? existingSnapshot.data() : null;
+
+      if (currentProposalId && !existingProposal) {
+        toast.error("Esta proposta não existe mais. Volte à lista e crie uma nova proposta.");
+        return;
+      }
+
+      if (
+        currentProposalId &&
+        operador.role === "consultor" &&
+        existingProposal?.operadorId !== user.uid
+      ) {
+        toast.error("Você só pode alterar propostas criadas por você.");
+        return;
+      }
+
+      // Ao editar como administrador, o proprietário original é preservado.
+      // Isso garante que a proposta continue disponível para o consultor autor.
+      const ownerId = existingProposal?.operadorId || user.uid;
+      const ownerName = existingProposal?.operadorName || operador.name || user.email || "Consultor";
       const proposalPayload = {
         clientName: clientName.trim(),
         workLocation: workLocation.trim(),
@@ -484,34 +516,43 @@ export default function PropostasPage() {
         status,
         observations: observations.trim() || undefined,
         updatedAt: serverTimestamp(),
-        operadorId: user?.uid,
-        operadorName: operador?.name || user?.email,
+        operadorId: ownerId,
+        operadorName: ownerName,
         data: currentData
       };
 
       if (currentProposalId) {
-        // Atualizar proposta existente
-        await updateDoc(doc(db, "proposals", currentProposalId), proposalPayload);
+        await setDoc(proposalRef, proposalPayload, { merge: true });
         toast.success("Proposta atualizada com sucesso!");
       } else {
-        // Criar nova proposta
-        await addDoc(collection(db, "proposals"), {
+        await setDoc(proposalRef, {
           ...proposalPayload,
           createdAt: serverTimestamp()
         });
         toast.success("Proposta salva com sucesso!");
       }
       
-      // Atualizar lista e voltar para a listagem
       await fetchProposals();
       setView('list');
     } catch (err: any) {
       console.error("Erro ao salvar proposta:", err);
-      toast.error(`Erro ao salvar proposta no banco de dados: ${err?.message || err}`);
+      if (err?.code === "permission-denied") {
+        toast.error("Seu perfil não tem permissão para gravar propostas. O administrador deve revisar seu cadastro de consultor.");
+      } else if (err?.code === "unauthenticated") {
+        toast.error("Sua sessão expirou. Entre novamente para salvar a proposta.");
+      } else {
+        toast.error(`Erro ao salvar proposta no banco de dados: ${err?.message || err}`);
+      }
+    } finally {
+      setSavingProposal(false);
     }
   };
 
   const handleEditProposal = (proposal: any) => {
+    if (operador?.role === "consultor" && proposal.operadorId !== user?.uid) {
+      toast.error("Você só pode alterar propostas criadas por você.");
+      return;
+    }
     const d = proposal.data as ProposalData;
     setCurrentProposalId(proposal.id);
     
@@ -573,11 +614,21 @@ export default function PropostasPage() {
 
   const handleDeleteProposal = async (id: string) => {
     if (!confirm("Tem certeza que deseja excluir esta proposta definitivamente?")) return;
-    if (!db) return;
+    if (!db || !user || !operador) return;
     try {
-      await deleteDoc(doc(db, "proposals", id));
+      const proposalRef = doc(db, "proposals", id);
+      const proposalSnapshot = await getDoc(proposalRef);
+      if (!proposalSnapshot.exists()) {
+        toast.error("Esta proposta não existe mais.");
+        return;
+      }
+      if (operador.role === "consultor" && proposalSnapshot.data().operadorId !== user.uid) {
+        toast.error("Você só pode excluir propostas criadas por você.");
+        return;
+      }
+      await deleteDoc(proposalRef);
       toast.success("Proposta excluída com sucesso.");
-      fetchProposals();
+      await fetchProposals();
     } catch (err) {
       console.error("Erro ao excluir proposta:", err);
       toast.error("Erro ao excluir proposta.");
@@ -1796,9 +1847,12 @@ export default function PropostasPage() {
                 variant="outline"
                 size="lg"
                 onClick={handleSaveProposal}
+                disabled={savingProposal}
                 className="h-12 md:h-16 px-6 md:px-8 rounded-[1.2rem] border-2 border-[#B06D46]/20 bg-[#B06D46]/5 font-black text-[#B06D46] hover:bg-[#B06D46]/10 transition-all uppercase tracking-widest text-xs md:text-sm"
               >
-                {currentProposalId ? 'Atualizar Proposta' : 'Salvar Proposta'}
+                {savingProposal ? (
+                  <><Loader2 className="w-4 h-4 animate-spin" /> Salvando...</>
+                ) : currentProposalId ? 'Atualizar Proposta' : 'Salvar Proposta'}
               </Button>
               <Button
                 onClick={handleGenerate}
