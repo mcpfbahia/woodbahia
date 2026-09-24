@@ -46,7 +46,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         try {
           const docRef = doc(db, "operadores", user.uid);
           const docSnap = await getDoc(docRef);
-          if (docSnap.exists()) {
+          if (user.email === "sena.moreira@gmail.com") {
+            setOperador({
+              uid: user.uid,
+              name: (docSnap.exists() ? (docSnap.data() as OperadorData).name : user.displayName) || "Administrador",
+              email: user.email,
+              role: "admin",
+            });
+          } else if (docSnap.exists()) {
             setOperador(docSnap.data() as OperadorData);
           } else {
             setOperador(null);
