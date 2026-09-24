@@ -61,7 +61,7 @@ export const PaymentSection = () => {
                 <div className="bg-[#F9F6F0] rounded-2xl p-6 border border-[#EFE8DF]">
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="text-2xl font-black text-[#111827]">
-                      Até <span className="text-[#B06D46]">18x</span> no cartão
+                      Até <span className="text-[#B06D46]">12x</span> sem juros
                     </h4>
                     <div className="w-3 h-3 rounded-full bg-[#B06D46] animate-pulse"></div>
                   </div>

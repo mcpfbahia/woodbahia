@@ -80,7 +80,7 @@ export function StepSummary({ state, onBack, onReset }: Props) {
     `• Sinal (${pctSinal}): ${fmt(sinalPix)} — ${descSinal}`,
     `• Saldo Final (${pctSaldo}): ${fmt(saldoPix)} — ${descSaldo}`,
     ``,
-    `💳 *OPÇÃO 2: PARCELAMENTO (ATÉ 18X NO CARTÃO)*`,
+    `💳 *OPÇÃO 2: PARCELAMENTO (ATÉ 12X SEM JUROS OU ATÉ 18X COM JUROS)*`,
     pixBase > 0 ? `*• Frete e Serviços Complementares (Via PIX)*: ${fmt(pixBase)} (30% no sinal e 70% 24h antes do embarque).` : ``,
     `*• 12x Sem Juros no Cartão*: ${fmt(calculateInstallmentValue(creditCardBase, 12).installment)} por mês (exclusivo para Kit Madeiramento, Base Estrutural e Assoalho. Ou até 18x com juros da maquininha).`,
     ``,

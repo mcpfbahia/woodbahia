@@ -504,7 +504,7 @@ export function generateProposalPDF(
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
   doc.setTextColor(...COLORS.accent);
-  doc.text(`OPÇÃO 2: PARCELAMENTO EM ATÉ 18X NO CARTÃO`, margin + 6, y + 4);
+  doc.text(`OPÇÃO 2: PARCELAMENTO EM ATÉ 12X SEM JUROS (OU ATÉ 18X COM JUROS)`, margin + 6, y + 4);
 
   doc.setFontSize(8);
   doc.setFont('helvetica', 'bold');

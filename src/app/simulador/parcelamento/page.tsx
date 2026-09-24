@@ -185,7 +185,7 @@ export default function InstallmentSimulatorPage() {
                   <div>
                     <label className="flex items-center justify-between text-sm font-bold text-slate-700 mb-4 uppercase tracking-wider">
                       <span className="flex items-center gap-2"><Calculator className="w-4 h-4 text-primary" /> Número de Parcelas</span>
-                      <span className="text-slate-500 text-xs font-medium tracking-normal">Até 18x no cartão</span>
+                      <span className="text-slate-500 text-xs font-medium tracking-normal">Até 12x sem juros (ou até 18x com juros)</span>
                     </label>
                     <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
                       {[3, 6, 10, 12, 15, 18].map((n) => (
