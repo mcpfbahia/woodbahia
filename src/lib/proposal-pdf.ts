@@ -521,8 +521,9 @@ export function generateProposalPDF(
     doc.setTextColor(...COLORS.foreground);
     const pixLabel = `Frete e Serviços Complementares (Via PIX): ${fmt(pixBase)}`;
     doc.text(pixLabel, margin + 6, y);
+    y += 5;
     doc.setFont('helvetica', 'normal');
-    doc.text(` — 30% no sinal de contrato e 70% 24h antes do embarque do kit.`, margin + 6 + doc.getTextWidth(pixLabel), y);
+    doc.text(`— 30% no sinal de contrato e 70% 24h antes do embarque do kit.`, margin + 6, y);
     y += 6;
   }
 
