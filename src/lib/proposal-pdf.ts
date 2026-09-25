@@ -843,6 +843,7 @@ export function generateProposalPDF(
     y += obsHeight + 6;
   }
 
+  y += 8;
   y = checkPageBreak(doc, y, 14);
 
   // Fundo e borda para o alerta de validade
