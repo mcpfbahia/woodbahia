@@ -843,20 +843,28 @@ export function generateProposalPDF(
     y += obsHeight + 6;
   }
 
-  y = checkPageBreak(doc, y, 10);
+  y = checkPageBreak(doc, y, 14);
+
+  // Fundo e borda para o alerta de validade
+  doc.setFillColor(253, 245, 240);
+  doc.setDrawColor(210, 100, 60);
+  doc.setLineWidth(0.2);
+  doc.roundedRect(margin, y - 5, contentWidth, 10, 2, 2, 'FD');
 
   // Ícone de Atenção desenhado
-  doc.setFillColor(180, 60, 30);
-  doc.circle(margin + 2, y - 1, 2.5, 'F');
+  doc.setFillColor(210, 100, 60);
+  doc.circle(margin + 5, y, 2.5, 'F');
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(7);
   doc.setTextColor(255, 255, 255);
-  doc.text('!', margin + 2, y + 0.5, { align: 'center' });
+  doc.text('!', margin + 5, y + 1.2, { align: 'center' });
 
   // Texto da validade
   doc.setFontSize(9);
-  doc.setTextColor(180, 60, 30);
-  doc.text('Esta proposta é válida por 7 dias a partir da data de emissão.', margin + 6, y);
+  doc.setTextColor(210, 100, 60);
+  doc.text('Esta proposta é válida por 7 dias a partir da data de emissão.', margin + 10, y + 1);
+  
+  y += 10;
 
   // ─── FOOTER on all pages ───
   const totalPages = (doc as any).internal.getNumberOfPages();
