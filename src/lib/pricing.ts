@@ -430,7 +430,10 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
       l.includes('kit madeiramento') ||
       l.includes('base estrutural') ||
       l.includes('assoalho') ||
-      l.includes('parede dupla')
+      l.includes('parede dupla') ||
+      l.includes('pinus tratado') ||
+      l.includes('caibro') ||
+      l.includes('deck tratado')
     ) {
       structuralTotal += i.value;
     }
@@ -720,7 +723,10 @@ export function calculateProposalItems(
       l.includes('kit madeiramento') ||
       l.includes('base estrutural') ||
       l.includes('assoalho') ||
-      l.includes('parede dupla')
+      l.includes('parede dupla') ||
+      l.includes('pinus tratado') ||
+      l.includes('caibro') ||
+      l.includes('deck tratado')
     ) {
       structuralTotal += i.value;
     }
