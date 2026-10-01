@@ -433,7 +433,9 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
       l.includes('parede dupla') ||
       l.includes('pinus tratado') ||
       l.includes('caibro') ||
-      l.includes('deck tratado')
+      l.includes('deck tratado') ||
+      l.includes('frontal pinus') ||
+      l.includes('frontal')
     ) {
       structuralTotal += i.value;
     }
@@ -721,7 +723,9 @@ export function calculateProposalItems(
       l.includes('parede dupla') ||
       l.includes('pinus tratado') ||
       l.includes('caibro') ||
-      l.includes('deck tratado')
+      l.includes('deck tratado') ||
+      l.includes('frontal pinus') ||
+      l.includes('frontal')
     ) {
       structuralTotal += i.value;
     }
