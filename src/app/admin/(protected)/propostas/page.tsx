@@ -475,7 +475,7 @@ export default function PropostasPage() {
     void fetchProposals();
   }, [fetchProposals, operador, user]);
 
-  const handleSaveProposal = async () => {
+  const handleSaveProposal = async (closeAfterSave: boolean = true) => {
     if (!db || !user || !operador) {
       toast.error("Seu perfil de acesso ainda não foi carregado. Entre novamente e tente salvar.");
       return;
@@ -533,10 +533,13 @@ export default function PropostasPage() {
           createdAt: serverTimestamp()
         });
         toast.success("Proposta salva com sucesso!");
+        setCurrentProposalId(proposalRef.id);
       }
       
       await fetchProposals();
-      setView('list');
+      if (closeAfterSave) {
+        setView('list');
+      }
     } catch (err: any) {
       console.error("Erro ao salvar proposta:", err);
       if (err?.code === "permission-denied") {
@@ -1850,13 +1853,24 @@ export default function PropostasPage() {
               <Button
                 variant="outline"
                 size="lg"
-                onClick={handleSaveProposal}
+                onClick={() => handleSaveProposal(false)}
                 disabled={savingProposal}
                 className="h-12 md:h-16 px-6 md:px-8 rounded-[1.2rem] border-2 border-[#B06D46]/20 bg-[#B06D46]/5 font-black text-[#B06D46] hover:bg-[#B06D46]/10 transition-all uppercase tracking-widest text-xs md:text-sm"
               >
                 {savingProposal ? (
-                  <><Loader2 className="w-4 h-4 animate-spin" /> Salvando...</>
-                ) : currentProposalId ? 'Atualizar Proposta' : 'Salvar Proposta'}
+                  <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Salvando...</>
+                ) : currentProposalId ? 'Salvar' : 'Salvar Proposta'}
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => handleSaveProposal(true)}
+                disabled={savingProposal}
+                className="h-12 md:h-16 px-6 md:px-8 rounded-[1.2rem] border-2 border-[#B06D46]/40 bg-[#B06D46]/10 font-black text-[#B06D46] hover:bg-[#B06D46]/20 transition-all uppercase tracking-widest text-xs md:text-sm"
+              >
+                {savingProposal ? (
+                  <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Salvando...</>
+                ) : 'Salvar & Fechar'}
               </Button>
               <Button
                 onClick={handleGenerate}
