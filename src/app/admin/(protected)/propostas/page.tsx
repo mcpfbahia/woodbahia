@@ -1661,12 +1661,7 @@ export default function PropostasPage() {
                                 <span className="font-bold text-amber-600">+{fmt(summary.additionalFreight)}</span>
                               </div>
                             )}
-                            {summary.additionalTravelCost > 0 && (
-                              <div className="flex justify-between text-sm py-2 border-b border-primary/5">
-                                <span className="text-muted-foreground font-medium text-amber-600">Deslocamento Adicional Chave na Mão (&gt; 200km)</span>
-                                <span className="font-bold text-amber-600">+{fmt(summary.additionalTravelCost)}</span>
-                              </div>
-                            )}
+
 
                           {/* Itens Adicionais Personalizados (Editáveis) */}
                           {extraItems.map((item, index) => (

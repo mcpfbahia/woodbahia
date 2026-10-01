@@ -25,7 +25,7 @@ const KIT_NAMES: Record<string, string> = {
 };
 
 export function StepSummary({ state, onBack, onReset }: Props) {
-  const { items, freight, additionalFreight, additionalTravelCost, total } = calculateSummary(state);
+  const { items, freight, additionalFreight, total } = calculateSummary(state);
   const area = getEffectiveArea(state);
   const complementsTotal = items.filter(i => !i.deleted && i.isComplement).reduce((sum, i) => sum + i.value, 0);
   const woodBahiaTotal = Math.max(0, total - complementsTotal);
@@ -64,7 +64,6 @@ export function StepSummary({ state, onBack, onReset }: Props) {
     ...items.filter(i => !i.isComplement).map((item: LineItem) => `• ${item.label}: ${fmt(item.value)}`),
     `• Frete Estimado: ${fmt(freight)}`,
     additionalFreight > 0 ? `• Frete Adicional (> 200km): ${fmt(additionalFreight)}` : ``,
-    additionalTravelCost > 0 ? `• Deslocamento Adicional Chave na Mão (> 200km): ${fmt(additionalTravelCost)}` : ``,
     ...(items.filter(i => i.isComplement).length > 0 ? [
       ``,
       `*Complementos Estimados (Adquiridos à parte):*`,
@@ -214,7 +213,7 @@ export function StepSummary({ state, onBack, onReset }: Props) {
                 )}
 
                 {/* 3. Serviços & Montagem de Obra Wood Bahia */}
-                {(wbServiceItems.length > 0 || additionalTravelCost > 0) && (
+                {(wbServiceItems.length > 0) && (
                   <div>
                     <h4 className="text-xs font-black uppercase tracking-widest text-[#B06D46] mb-3 flex items-center gap-1.5 border-b border-stone-100 pb-1.5">
                       <span>🔨</span> Serviços e Mão de Obra (Wood Bahia)
@@ -230,12 +229,6 @@ export function StepSummary({ state, onBack, onReset }: Props) {
                           </div>
                         );
                       })}
-                      {additionalTravelCost > 0 && (
-                        <div className="flex justify-between items-center text-sm py-0.5 text-amber-600 font-semibold">
-                          <span>Deslocamento Adicional Chave na Mão (&gt; 200km)</span>
-                          <span className="tabular-nums">+{fmt(additionalTravelCost)}</span>
-                        </div>
-                      )}
                     </div>
                   </div>
                 )}

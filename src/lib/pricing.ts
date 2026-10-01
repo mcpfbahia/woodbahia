@@ -274,7 +274,7 @@ export function getEffectiveArea(state: SimulationState): number {
   return state.model?.area ?? 0;
 }
 
-export function calculateSummary(state: SimulationState): { items: LineItem[]; freight: number; additionalFreight: number; additionalTravelCost: number; total: number; materialSubtotal: number; laborTotal: number } {
+export function calculateSummary(state: SimulationState): { items: LineItem[]; freight: number; additionalFreight: number; total: number; materialSubtotal: number; laborTotal: number } {
   const items: LineItem[] = [];
   const kit = state.kitType;
   const area = getEffectiveArea(state);
@@ -285,7 +285,7 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
     const timberRate = getTimberRate(area);
     items.push({ label: `Kit Madeiramento (${area}m² × R$ ${timberRate})`, value: Math.round(area * timberRate) });
   } else {
-    if (!state.model) return { items: [], freight: 0, additionalFreight: 0, additionalTravelCost: 0, total: 0, materialSubtotal: 0, laborTotal: 0 };
+    if (!state.model) return { items: [], freight: 0, additionalFreight: 0, total: 0, materialSubtotal: 0, laborTotal: 0 };
     items.push({ label: 'Kit Madeiramento', value: state.model.kitPrice });
   }
 
@@ -446,20 +446,15 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
     additionalFreight = (state.clientData.distance - 200) * 5;
   }
 
-  let additionalTravelCost = 0;
-  if (state.kitType === 'turnkey' && state.clientData?.distance && state.clientData.distance > 200) {
-    additionalTravelCost = (state.clientData.distance - 200) * 7.5;
-  }
+  const total = subtotal + freight + additionalFreight;
 
-  const total = subtotal + freight + additionalFreight + additionalTravelCost;
-
-  return { items, freight, additionalFreight, additionalTravelCost, total, materialSubtotal, laborTotal };
+  return { items, freight, additionalFreight, total, materialSubtotal, laborTotal };
 }
 
 export function calculateProposalItems(
   data: ProposalData,
   modelsList: CabinModel[] = CABIN_MODELS
-): { items: LineItem[]; freight: number; additionalFreight: number; additionalTravelCost: number; subtotal: number; total: number; discount: number; materialSubtotal: number; laborTotal: number } {
+): { items: LineItem[]; freight: number; additionalFreight: number; subtotal: number; total: number; discount: number; materialSubtotal: number; laborTotal: number } {
   const model = modelsList.find(m => m.id === data.modelId);
   const area = data.customArea || model?.area || 0;
   const items: LineItem[] = [];
@@ -742,10 +737,7 @@ export function calculateProposalItems(
     additionalFreight = (data.distanceFromFactory - 200) * 5;
   }
 
-  let additionalTravelCost = 0;
-  if (data.kitType === 'turnkey' && data.distanceFromFactory && data.distanceFromFactory > 200) {
-    additionalTravelCost = (data.distanceFromFactory - 200) * 7.5;
-  }
+
 
   let discount = 0;
   if (data.discountType === 'percentage') {
@@ -754,9 +746,9 @@ export function calculateProposalItems(
     discount = Math.min(data.discountValue, materialSubtotal);
   }
 
-  const total = subtotal - discount + freight + additionalFreight + additionalTravelCost;
+  const total = subtotal - discount + freight + additionalFreight;
 
-  return { items, freight, additionalFreight, additionalTravelCost, subtotal, total, discount, materialSubtotal, laborTotal };
+  return { items, freight, additionalFreight, subtotal, total, discount, materialSubtotal, laborTotal };
 }
 
 export function getPaymentBases(

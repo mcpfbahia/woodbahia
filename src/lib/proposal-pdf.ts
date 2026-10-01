@@ -236,7 +236,7 @@ export function generateProposalPDF(
   const kitName = KIT_NAMES[data.kitType] || data.kitType;
   const kitDesc = data.kitType === 'custom' && data.customModelDescription ? data.customModelDescription : (KIT_DESCRIPTIONS[data.kitType] || '');
   const modelName = model?.name || 'Kit Personalizado';
-  const { items, freight, additionalFreight, additionalTravelCost, subtotal, total: totalFinal, discount, materialSubtotal } = calculateProposalItems(data, modelsList);
+  const { items, freight, additionalFreight, subtotal, total: totalFinal, discount, materialSubtotal } = calculateProposalItems(data, modelsList);
   
   // Isolamento da Mão de Obra de Montador Parceiro (contratada direto com o profissional)
   const partnerLaborItem = items.find(i => i.label.toLowerCase().includes('montador parceiro'));
@@ -388,9 +388,7 @@ export function generateProposalPDF(
     tableBody.push(['Frete Adicional (> 200km)', '+' + fmt(additionalFreight)]);
   }
 
-  if (additionalTravelCost > 0) {
-    tableBody.push(['Adicional Deslocamento Chave na Mão (> 200km)', '+' + fmt(additionalTravelCost)]);
-  }
+
 
   if (compItems.length > 0) {
     tableBody.push([{ content: '--- COMPLEMENTOS ESTIMADOS (ADQUIRIDOS À PARTE) ---', colSpan: 2, styles: { halign: 'center', fillColor: [255, 240, 230], textColor: [180, 60, 30], fontStyle: 'bold' } }]);
