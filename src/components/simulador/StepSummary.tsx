@@ -25,7 +25,7 @@ const KIT_NAMES: Record<string, string> = {
 };
 
 export function StepSummary({ state, onBack, onReset }: Props) {
-  const { items, freight, total } = calculateSummary(state);
+  const { items, freight, additionalFreight, total } = calculateSummary(state);
   const area = getEffectiveArea(state);
   const complementsTotal = items.filter(i => !i.deleted && i.isComplement).reduce((sum, i) => sum + i.value, 0);
   const woodBahiaTotal = Math.max(0, total - complementsTotal);
@@ -63,6 +63,7 @@ export function StepSummary({ state, onBack, onReset }: Props) {
     ...(items.filter(i => !i.isComplement).length > 0 ? [`*Itens Wood Bahia:*`] : []),
     ...items.filter(i => !i.isComplement).map((item: LineItem) => `• ${item.label}: ${fmt(item.value)}`),
     `• Frete Estimado: ${fmt(freight)}`,
+    additionalFreight > 0 ? `• Frete Adicional (> 200km): ${fmt(additionalFreight)}` : ``,
     ...(items.filter(i => i.isComplement).length > 0 ? [
       ``,
       `*Complementos Estimados (Adquiridos à parte):*`,
@@ -162,7 +163,12 @@ export function StepSummary({ state, onBack, onReset }: Props) {
                       <span className="text-muted-foreground">Frete Compartilhado Estimado (12,5% do material estrutural)</span>
                       <span className="font-semibold tabular-nums text-stone-850">{fmt(freight)}</span>
                     </div>
-
+                    {additionalFreight > 0 && (
+                      <div className="flex justify-between items-center text-sm py-0.5 text-amber-600 font-semibold">
+                        <span>Frete Adicional (&gt; 200km)</span>
+                        <span className="tabular-nums">+{fmt(additionalFreight)}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 

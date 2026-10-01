@@ -274,7 +274,7 @@ export function getEffectiveArea(state: SimulationState): number {
   return state.model?.area ?? 0;
 }
 
-export function calculateSummary(state: SimulationState): { items: LineItem[]; freight: number; total: number; materialSubtotal: number; laborTotal: number } {
+export function calculateSummary(state: SimulationState): { items: LineItem[]; freight: number; additionalFreight: number; total: number; materialSubtotal: number; laborTotal: number } {
   const items: LineItem[] = [];
   const kit = state.kitType;
   const area = getEffectiveArea(state);
@@ -441,21 +441,22 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
     }
   });
 
-  let freight = getFreight(structuralTotal);
+  const freight = getFreight(structuralTotal);
 
+  let additionalFreight = 0;
   if (state.clientData?.distance && state.clientData.distance > 200) {
-    freight += (state.clientData.distance - 200) * 5;
+    additionalFreight = (state.clientData.distance - 200) * 5;
   }
 
-  const total = subtotal + freight;
+  const total = subtotal + freight + additionalFreight;
 
-  return { items, freight, total, materialSubtotal, laborTotal };
+  return { items, freight, additionalFreight, total, materialSubtotal, laborTotal };
 }
 
 export function calculateProposalItems(
   data: ProposalData,
   modelsList: CabinModel[] = CABIN_MODELS
-): { items: LineItem[]; freight: number; subtotal: number; total: number; discount: number; materialSubtotal: number; laborTotal: number } {
+): { items: LineItem[]; freight: number; additionalFreight: number; subtotal: number; total: number; discount: number; materialSubtotal: number; laborTotal: number } {
   const model = modelsList.find(m => m.id === data.modelId);
   const area = data.customArea || model?.area || 0;
   const items: LineItem[] = [];
@@ -731,14 +732,16 @@ export function calculateProposalItems(
   });
 
   let freight = getFreight(structuralTotal);
-  
-  if (data.distanceFromFactory && data.distanceFromFactory > 200) {
-    freight += (data.distanceFromFactory - 200) * 5;
-  }
-
   if (data.freightOverride !== undefined) {
     freight = data.freightOverride;
   }
+
+  let additionalFreight = 0;
+  if (data.distanceFromFactory && data.distanceFromFactory > 200) {
+    additionalFreight = (data.distanceFromFactory - 200) * 5;
+  }
+
+
 
   let discount = 0;
   if (data.discountType === 'percentage') {
@@ -747,9 +750,9 @@ export function calculateProposalItems(
     discount = Math.min(data.discountValue, materialSubtotal);
   }
 
-  const total = subtotal - discount + freight;
+  const total = subtotal - discount + freight + additionalFreight;
 
-  return { items, freight, subtotal, total, discount, materialSubtotal, laborTotal };
+  return { items, freight, additionalFreight, subtotal, total, discount, materialSubtotal, laborTotal };
 }
 
 export function getPaymentBases(
