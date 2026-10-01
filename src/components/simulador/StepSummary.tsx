@@ -164,10 +164,16 @@ export function StepSummary({ state, onBack, onReset }: Props) {
                       <span className="font-semibold tabular-nums text-stone-850">{fmt(freight)}</span>
                     </div>
                     {additionalFreight > 0 && (
-                      <div className="flex justify-between items-center text-sm py-0.5 text-amber-600 font-semibold">
-                        <span>Frete Adicional (&gt; 200km)</span>
-                        <span className="tabular-nums">+{fmt(additionalFreight)}</span>
-                      </div>
+                      <>
+                        <div className="flex justify-between items-center text-sm py-0.5 text-amber-600 font-semibold">
+                          <span>Frete Adicional (&gt; 200km)</span>
+                          <span className="tabular-nums">+{fmt(additionalFreight)}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm py-1 mt-1 bg-stone-50 px-2 rounded font-black text-stone-700 border border-stone-100">
+                          <span className="uppercase text-[10px] tracking-wider">Subtotal Frete Estimado</span>
+                          <span className="tabular-nums">{fmt(freight + additionalFreight)}</span>
+                        </div>
+                      </>
                     )}
                   </div>
                 </div>

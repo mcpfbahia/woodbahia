@@ -386,6 +386,9 @@ export function generateProposalPDF(
 
   if (additionalFreight > 0) {
     tableBody.push(['Frete Adicional (> 200km)', '+' + fmt(additionalFreight)]);
+    tableBody.push([{ content: `Subtotal Frete Estimado: ${fmt(freight + additionalFreight)}`, colSpan: 2, styles: { halign: 'right', fillColor: [245, 245, 245], fontStyle: 'italic', textColor: [100, 100, 100] } }]);
+  } else {
+    tableBody.push([{ content: `Subtotal Frete Estimado: ${fmt(freight)}`, colSpan: 2, styles: { halign: 'right', fillColor: [245, 245, 245], fontStyle: 'italic', textColor: [100, 100, 100] } }]);
   }
 
 

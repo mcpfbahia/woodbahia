@@ -201,6 +201,7 @@ export default function PropostasPage() {
   const [glassPriceOverride, setGlassPriceOverride] = useState<number | string | undefined>(undefined);
   const [projectPriceOverride, setProjectPriceOverride] = useState<number | string | undefined>(undefined);
   const [freightOverride, setFreightOverride] = useState<number | string | undefined>(undefined);
+  const [additionalFreightOverride, setAdditionalFreightOverride] = useState<number | string | undefined>(undefined);
   const [distanceFromFactory, setDistanceFromFactory] = useState<number | string | undefined>(undefined);
   
   const [foundationType, setFoundationType] = useState<FoundationType>('none');
@@ -290,6 +291,7 @@ export default function PropostasPage() {
     setGlassPriceOverride(undefined);
     setProjectPriceOverride(undefined);
     setFreightOverride(undefined);
+    setAdditionalFreightOverride(undefined);
     setFoundationPriceOverride(undefined);
     setMasonryBathroomPriceOverride(undefined);
     setCustomNotIncludedItems(undefined);
@@ -603,6 +605,7 @@ export default function PropostasPage() {
     setGlassPriceOverride(d.glassPriceOverride);
     setProjectPriceOverride(d.projectPriceOverride);
     setFreightOverride(d.freightOverride);
+    setAdditionalFreightOverride(d.additionalFreightOverride);
     setDistanceFromFactory(d.distanceFromFactory);
     
     setFoundationType(d.foundationType || 'none');
@@ -687,6 +690,7 @@ export default function PropostasPage() {
     setGlassPriceOverride(undefined);
     setProjectPriceOverride(undefined);
     setFreightOverride(undefined);
+    setAdditionalFreightOverride(undefined);
     setDistanceFromFactory(undefined);
     
     setFoundationType('none');
@@ -739,6 +743,7 @@ export default function PropostasPage() {
     glassPriceOverride: typeof glassPriceOverride === 'number' ? glassPriceOverride : undefined,
     projectPriceOverride: typeof projectPriceOverride === 'number' ? projectPriceOverride : undefined,
     freightOverride: typeof freightOverride === 'number' ? freightOverride : undefined,
+    additionalFreightOverride: typeof additionalFreightOverride === 'number' ? additionalFreightOverride : undefined,
     distanceFromFactory: typeof distanceFromFactory === 'number' ? distanceFromFactory : undefined,
     foundationType,
     foundationPriceOverride: typeof foundationPriceOverride === 'number' ? foundationPriceOverride : undefined,
@@ -1657,11 +1662,24 @@ export default function PropostasPage() {
                                 />
                               </div>
                             </div>
-                            {summary.additionalFreight > 0 && (
-                              <div className="flex justify-between text-sm py-2 border-b border-primary/5">
-                                <span className="text-muted-foreground font-medium text-amber-600">Frete Adicional (&gt; 200km)</span>
-                                <span className="font-bold text-amber-600">+{fmt(summary.additionalFreight)}</span>
-                              </div>
+                            {(summary.additionalFreight > 0 || additionalFreightOverride !== undefined) && (
+                              <>
+                                <div className="flex justify-between text-sm py-2 border-b border-primary/5 items-center">
+                                  <span className="text-muted-foreground font-medium text-amber-600">Frete Adicional (&gt; 200km)</span>
+                                  <div className="flex items-center gap-4">
+                                    <InlineEditablePrice 
+                                      value={summary.additionalFreight} 
+                                      onChange={setAdditionalFreightOverride} 
+                                      onReset={() => setAdditionalFreightOverride(undefined)} 
+                                      isOverridden={additionalFreightOverride !== undefined}
+                                    />
+                                  </div>
+                                </div>
+                                <div className="flex justify-between text-sm py-2 border-b border-primary/5 items-center bg-stone-50 px-3 rounded-md mt-1 border border-stone-100">
+                                  <span className="text-muted-foreground font-black text-stone-600 text-[10px] uppercase tracking-widest">Subtotal Frete Total</span>
+                                  <span className="font-black text-stone-800">{fmt(summary.freight + summary.additionalFreight)}</span>
+                                </div>
+                              </>
                             )}
 
 

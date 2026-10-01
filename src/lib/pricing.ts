@@ -224,6 +224,7 @@ export interface ProposalData {
   glassPriceOverride?: number;
   projectPriceOverride?: number;
   freightOverride?: number;
+  additionalFreightOverride?: number;
   distanceFromFactory?: number;
   foundationType?: FoundationType;
   foundationPriceOverride?: number;
@@ -737,7 +738,9 @@ export function calculateProposalItems(
   }
 
   let additionalFreight = 0;
-  if (data.distanceFromFactory && data.distanceFromFactory > 200) {
+  if (data.additionalFreightOverride !== undefined) {
+    additionalFreight = data.additionalFreightOverride;
+  } else if (data.distanceFromFactory && data.distanceFromFactory > 200) {
     additionalFreight = (data.distanceFromFactory - 200) * 5;
   }
 
