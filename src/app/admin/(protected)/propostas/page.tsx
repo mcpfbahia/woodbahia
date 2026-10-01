@@ -1834,7 +1834,7 @@ export default function PropostasPage() {
                           <div className="pt-4 md:pt-6 border-t border-primary/10 mt-2">
                              <div className="text-center md:text-left">
                                 <p className="text-[10px] uppercase font-black text-primary/60 mb-1 md:mb-2 tracking-[.2em] ml-1">Total do Investimento</p>
-                                <h3 className="text-3xl md:text-5xl font-black engraved-text leading-tight">{fmt(summary.total)}</h3>
+                                <h3 className="text-2xl sm:text-3xl md:text-5xl font-black engraved-text leading-tight tracking-tighter break-words">{fmt(summary.total)}</h3>
                              </div>
                           </div>
 
