@@ -12,7 +12,7 @@ import { FileDown, User, Home, Settings2, Tag, LayoutDashboard, Plus, Trash2, La
 import { useRouter } from 'next/navigation';
 import { useAuth } from '~/contexts/AuthContext';
 import { db } from "~/lib/firebase";
-import { collection, getDocs, getDoc, setDoc, deleteDoc, doc, query, orderBy, serverTimestamp, limit, startAfter, where } from "firebase/firestore";
+import { collection, getDocs, getDoc, setDoc, updateDoc, deleteDoc, doc, query, orderBy, serverTimestamp, limit, startAfter, where } from "firebase/firestore";
 
 const STATUS_CONFIG: Record<'rascunho' | 'enviada' | 'fechada' | 'perdida', { label: string; bg: string; text: string; border: string; emoji: string }> = {
   rascunho: { label: 'Rascunho', bg: 'bg-stone-50', text: 'text-stone-600', border: 'border-stone-200/60', emoji: '📝' },
@@ -517,7 +517,7 @@ export default function PropostasPage() {
         kitTypeLabel: KIT_OPTIONS.find(o => o.value === kitType)?.label || kitType,
         totalValue: summary.total,
         status,
-        observations: observations.trim() || undefined,
+        observations: observations.trim() || null,
         updatedAt: serverTimestamp(),
         operadorId: ownerId,
         operadorName: ownerName,
@@ -525,7 +525,7 @@ export default function PropostasPage() {
       };
 
       if (currentProposalId) {
-        await setDoc(proposalRef, proposalPayload, { merge: true });
+        await updateDoc(proposalRef, proposalPayload);
         toast.success("Proposta atualizada com sucesso!");
       } else {
         await setDoc(proposalRef, {
