@@ -290,7 +290,6 @@ export default function PropostasPage() {
     setGlassPriceOverride(undefined);
     setProjectPriceOverride(undefined);
     setFreightOverride(undefined);
-    setDistanceFromFactory(undefined);
     setFoundationPriceOverride(undefined);
     setMasonryBathroomPriceOverride(undefined);
     setCustomNotIncludedItems(undefined);
