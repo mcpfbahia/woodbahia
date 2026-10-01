@@ -1657,13 +1657,6 @@ export default function PropostasPage() {
                                 />
                               </div>
                             </div>
-                            {summary.additionalFreight > 0 && (
-                              <div className="flex justify-between text-sm py-2 border-b border-primary/5">
-                                <span className="text-muted-foreground font-medium text-amber-600">Frete Adicional (&gt; 200km)</span>
-                                <span className="font-bold text-amber-600">+{fmt(summary.additionalFreight)}</span>
-                              </div>
-                            )}
-
 
                           {/* Itens Adicionais Personalizados (Editáveis) */}
                           {extraItems.map((item, index) => (
