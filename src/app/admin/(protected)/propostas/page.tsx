@@ -1809,6 +1809,11 @@ export default function PropostasPage() {
                             <span className="text-sm md:text-lg">-{fmt(summary.freight)}</span>
                           </div>
 
+                          <div className="flex justify-between items-center px-2 pt-2">
+                            <span className="text-[10px] md:text-xs text-muted-foreground font-bold uppercase tracking-widest">Frete Total Estimado (Cliente)</span>
+                            <span className="text-sm md:text-base font-bold text-foreground">{fmt(summary.freight + summary.additionalFreight)}</span>
+                          </div>
+
                           {summary.discount > 0 && (
                             <div className="flex justify-between items-center text-primary font-bold bg-primary/10 p-3 md:p-4 rounded-xl border border-primary/30 shadow-md animate-in fade-in zoom-in duration-500">
                               <div className="flex flex-col">
