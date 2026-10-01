@@ -161,7 +161,7 @@ export function StepSummary({ state, onBack, onReset }: Props) {
                       );
                     })}
                     <div className="flex justify-between items-center text-sm py-0.5">
-                      <span className="text-muted-foreground">Frete Compartilhado Estimado ({area}m² × R$ 90)</span>
+                      <span className="text-muted-foreground">Frete Compartilhado Estimado (12,5% do material estrutural)</span>
                       <span className="font-semibold tabular-nums text-stone-850">{fmt(freight)}</span>
                     </div>
                     {additionalFreight > 0 && (

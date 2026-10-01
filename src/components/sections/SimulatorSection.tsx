@@ -126,8 +126,6 @@ export const SimulatorSection = () => {
     const timber = area * rate;
     setTimberPrice(timber);
 
-    const freight = includeFreight ? getFreight(area) : 0;
-    setFreightPrice(freight);
 
     let foundation = 0;
     if (foundationType === "wooden_eucalyptus") foundation = getEucalyptusFoundation(area);
@@ -161,9 +159,11 @@ export const SimulatorSection = () => {
     const paint = includePaint ? (area <= 25 ? 2000 : area <= 55 ? 3000 : 4500) : 0;
     setPaintPrice(paint);
 
-    // Base estrutural com assoalho: R$ 150/m²
     const woodenBase = includeWoodenBase ? area * 150 : 0;
     setWoodenBasePrice(woodenBase);
+
+    const freight = includeFreight ? getFreight(timber + woodenBase) : 0;
+    setFreightPrice(freight);
 
     // Total final
     const total = timber + freight + foundation + labor + admin + tiles + electrical + glass + doorsWindows + hardware + paint + woodenBase;

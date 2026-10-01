@@ -164,8 +164,8 @@ export function getRadierFoundation(area: number): number {
   return Math.round(area * 400);
 }
 
-export function getFreight(area: number): number {
-  return area * 95;
+export function getFreight(structuralTotal: number): number {
+  return Math.round(structuralTotal * 0.125);
 }
 
 export type KitType = 'madeiramento' | 'parceira' | 'turnkey' | 'custom';
@@ -421,7 +421,22 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
   const subtotal = items.reduce((sum, i) => sum + i.value, 0);
   const laborTotal = items.filter(i => i.label.includes('Mão de Obra') || i.label.includes('Gestão e Coordenação')).reduce((sum, i) => sum + i.value, 0);
   const materialSubtotal = subtotal - laborTotal;
-  const freight = getFreight(area);
+  // Calculate structural total for freight
+  let structuralTotal = 0;
+  items.forEach(i => {
+    if (i.deleted) return;
+    const l = i.label.toLowerCase();
+    if (
+      l.includes('kit madeiramento') ||
+      l.includes('base estrutural') ||
+      l.includes('assoalho') ||
+      l.includes('parede dupla')
+    ) {
+      structuralTotal += i.value;
+    }
+  });
+
+  const freight = getFreight(structuralTotal);
 
   let additionalFreight = 0;
   if (state.clientData?.distance && state.clientData.distance > 200) {
@@ -696,7 +711,22 @@ export function calculateProposalItems(
   const laborTotal = (laborItem ? laborItem.value : 0) + (adminItem ? adminItem.value : 0);
   const materialSubtotal = subtotal - laborTotal;
 
-  let freight = getFreight(area);
+  // Calculate structural total for freight
+  let structuralTotal = 0;
+  items.forEach(i => {
+    if (i.deleted) return;
+    const l = i.label.toLowerCase();
+    if (
+      l.includes('kit madeiramento') ||
+      l.includes('base estrutural') ||
+      l.includes('assoalho') ||
+      l.includes('parede dupla')
+    ) {
+      structuralTotal += i.value;
+    }
+  });
+
+  let freight = getFreight(structuralTotal);
   if (data.freightOverride !== undefined) {
     freight = data.freightOverride;
   }

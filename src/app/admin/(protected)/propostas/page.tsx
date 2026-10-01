@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect, useCallback } from "react";
+import React, { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { motion } from 'framer-motion';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
@@ -150,6 +150,7 @@ const InlineEditablePrice = ({
 export default function PropostasPage() {
   const router = useRouter();
   const { user, operador } = useAuth();
+  const isHydratingRef = useRef(false);
   const [cabinModels, setCabinModels] = useState<CabinModel[]>(CABIN_MODELS);
   const [view, setView] = useState<'list' | 'form' | 'summary'>('list');
   const [currentProposalId, setCurrentProposalId] = useState<string | null>(null);
@@ -280,6 +281,7 @@ export default function PropostasPage() {
 
   // Limpar overrides ao mudar modelo ou área para evitar erros de cálculo entre modelos
   useEffect(() => {
+    if (isHydratingRef.current) return;
     setKitPriceOverride(undefined);
     setFixturesPriceOverride(undefined);
     setTilesStainPriceOverride(undefined);
@@ -298,6 +300,7 @@ export default function PropostasPage() {
 
   // Seleção automática dos opcionais padrão ao alterar modalidade
   useEffect(() => {
+    if (isHydratingRef.current) return;
     if (kitType === 'turnkey') {
       setIncludeFixtures(true);
       setIncludeTilesStain(true);
@@ -321,6 +324,7 @@ export default function PropostasPage() {
 
   // Sincronização da inclusão padrão da fundação
   useEffect(() => {
+    if (isHydratingRef.current) return;
     if (kitType === 'turnkey') {
       if (foundationType === 'wooden_eucalyptus' || foundationType === 'eucalyptus') {
         setFoundationIncluded(true);
@@ -556,6 +560,8 @@ export default function PropostasPage() {
     const d = proposal.data as ProposalData;
     setCurrentProposalId(proposal.id);
     
+    isHydratingRef.current = true;
+    
     // Setar estados locais com os dados da proposta salva
     setClientName(d.clientName || '');
     setWorkLocation(d.workLocation || '');
@@ -610,6 +616,10 @@ export default function PropostasPage() {
     setItemOverrides(d.itemOverrides || {});
     
     setView('form');
+    
+    setTimeout(() => {
+      isHydratingRef.current = false;
+    }, 50);
   };
 
   const handleDeleteProposal = async (id: string) => {

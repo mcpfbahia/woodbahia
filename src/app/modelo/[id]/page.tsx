@@ -464,18 +464,18 @@ export default function ModelDetailPage() {
   const discountRate = getModelDiscountRate(model.id || model.name, model.discountRate);
 
   // Kit Madeiramento (Completo com Frete)
-  const kitEstimation = kitBasePriceNum + getFreight(numericArea);
+  const kitEstimation = kitBasePriceNum + getFreight(kitBasePriceNum);
   const kitPriceDiscounted = kitEstimation - (kitBasePriceNum * discountRate);
 
   // Montagem Parceira (Completo com Frete + Fundação Eucalipto + Portas/Janelas)
-  const partnerEstimation = kitBasePriceNum + modelFixturesPrice + laborCost + getEucalyptusFoundation(numericArea) + getFreight(numericArea);
+  const partnerEstimation = kitBasePriceNum + modelFixturesPrice + laborCost + getEucalyptusFoundation(numericArea) + getFreight(kitBasePriceNum + (numericArea * 140));
   const partnerEstimationDiscounted = partnerEstimation - (kitBasePriceNum * discountRate);
 
   // Chave na Mão (Obra Completa)
   const paintCost = numericArea <= 25 ? 2000 : numericArea <= 55 ? 3000 : 4500;
   const basePrice = numericArea * 150;
   const isVilas = id.includes('vilas') || (model.name && (model.name.toLowerCase().includes('vilas') || model.name.toLowerCase().includes('villas')));
-  const turnkeyEstimation = kitBasePriceNum + basePrice + laborCost + adminCost + getEucalyptusFoundation(numericArea) + modelTilesPrice + modelFixturesPrice + modelGlassPrice + paintCost + getElectricalKit(numericArea) + getFreight(numericArea);
+  const turnkeyEstimation = kitBasePriceNum + basePrice + laborCost + adminCost + getEucalyptusFoundation(numericArea) + modelTilesPrice + modelFixturesPrice + modelGlassPrice + paintCost + getElectricalKit(numericArea) + getFreight(kitBasePriceNum + (numericArea * 140));
   const turnkeyEstimationDiscounted = turnkeyEstimation - ((kitBasePriceNum + basePrice) * discountRate);
   const hasPromo = !!model.promoPrice && model.promoPrice.trim() !== "" && model.promoPrice !== "R$ 0,00" && model.promoPrice !== "0";
 
@@ -1158,7 +1158,7 @@ export default function ModelDetailPage() {
                     {/* Item 11: Frete Estimado */}
                     <div className="flex justify-between pb-3 border-b border-stone-100">
                       <span className="text-stone-700 font-medium">Frete Estimado (Litoral/Região Metropolitana):</span>
-                      <span className="font-bold text-stone-850">{formatBRL(getFreight(numericArea))}</span>
+                      <span className="font-bold text-stone-850">{formatBRL(getFreight(kitBasePriceNum + (includeBaseInSim ? (numericArea * 140) : 0)))}</span>
                     </div>
                   </div>
                     
@@ -1167,19 +1167,19 @@ export default function ModelDetailPage() {
                       const basePrice = numericArea * 150;
                       
                       // 1. Kit
-                      const kitAPrazo = kitBasePriceNum + getFreight(numericArea) + (includeBaseInSim ? basePrice : 0);
+                      const kitAPrazo = kitBasePriceNum + getFreight(kitBasePriceNum + (includeBaseInSim ? (numericArea * 140) : 0)) + (includeBaseInSim ? basePrice : 0);
                       const kitDiscountable = kitBasePriceNum + (includeBaseInSim ? basePrice : 0);
                       const kitDesconto = Math.round(kitDiscountable * discountRate);
                       const kitAVista = kitAPrazo - kitDesconto;
                       
                       // 2. Parceira (isolando mão de obra para pagamento direto ao carpinteiro)
-                      const partnerAPrazo = kitBasePriceNum + getFreight(numericArea) + (includeBaseInSim ? basePrice : 0);
+                      const partnerAPrazo = kitBasePriceNum + getFreight(kitBasePriceNum + (includeBaseInSim ? (numericArea * 140) : 0)) + (includeBaseInSim ? basePrice : 0);
                       const partnerDiscountable = kitBasePriceNum + (includeBaseInSim ? basePrice : 0);
                       const partnerDesconto = Math.round(partnerDiscountable * discountRate);
                       const partnerAVista = partnerAPrazo - partnerDesconto;
                       
                       // 3. Chave na mão (base está inclusa por padrão)
-                      const turnkeyAPrazo = kitBasePriceNum + basePrice + laborCost + adminCost + getEucalyptusFoundation(numericArea) + modelTilesPrice + modelFixturesPrice + modelGlassPrice + (numericArea <= 25 ? 2000 : numericArea <= 55 ? 3000 : 4500) + getElectricalKit(numericArea) + getFreight(numericArea);
+                      const turnkeyAPrazo = kitBasePriceNum + basePrice + laborCost + adminCost + getEucalyptusFoundation(numericArea) + modelTilesPrice + modelFixturesPrice + modelGlassPrice + (numericArea <= 25 ? 2000 : numericArea <= 55 ? 3000 : 4500) + getElectricalKit(numericArea) + getFreight(kitBasePriceNum + (numericArea * 140));
                       const turnkeyDiscountable = kitBasePriceNum + basePrice;
                       const turnkeyDesconto = Math.round(turnkeyDiscountable * discountRate);
                       const turnkeyAVista = turnkeyAPrazo - turnkeyDesconto;

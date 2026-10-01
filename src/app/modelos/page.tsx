@@ -164,17 +164,17 @@ export default function ModelsGalleryPage() {
                 const discountRate = getModelDiscountRate(model.id || model.name, model.discountRate);
 
                 // 1. Kit Madeiramento (Completo com Frete)
-                const kitEstimation = kitFull + getFreight(numericArea);
+                const kitEstimation = kitFull + getFreight(kitFull);
                 const kitPriceDiscounted = kitEstimation - (kitFull * discountRate);
 
                 // 2. Montagem Parceira (Completo com Frete + Fundação Eucalipto)
-                const partnerEstimation = kitFull + laborCost + getEucalyptusFoundation(numericArea) + getFreight(numericArea);
+                const partnerEstimation = kitFull + laborCost + getEucalyptusFoundation(numericArea) + getFreight(kitFull + (numericArea * 140));
                 const partnerEstimationDiscounted = partnerEstimation - (kitFull * discountRate);
 
                 // 3. Chave na Mão (Obra Completa)
                 const paintCost = numericArea <= 25 ? 2000 : numericArea <= 55 ? 3000 : 4500;
                 const basePrice = numericArea * 150;
-                const turnkeyEstimation = kitFull + basePrice + laborCost + adminCost + getEucalyptusFoundation(numericArea) + modelTilesPrice + modelFixturesPrice + modelGlassPrice + paintCost + getElectricalKit(numericArea) + getFreight(numericArea);
+                const turnkeyEstimation = kitFull + basePrice + laborCost + adminCost + getEucalyptusFoundation(numericArea) + modelTilesPrice + modelFixturesPrice + modelGlassPrice + paintCost + getElectricalKit(numericArea) + getFreight(kitFull + (numericArea * 140));
                 const turnkeyEstimationDiscounted = turnkeyEstimation - ((kitFull + basePrice) * discountRate);
 
                 return (

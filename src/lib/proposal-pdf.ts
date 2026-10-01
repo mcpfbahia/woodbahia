@@ -381,7 +381,7 @@ export function generateProposalPDF(
   wbItems.forEach(item => tableBody.push(formatItem(item)));
   
   const freightBase = freight * 2;
-  tableBody.push(['Frete Base Estimado (' + area + 'm² × R$ 180)', fmt(freightBase)]);
+  tableBody.push(['Frete Base Estimado (25% do material estrutural)', fmt(freightBase)]);
   tableBody.push(['Promoção: Frete Compartilhado (Nós pagamos 50% do seu frete)', '-' + fmt(freight)]);
 
   if (additionalFreight > 0) {
