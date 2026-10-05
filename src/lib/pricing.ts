@@ -133,10 +133,8 @@ export function getElectricalKit(area: number): number {
 
 export function getLaborRate(area: number): number {
   if (area <= 14) return 650;
-  if (area <= 25) return 550;
-  if (area <= 35) return 500;
-  if (area <= 55) return 450;
-  return 400;
+  if (area <= 30) return 550;
+  return 500;
 }
 
 export function getLaborCost(area: number): number {
