@@ -322,11 +322,11 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
     }
   } else if (['parceira', 'kit', 'basico', 'madeiramento'].includes(kit as string)) {
     // Se o cliente optou por não comprar a fundação da Wood Bahia (ou não preencheu), 
-    // os itens de base estrutural, assoalho e sapatas são essenciais e vão aparecer como Complementos Estimados.
+    // os itens de base estrutural e assoalho (madeira pinus) agora são Itens Wood Bahia por padrão.
+    // As sapatas continuam como complementos estimados.
     items.push({ 
-      label: `Base Estrutural de Madeira (Estimada)`, 
-      value: area * 65,
-      isComplement: true
+      label: `Base Estrutural de Madeira`, 
+      value: area * 65
     });
     
     items.push({ 
@@ -336,9 +336,8 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
     });
     
     items.push({ 
-      label: `Assoalho (Estimado)`, 
-      value: area * 75,
-      isComplement: true
+      label: `Assoalho`, 
+      value: area * 75
     });
   }
 
@@ -514,9 +513,8 @@ export function calculateProposalItems(
     }
   } else if (['parceira', 'kit', 'basico', 'madeiramento'].includes(data.kitType as string)) {
     items.push({ 
-      label: `Base Estrutural de Madeira (Estimada)`, 
-      value: area * 65,
-      isComplement: true
+      label: `Base Estrutural de Madeira`, 
+      value: area * 65
     });
     
     items.push({ 
@@ -526,9 +524,8 @@ export function calculateProposalItems(
     });
     
     items.push({ 
-      label: `Assoalho (Estimado)`, 
-      value: area * 75,
-      isComplement: true
+      label: `Assoalho`, 
+      value: area * 75
     });
   }
 
