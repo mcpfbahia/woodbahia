@@ -380,6 +380,11 @@ export function generateProposalPDF(
 
   wbItems.forEach(item => tableBody.push(formatItem(item)));
   
+  const wbSubtotal = wbItems.reduce((acc, curr) => acc + curr.value, 0);
+  if (wbSubtotal > 0) {
+    tableBody.push([{ content: `Subtotal Itens Wood Bahia: ${fmt(wbSubtotal)}`, colSpan: 2, styles: { halign: 'right', fillColor: [245, 245, 245], fontStyle: 'italic', textColor: [100, 100, 100] } }]);
+  }
+  
   const freightBase = freight * 2;
   tableBody.push(['Frete Base Estimado (25% do material estrutural)', fmt(freightBase)]);
   tableBody.push(['Promoção: Frete Compartilhado (Nós pagamos 50% do seu frete)', '-' + fmt(freight)]);
