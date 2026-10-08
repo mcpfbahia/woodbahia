@@ -463,19 +463,22 @@ export default function ModelDetailPage() {
 
   const discountRate = getModelDiscountRate(model.id || model.name, model.discountRate);
 
-  // Kit Madeiramento (Completo com Frete)
-  const kitEstimation = kitBasePriceNum + getFreight(kitBasePriceNum);
+  // Kit Madeiramento (Separado do Frete)
+  const freightKit = getFreight(kitBasePriceNum);
+  const kitEstimation = kitBasePriceNum;
   const kitPriceDiscounted = kitEstimation - (kitBasePriceNum * discountRate);
 
-  // Montagem Parceira (Completo com Frete + Fundação Eucalipto + Portas/Janelas)
-  const partnerEstimation = kitBasePriceNum + modelFixturesPrice + laborCost + getEucalyptusFoundation(numericArea) + getFreight(kitBasePriceNum + (numericArea * 140));
+  // Montagem Parceira (Separado do Frete)
+  const freightPartner = getFreight(kitBasePriceNum + (numericArea * 140));
+  const partnerEstimation = kitBasePriceNum + modelFixturesPrice + laborCost + getEucalyptusFoundation(numericArea);
   const partnerEstimationDiscounted = partnerEstimation - (kitBasePriceNum * discountRate);
 
-  // Chave na Mão (Obra Completa)
+  // Chave na Mão (Separado do Frete)
+  const freightTurnkey = getFreight(kitBasePriceNum + (numericArea * 140));
   const paintCost = numericArea <= 25 ? 2000 : numericArea <= 55 ? 3000 : 4500;
   const basePrice = numericArea * 150;
   const isVilas = id.includes('vilas') || (model.name && (model.name.toLowerCase().includes('vilas') || model.name.toLowerCase().includes('villas')));
-  const turnkeyEstimation = kitBasePriceNum + basePrice + laborCost + adminCost + getEucalyptusFoundation(numericArea) + modelTilesPrice + modelFixturesPrice + modelGlassPrice + paintCost + getElectricalKit(numericArea) + getFreight(kitBasePriceNum + (numericArea * 140));
+  const turnkeyEstimation = kitBasePriceNum + basePrice + laborCost + adminCost + getEucalyptusFoundation(numericArea) + modelTilesPrice + modelFixturesPrice + modelGlassPrice + paintCost + getElectricalKit(numericArea);
   const turnkeyEstimationDiscounted = turnkeyEstimation - ((kitBasePriceNum + basePrice) * discountRate);
   const hasPromo = !!model.promoPrice && model.promoPrice.trim() !== "" && model.promoPrice !== "R$ 0,00" && model.promoPrice !== "0";
 
@@ -676,7 +679,7 @@ export default function ModelDetailPage() {
                       <div className="text-[10px] text-[#8C6239] font-bold bg-[#E8DCCF]/20 px-2 py-1 rounded-lg border border-[#E8DCCF]/45 mt-2.5 self-start inline-block">
                         Consulte Kit Base + Assoalho
                       </div>
-                      <span className="text-[9px] text-stone-500 block mt-2.5 font-medium italic">*Inclui frete. Solicite proposta para valores reais.</span>
+                      <span className="text-[9px] text-stone-500 block mt-2.5 font-medium italic">+ Frete Estimado: {formatBRL(freightKit)}. Solicite proposta exata.</span>
                     </div>
                   </div>
 
@@ -701,7 +704,7 @@ export default function ModelDetailPage() {
                       <span className="text-[9px] text-emerald-600 font-bold block">{discountRate * 100}% de desc. à vista no madeiramento</span>
                       <span className="text-[9px] text-slate-500 font-medium block">ou 12x s/ juros de {formatBRL(partnerEstimation / 12)}</span>
                     </div>
-                      <span className="text-[9px] text-stone-555 block mt-2.5 font-medium italic">*Obra Completa. Solicite proposta para valores reais do frete/fundação no seu terreno.</span>
+                      <span className="text-[9px] text-stone-555 block mt-2.5 font-medium italic">+ Frete Estimado: {formatBRL(freightPartner)}. Solicite proposta exata.</span>
                     </div>
                   </div>
 
@@ -738,7 +741,7 @@ export default function ModelDetailPage() {
                       <span className="text-[9px] text-emerald-600 font-bold block">{discountRate * 100}% de desc. à vista aplicado</span>
                       <span className="text-[9px] text-slate-500 font-medium block">ou 12x s/ juros de {formatBRL(turnkeyEstimation / 12)}</span>
                     </div>
-                      <span className="text-[9px] text-stone-555 block mt-2.5 font-medium italic">*Obra Completa. Solicite proposta para valores reais do frete/fundação no seu terreno.</span>
+                      <span className="text-[9px] text-stone-555 block mt-2.5 font-medium italic">+ Frete Estimado: {formatBRL(freightTurnkey)}. Solicite proposta exata.</span>
                     </div>
                   </div>
                 </div>
