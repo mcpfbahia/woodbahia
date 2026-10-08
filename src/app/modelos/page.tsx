@@ -163,18 +163,21 @@ export default function ModelsGalleryPage() {
                 
                 const discountRate = getModelDiscountRate(model.id || model.name, model.discountRate);
 
-                // 1. Kit Madeiramento (Completo com Frete)
-                const kitEstimation = kitFull + getFreight(kitFull);
+                // 1. Kit Madeiramento (Separado do Frete)
+                const freightKit = getFreight(kitFull);
+                const kitEstimation = kitFull;
                 const kitPriceDiscounted = kitEstimation - (kitFull * discountRate);
 
-                // 2. Montagem Parceira (Completo com Frete + Fundação Eucalipto)
-                const partnerEstimation = kitFull + laborCost + getEucalyptusFoundation(numericArea) + getFreight(kitFull + (numericArea * 140));
+                // 2. Montagem Parceira (Separado do Frete)
+                const freightPartner = getFreight(kitFull + (numericArea * 140));
+                const partnerEstimation = kitFull + laborCost + getEucalyptusFoundation(numericArea);
                 const partnerEstimationDiscounted = partnerEstimation - (kitFull * discountRate);
 
-                // 3. Chave na Mão (Obra Completa)
+                // 3. Chave na Mão (Separado do Frete)
+                const freightTurnkey = getFreight(kitFull + (numericArea * 140));
                 const paintCost = numericArea <= 25 ? 2000 : numericArea <= 55 ? 3000 : 4500;
                 const basePrice = numericArea * 150;
-                const turnkeyEstimation = kitFull + basePrice + laborCost + adminCost + getEucalyptusFoundation(numericArea) + modelTilesPrice + modelFixturesPrice + modelGlassPrice + paintCost + getElectricalKit(numericArea) + getFreight(kitFull + (numericArea * 140));
+                const turnkeyEstimation = kitFull + basePrice + laborCost + adminCost + getEucalyptusFoundation(numericArea) + modelTilesPrice + modelFixturesPrice + modelGlassPrice + paintCost + getElectricalKit(numericArea);
                 const turnkeyEstimationDiscounted = turnkeyEstimation - ((kitFull + basePrice) * discountRate);
 
                 return (
@@ -361,9 +364,9 @@ export default function ModelsGalleryPage() {
                     {/* Rodapé */}
                     <div className="mt-auto flex flex-col gap-2 p-4 pt-1 sm:flex-row sm:items-end sm:justify-between border-t border-stone-50">
                       <p className="text-[9px] italic leading-snug text-muted-foreground/70 sm:max-w-[220px]">
-                        {selectedModalidade === 'kit' && "*Valores estimativos. Inclui frete. Solicite uma proposta para valores reais do frete e fundação para o seu terreno."}
-                        {selectedModalidade === 'parceira' && "*Valores estimativos. Inclui frete e fundação. Solicite uma proposta para obter valores reais."}
-                        {selectedModalidade === 'turnkey' && "*Valores estimativos. Obra completa. Solicite uma proposta para obter valores reais de frete e fundação no seu terreno."}
+                        {selectedModalidade === 'kit' && `+ Frete Estimado: ${formatBRL(freightKit)}. Solicite proposta exata.`}
+                        {selectedModalidade === 'parceira' && `+ Frete Estimado: ${formatBRL(freightPartner)}. Solicite proposta exata.`}
+                        {selectedModalidade === 'turnkey' && `+ Frete Estimado: ${formatBRL(freightTurnkey)}. Solicite proposta exata.`}
                       </p>
                       <Link
                         href={`/modelo/${model.id}`}
