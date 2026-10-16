@@ -378,7 +378,67 @@ export function generateProposalPDF(
     return [item.label, displayValue];
   };
 
-  wbItems.forEach(item => tableBody.push(formatItem(item)));
+  // ─── AGRUPAMENTO POR CLASSE (PDF DO CLIENTE) ───
+  // Kit e Mão de Obra de Montagem aparecem individualmente; demais itens
+  // são somados por classe, listando apenas o que está incluso (sem preço unitário).
+  type ClassKey = 'kit' | 'montagem' | 'estrutura' | 'cobertura' | 'acabamentos' | 'instalacoes' | 'gestao' | 'outros';
+  const CLASS_ORDER: { key: ClassKey; name: string }[] = [
+    { key: 'kit', name: 'Kit Madeiramento' },
+    { key: 'montagem', name: 'Mão de Obra de Montagem' },
+    { key: 'estrutura', name: 'Estrutura e Fundação' },
+    { key: 'cobertura', name: 'Cobertura' },
+    { key: 'acabamentos', name: 'Acabamentos e Esquadrias' },
+    { key: 'instalacoes', name: 'Instalações Elétricas e Hidráulicas' },
+    { key: 'gestao', name: 'Gestão e Coordenação da Obra' },
+    { key: 'outros', name: 'Serviços Complementares' },
+  ];
+
+  const classify = (label: string): ClassKey => {
+    const l = label.toLowerCase();
+    // A ordem importa: "Mão de Obra Elétrica" deve cair em instalações, não em montagem
+    if (l.includes('elétric') || l.includes('eletric') || l.includes('hidráulic') || l.includes('hidraulic')) return 'instalacoes';
+    if (l.includes('gestão') || l.includes('gestao') || l.includes('coordenação') || l.includes('coordenacao')) return 'gestao';
+    if (l.includes('madeiramento') || l.startsWith('kit')) return 'kit';
+    if (l.includes('mão de obra') || l.includes('mao de obra') || l.includes('montagem') || l.includes('montador')) return 'montagem';
+    if (l.includes('telha') || l.includes('cobertura') || l.includes('manta')) return 'cobertura';
+    if (l.includes('porta') || l.includes('janela') || l.includes('esquadria') || l.includes('ferrage') ||
+        l.includes('stain') || l.includes('pintura') || l.includes('vidro')) return 'acabamentos';
+    if (l.includes('sapata') || l.includes('base') || l.includes('radier') || l.includes('fundação') ||
+        l.includes('alicerce') || l.includes('assoalho') || l.includes('piso') || l.includes('banheiro') ||
+        l.includes('drywall') || l.includes('cimentícia')) return 'estrutura';
+    return 'outros';
+  };
+
+  const groups = new Map<ClassKey, { value: number; labels: string[] }>();
+  wbItems.forEach(item => {
+    const key = classify(item.label);
+    const g = groups.get(key) || { value: 0, labels: [] };
+    g.value += item.value;
+    g.labels.push(item.label);
+    groups.set(key, g);
+  });
+
+  CLASS_ORDER.forEach(({ key, name }) => {
+    const g = groups.get(key);
+    if (!g) return;
+    const isSingle = key === 'kit' || key === 'montagem';
+    const isPartnerLabor = key === 'montagem' && data.kitType === 'parceira';
+    const valueText = g.value === 0 ? 'Incluso' : isPartnerLabor ? `${fmt(g.value)} *` : fmt(g.value);
+    const rowFill: [number, number, number] = [245, 240, 234];
+    tableBody.push([
+      { content: name, styles: { fontStyle: 'bold', fillColor: rowFill } },
+      { content: valueText, styles: { fillColor: rowFill } },
+    ]);
+    if (!isSingle || g.labels.length > 1) {
+      tableBody.push([{
+        content: key === 'cobertura'
+          ? 'Inclui: Telhas, manta térmica, pregos e parafusos'
+          : `Inclui: ${g.labels.join(', ')}`,
+        colSpan: 2,
+        styles: { fontSize: 7.5, fontStyle: 'italic', textColor: COLORS.muted, fillColor: COLORS.white, cellPadding: { top: 0.5, bottom: 2.5, left: 6, right: 3 } },
+      }]);
+    }
+  });
   
   const wbSubtotal = wbItems.reduce((acc, curr) => acc + curr.value, 0);
   if (wbSubtotal > 0) {
