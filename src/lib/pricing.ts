@@ -753,6 +753,22 @@ export function calculateProposalItems(
   return { items, freight, additionalFreight, subtotal, total, discount, materialSubtotal, laborTotal };
 }
 
+/**
+ * Itens em madeira Pinus (Kit, Base Estrutural, Assoalho, Deck, peças Pinus).
+ * Regra comercial: tudo que é madeira Pinus pode ser parcelado em 12x sem juros
+ * ou receber o desconto à vista.
+ */
+export function isPinusWoodItem(label: string): boolean {
+  const l = label.toLowerCase();
+  return (
+    l.includes('kit madeiramento') ||
+    l.includes('base estrutural') ||
+    l.includes('assoalho') ||
+    l.includes('deck') ||
+    l.includes('pinus')
+  );
+}
+
 export function getPaymentBases(
   items: LineItem[],
   totalFinal: number
@@ -761,12 +777,7 @@ export function getPaymentBases(
   
   items.forEach(item => {
     if (item.deleted) return;
-    const l = item.label.toLowerCase();
-    if (
-      l.includes('kit madeiramento') || 
-      l.includes('base estrutural') ||
-      l.includes('assoalho')
-    ) {
+    if (isPinusWoodItem(item.label)) {
       creditCardBase += item.value;
     }
   });

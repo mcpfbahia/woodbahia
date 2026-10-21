@@ -8,6 +8,7 @@ import {
   calculateInstallmentValue,
   getModelDiscountRate,
   getPaymentBases,
+  isPinusWoodItem,
   type ProposalData,
   type KitType,
   type CabinModel,
@@ -51,6 +52,14 @@ export function getIncludedItems(data: ProposalData): string[] {
     'Ripas, canaletas, rodapés, molduras',
     'Manual de montagem detalhado e suporte técnico',
   ];
+
+  // Itens extras em madeira Pinus (ex.: Deck) também compõem o kit
+  (data.extraItems || []).forEach(extra => {
+    const desc = (extra.description || '').trim();
+    if (desc && (extra.value || 0) > 0 && isPinusWoodItem(desc)) {
+      items.push(/pinus/i.test(desc) ? desc : `${desc} (madeira Pinus autoclavada)`);
+    }
+  });
   
   const isCustom = data.kitType === 'custom';
   const hasDoorsWindows = isCustom ? (data.includeDoorsWindows ?? data.includeFixtures) : data.kitType === 'turnkey';
@@ -399,6 +408,8 @@ export function generateProposalPDF(
     if (l.includes('elétric') || l.includes('eletric') || l.includes('hidráulic') || l.includes('hidraulic')) return 'instalacoes';
     if (l.includes('gestão') || l.includes('gestao') || l.includes('coordenação') || l.includes('coordenacao')) return 'gestao';
     if (l.includes('madeiramento') || l.startsWith('kit')) return 'kit';
+    // Deck e demais peças em Pinus compõem o Kit Madeiramento
+    if (l.includes('deck') || l.includes('pinus')) return 'kit';
     if (l.includes('mão de obra') || l.includes('mao de obra') || l.includes('montagem') || l.includes('montador')) return 'montagem';
     if (l.includes('telha') || l.includes('cobertura') || l.includes('manta')) return 'cobertura';
     if (l.includes('porta') || l.includes('janela') || l.includes('esquadria') || l.includes('ferrage') ||
@@ -575,7 +586,7 @@ export function generateProposalPDF(
   doc.setFontSize(8);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(180, 60, 30); // Red color for alert
-  doc.text(`* ATENÇÃO: Parcelamento em 12x sem juros válido APENAS para o Kit Madeiramento.`, margin + 6, y + 9);
+  doc.text(`* ATENÇÃO: Parcelamento em 12x sem juros válido APENAS para itens em madeira Pinus (Kit, Base, Assoalho e Deck).`, margin + 6, y + 9);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(...COLORS.muted);
   doc.text(`* Frete e serviços complementares são quitados à parte via PIX (30% no sinal e 70% 24h antes do embarque).`, margin + 6, y + 13);
