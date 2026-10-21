@@ -81,7 +81,7 @@ export function StepSummary({ state, onBack, onReset }: Props) {
     ``,
     `💳 *OPÇÃO 2: PARCELAMENTO (ATÉ 12X SEM JUROS OU ATÉ 18X COM JUROS)*`,
     pixBase > 0 ? `*• Frete e Serviços Complementares (Via PIX)*: ${fmt(pixBase)} (30% no sinal e 70% 24h antes do embarque).` : ``,
-    `*• 12x Sem Juros no Cartão*: ${fmt(calculateInstallmentValue(creditCardBase, 12).installment)} por mês (exclusivo para Kit Madeiramento, Base Estrutural e Assoalho. Ou até 18x com juros da maquininha).`,
+    `*• 12x Sem Juros no Cartão*: ${fmt(calculateInstallmentValue(creditCardBase, 12).installment)} por mês (exclusivo para itens em madeira Pinus: Kit, Base, Assoalho, Deck e similares. Ou até 18x com juros da maquininha).`,
     ``,
     `*Status:* Gostaria de uma análise de crédito ou tem dúvidas sobre a proposta?`,
   ].filter(Boolean).join('\n');
@@ -314,7 +314,7 @@ export function StepSummary({ state, onBack, onReset }: Props) {
                     <p className="text-[11px] text-foreground/80 leading-snug">
                       Frete e serviços complementares (<span className="font-bold text-accent">{fmt(pixBase)}</span>) 
                       são quitados à parte via PIX (30% no sinal e 70% 24h antes do embarque do kit).<br/>
-                      A condição de 12x sem juros aplica-se <b>exclusivamente</b> ao valor da estrutura de madeira (Kit, Base e Assoalho = <b>{fmt(creditCardBase)}</b>). Você pode parcelar em até 18x com juros da maquininha.
+                      A condição de 12x sem juros aplica-se <b>exclusivamente</b> aos itens em madeira Pinus (Kit, Base, Assoalho, Deck e similares = <b>{fmt(creditCardBase)}</b>). Você pode parcelar em até 18x com juros da maquininha.
                     </p>
                   </div>
                 )}
