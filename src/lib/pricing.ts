@@ -3,22 +3,24 @@ export interface CabinModel {
   name: string;
   area: number;
   kitPrice: number;
+  freightPrice?: number;
   tilesStainPrice: number;
   fixturesPrice: number;
   discountRate?: number | string;
 }
 
 export const CABIN_MODELS: CabinModel[] = [
-  { id: 'guarajuba', name: 'Chalé Guarajuba', area: 52, kitPrice: 38870, tilesStainPrice: 12210, fixturesPrice: 5200 },
-  { id: 'itacimirim', name: 'Chalé Itacimirim', area: 35, kitPrice: 26160, tilesStainPrice: 10250, fixturesPrice: 3500 },
-  { id: 'curralinho', name: 'Cabana Camping Curralinho', area: 6.5, kitPrice: 5890, tilesStainPrice: 0, fixturesPrice: 650 },
-  { id: 'praia-do-forte', name: 'Chalé Praia do Forte', area: 21, kitPrice: 14580, tilesStainPrice: 6875, fixturesPrice: 2100 },
-  { id: 'arembepe-plus', name: 'Chalé Arembepe Plus', area: 20, kitPrice: 14950, tilesStainPrice: 6700, fixturesPrice: 0 },
-  { id: 'arembepe', name: 'Cabana Camping Arembepe', area: 10.5, kitPrice: 9580, tilesStainPrice: 0, fixturesPrice: 1050 },
-  { id: 'baixios', name: 'Chalé Baixios', area: 32, kitPrice: 23920, tilesStainPrice: 9650, fixturesPrice: 3200 },
-  { id: 'casa-caymmi', name: 'Casa Caymmi', area: 60, kitPrice: 40830, tilesStainPrice: 12850, fixturesPrice: 6000 },
-  { id: 'chale-vilas-do-atlantico', name: 'Chalé Vilas do Atlântico', area: 35, kitPrice: 24150, tilesStainPrice: 10250, fixturesPrice: 3500 },
-  { id: 'chale-escandinavo-trancoso', name: 'Chalé Escandinavo Trancoso', area: 35, kitPrice: 40250, tilesStainPrice: 10250, fixturesPrice: 3500 },
+  { id: 'guarajuba', name: 'Chalé Guarajuba', area: 52, kitPrice: 39000, freightPrice: 4500, tilesStainPrice: 12210, fixturesPrice: 5200 },
+  { id: 'itacimirim', name: 'Chalé Itacimirim', area: 35, kitPrice: 23000, freightPrice: 3600, tilesStainPrice: 10250, fixturesPrice: 3500 },
+  { id: 'curralinho', name: 'Cabana Camping Curralinho', area: 6.5, kitPrice: 7600, freightPrice: 900, tilesStainPrice: 0, fixturesPrice: 650 },
+  { id: 'praia-do-forte', name: 'Chalé Praia do Forte', area: 21, kitPrice: 17000, freightPrice: 2500, tilesStainPrice: 6875, fixturesPrice: 2100 },
+  { id: 'arembepe-plus', name: 'Chalé Arembepe Plus', area: 20, kitPrice: 18382, freightPrice: 1800, tilesStainPrice: 6700, fixturesPrice: 0 },
+  { id: 'arembepe', name: 'Cabana Camping Arembepe', area: 10.5, kitPrice: 9600, freightPrice: 1100, tilesStainPrice: 0, fixturesPrice: 1050 },
+  { id: 'baixios', name: 'Chalé Baixios', area: 32, kitPrice: 25000, freightPrice: 3650, tilesStainPrice: 9650, fixturesPrice: 3200 },
+  { id: 'casa-jorge-amado', name: 'Casa Jorge Amado', area: 80, kitPrice: 51800, freightPrice: 5900, tilesStainPrice: 12975, fixturesPrice: 11200 },
+  { id: 'casa-caymmi', name: 'Casa Caymmi', area: 60, kitPrice: 41800, freightPrice: 5200, tilesStainPrice: 12850, fixturesPrice: 6000 },
+  { id: 'chale-vilas-do-atlantico', name: 'Chalé Vilas do Atlântico', area: 35, kitPrice: 27000, freightPrice: 3800, tilesStainPrice: 10250, fixturesPrice: 3500 },
+  { id: 'chale-escandinavo-trancoso', name: 'Chalé Escandinavo Trancoso', area: 35, kitPrice: 39000, freightPrice: 5100, tilesStainPrice: 10250, fixturesPrice: 3500 },
 ];
 
 export function getModelDiscountRate(modelIdOrName?: string, customDiscountRate?: number | string): number {
@@ -162,7 +164,62 @@ export function getRadierFoundation(area: number): number {
   return Math.round(area * 400);
 }
 
-export function getFreight(structuralTotal: number): number {
+function normalizePricingSlug(value: string): string {
+  return (value || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/villas/g, 'vilas')
+    .replace(/caimmy/g, 'caymmi')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function parseBRLNumber(val: number | string | undefined): number {
+  if (typeof val === 'number') return isNaN(val) ? 0 : val;
+  if (!val) return 0;
+  const str = val.toString().replace(/[R$\s]/gi, '');
+  if (str.includes(',')) {
+    return parseFloat(str.replace(/\./g, '').replace(',', '.')) || 0;
+  }
+  return parseFloat(str.replace(/[^\d.-]/g, '')) || 0;
+}
+
+export function findCabinModel(
+  idOrName?: string,
+  modelsList: CabinModel[] = CABIN_MODELS
+): CabinModel | undefined {
+  if (!idOrName) return undefined;
+  const exact = modelsList.find((m) => m.id === idOrName);
+  if (exact) return exact;
+
+  const slug = normalizePricingSlug(idOrName);
+  return [...modelsList]
+    .sort((a, b) => b.id.length - a.id.length)
+    .find((m) => {
+      const mId = normalizePricingSlug(m.id);
+      const mName = normalizePricingSlug(m.name);
+      return slug.includes(mId) || mId.includes(slug) || slug.includes(mName) || mName.includes(slug);
+    });
+}
+
+export function getFreight(
+  structuralTotal: number,
+  modelIdOrName?: string,
+  explicitFreight?: number | string
+): number {
+  const parsedExplicit = parseBRLNumber(explicitFreight);
+  if (parsedExplicit > 0) {
+    return parsedExplicit;
+  }
+
+  if (modelIdOrName) {
+    const matched = findCabinModel(modelIdOrName, CABIN_MODELS);
+    if (matched?.freightPrice) {
+      return matched.freightPrice;
+    }
+  }
+
   return Math.round(structuralTotal * 0.125);
 }
 
@@ -439,7 +496,9 @@ export function calculateSummary(state: SimulationState): { items: LineItem[]; f
     }
   });
 
-  const freight = getFreight(structuralTotal);
+  const freight = kit === 'custom'
+    ? getFreight(structuralTotal)
+    : getFreight(structuralTotal, state.model?.id || state.model?.name, state.model?.freightPrice);
 
   let additionalFreight = 0;
   if (state.clientData?.distance && state.clientData.distance > 200) {
@@ -455,7 +514,7 @@ export function calculateProposalItems(
   data: ProposalData,
   modelsList: CabinModel[] = CABIN_MODELS
 ): { items: LineItem[]; freight: number; additionalFreight: number; subtotal: number; total: number; discount: number; materialSubtotal: number; laborTotal: number } {
-  const model = modelsList.find(m => m.id === data.modelId);
+  const model = findCabinModel(data.modelId, modelsList);
   const area = data.customArea || model?.area || 0;
   const items: LineItem[] = [];
 
@@ -727,7 +786,9 @@ export function calculateProposalItems(
     }
   });
 
-  let freight = getFreight(structuralTotal);
+  let freight = data.kitType === 'custom'
+    ? getFreight(structuralTotal)
+    : getFreight(structuralTotal, data.modelId || model?.name, model?.freightPrice);
   if (data.freightOverride !== undefined) {
     freight = data.freightOverride;
   }

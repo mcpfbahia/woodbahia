@@ -8,8 +8,8 @@ export const initialModels = [
     bedrooms: 1,
     infoLabel: "10,5m² | 1 quarto",
     description: "Chalé camping A-frame (3,00m x 3,50m). Compacto, ecológico e funcional. Estrutura em madeira pinus tratada, ideal para um casal com um filho.",
-    kitPrice: "R$ 9.580,00",
-    freight_value: "R$ 1.800,00",
+    kitPrice: "R$ 9.600,00",
+    freight_value: "R$ 1.100,00",
     freight_is_promo: true,
     purposes: ["airbnb", "praia", "campo"],
   },
@@ -23,8 +23,8 @@ export const initialModels = [
     bedrooms: 1,
     infoLabel: "32m² | 1 pavimento",
     description: "Chalé A-frame com 4,00m x 5,00m de base e pé-direito alto. Sala e cozinha integradas, banheiro, quarto térreo e deck frontal de 6m² ampliando o lazer.",
-    kitPrice: "R$ 23.920,00",
-    freight_value: "R$ 8.500,00",
+    kitPrice: "R$ 25.000,00",
+    freight_value: "R$ 3.650,00",
     freight_is_promo: true,
     purposes: ["airbnb", "campo", "praia"],
   },
@@ -37,8 +37,8 @@ export const initialModels = [
     bedrooms: 1,
     infoLabel: "52m² | 1 pavimento",
     description: "Chalé A-frame de 52m² com sala e cozinha integradas, banheiro, quarto térreo aos fundos e deck externo. Design marcante, funcional e ideal para até 5 pessoas.",
-    kitPrice: "R$ 38.870,00",
-    freight_value: "R$ 11.500,00",
+    kitPrice: "R$ 39.000,00",
+    freight_value: "R$ 4.500,00",
     freight_is_promo: true,
     purposes: ["airbnb", "moradia", "campo", "praia"],
   },
@@ -51,8 +51,8 @@ export const initialModels = [
     bedrooms: 1,
     infoLabel: "35m² | 1 pavimento",
     description: "Chalé compacto de 35m² com sala e cozinha integradas, banheiro e quarto térreo. Solução funcional e de baixo custo estrutural, ideal para investimento em locação por temporada.",
-    kitPrice: "R$ 26.160,00",
-    freight_value: "R$ 8.000,00",
+    kitPrice: "R$ 23.000,00",
+    freight_value: "R$ 3.600,00",
     freight_is_promo: true,
     purposes: ["airbnb", "praia", "campo"],
   },
@@ -65,8 +65,8 @@ export const initialModels = [
     bedrooms: 1,
     infoLabel: "21m² | 1 pavimento",
     description: "Chalé Praia do Forte (3,00m x 7,00m). Design inteligente A-frame com foco em amplitude interna. Banheiro generoso de 6m², quarto ao fundo e integração fluida entre os ambientes.",
-    kitPrice: "R$ 14.580,00",
-    freight_value: "R$ 6.500,00",
+    kitPrice: "R$ 17.000,00",
+    freight_value: "R$ 2.500,00",
     freight_is_promo: true,
     purposes: ["airbnb", "praia"],
   },
@@ -79,8 +79,8 @@ export const initialModels = [
     bedrooms: 2,
     infoLabel: "60m² | 2 quartos",
     description: "Refúgio de madeira rústico-chique com design de cabana pré-fabricada. Fachada em madeira de tom quente com telhado vermelho icônico e ampla varanda coberta com deck estendido. Interior luminoso e aconchegante com 2 quartos, banheiro, sala e cozinha integrados por grandes aberturas de vidro. Ideal para seu sítio, praia ou serra.",
-    kitPrice: "R$ 40.830,00",
-    freight_value: "R$ 8.500,00",
+    kitPrice: "R$ 41.800,00",
+    freight_value: "R$ 5.200,00",
     freight_is_promo: true,
     purposes: ["moradia", "campo", "praia", "airbnb"],
   },
@@ -93,8 +93,8 @@ export const initialModels = [
     bedrooms: 1,
     infoLabel: "35m² | 1 quarto",
     description: "O Chalé Vilas do Atlântico reúne design moderno, conforto e excelente custo-benefício. Com 35 m², mezanino, deck frontal e uma imponente fachada em vidro temperado, oferece ambientes bem aproveitados e muito aconchegantes.",
-    kitPrice: "R$ 24.150,00",
-    freight_value: "R$ 5.500,00",
+    kitPrice: "R$ 27.000,00",
+    freight_value: "R$ 3.800,00",
     freight_is_promo: true,
     purposes: ["airbnb", "praia", "campo"],
   },
@@ -106,61 +106,96 @@ export const initialModels = [
 // A busca é feita pelo ID do documento OU por keyword no nome do modelo.
 const MODEL_OVERRIDES: Record<string, Partial<{
   kitPrice: string;
+  promoPrice: string;
   freight_value: string;
   freight_is_promo: boolean;
   infoLabel: string;
   description: string;
 }>> = {
-
-  "arembepe-plus": {
-    kitPrice: "R$ 14.950,00",
-    freight_value: "R$ 2.500,00", // Valor de exemplo, pode ser ajustado
+  curralinho: {
+    kitPrice: "R$ 7.600,00",
+    freight_value: "R$ 900,00",
     freight_is_promo: true,
+    promoPrice: "",
   },
-  arembepe: {
-    kitPrice: "R$ 9.580,00",
+  "arembepe-plus": {
+    kitPrice: "R$ 18.382,00",
     freight_value: "R$ 1.800,00",
     freight_is_promo: true,
+    promoPrice: "",
   },
-
+  arembepe: {
+    kitPrice: "R$ 9.600,00",
+    freight_value: "R$ 1.100,00",
+    freight_is_promo: true,
+    promoPrice: "",
+  },
   baixios: {
-    kitPrice: "R$ 23.920,00",
-    freight_value: "R$ 8.500,00",
+    kitPrice: "R$ 25.000,00",
+    freight_value: "R$ 3.650,00",
     freight_is_promo: true,
-  },
-  guarajuba: {
-    kitPrice: "R$ 38.870,00",
-    freight_value: "R$ 11.500,00",
-    freight_is_promo: true,
+    promoPrice: "",
   },
   itacimirim: {
-    kitPrice: "R$ 26.160,00",
-    freight_value: "R$ 8.000,00",
+    kitPrice: "R$ 23.000,00",
+    freight_value: "R$ 3.600,00",
     freight_is_promo: true,
+    promoPrice: "",
+  },
+  guarajuba: {
+    kitPrice: "R$ 39.000,00",
+    freight_value: "R$ 4.500,00",
+    freight_is_promo: true,
+    promoPrice: "",
   },
   "praia-do-forte": {
-    kitPrice: "R$ 14.580,00",
-    freight_value: "R$ 6.500,00",
+    kitPrice: "R$ 17.000,00",
+    freight_value: "R$ 2.500,00",
     freight_is_promo: true,
+    promoPrice: "",
+  },
+  "jorge-amado": {
+    kitPrice: "R$ 51.800,00",
+    freight_value: "R$ 5.900,00",
+    freight_is_promo: true,
+    promoPrice: "",
   },
   caymmi: {
-    kitPrice: "R$ 40.830,00",
-    freight_value: "R$ 8.500,00",
+    kitPrice: "R$ 41.800,00",
+    freight_value: "R$ 5.200,00",
     freight_is_promo: true,
+    promoPrice: "",
   },
   "vilas-do-atlantico": {
-    kitPrice: "R$ 24.150,00",
-    freight_value: "R$ 5.500,00",
+    kitPrice: "R$ 27.000,00",
+    freight_value: "R$ 3.800,00",
     freight_is_promo: true,
+    promoPrice: "",
   },
-
+  trancoso: {
+    kitPrice: "R$ 39.000,00",
+    freight_value: "R$ 5.100,00",
+    freight_is_promo: true,
+    promoPrice: "",
+  },
 };
+
+function normalizeModelSlug(value: string): string {
+  return (value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/villas/g, "vilas")
+    .replace(/caimmy/g, "caymmi")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
 
 /** Aplica os overrides locais sobre qualquer objeto de modelo (Firebase ou estático). */
 export function applyModelOverrides(model: any): any {
   if (!model) return model;
-  const modelId: string = (model.id || "").toLowerCase();
-  const modelName: string = (model.name || "").toLowerCase();
+  const modelId = normalizeModelSlug(model.id || "");
+  const modelName = normalizeModelSlug(model.name || model.title || "");
 
   const matchedKey = Object.keys(MODEL_OVERRIDES)
     .sort((a, b) => b.length - a.length)

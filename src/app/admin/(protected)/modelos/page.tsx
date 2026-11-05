@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { collection, getDocs, doc, deleteDoc, updateDoc, addDoc, setDoc, getDoc } from "firebase/firestore";
 import { db } from "~/lib/firebase";
+import { applyModelOverrides } from "~/lib/data";
 import { Loader2, Plus, Edit2, Trash2, X, Save, Image as ImageIcon, FileText, Settings, Minus } from "lucide-react";
 import Image from "next/image";
 import { ImageUpload } from "~/components/admin/ImageUpload";
@@ -88,7 +89,7 @@ export default function AdminModelosPage() {
     try {
       if (!db) throw new Error("Firebase DB not initialized");
       const querySnapshot = await getDocs(collection(db, "models"));
-      const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ModelItem));
+      const data = querySnapshot.docs.map(doc => applyModelOverrides({ id: doc.id, ...doc.data() }) as ModelItem);
       setModels(data);
     } catch (error) {
       console.error("Error fetching models:", error);

@@ -162,19 +162,20 @@ export default function ModelsGalleryPage() {
                 const adminCost = Math.round(laborCost * 0.25); // 25% de coordenação
                 
                 const discountRate = getModelDiscountRate(model.id || model.name, model.discountRate);
+                const modelKey = model.id || model.name;
 
                 // 1. Kit Madeiramento (Separado do Frete)
-                const freightKit = getFreight(kitFull);
+                const freightKit = getFreight(kitFull, modelKey, model.freight_value);
                 const kitEstimation = kitFull;
                 const kitPriceDiscounted = kitEstimation - (kitFull * discountRate);
 
                 // 2. Montagem Parceira (Separado do Frete)
-                const freightPartner = getFreight(kitFull + (numericArea * 140));
+                const freightPartner = getFreight(kitFull + (numericArea * 140), modelKey, model.freight_value);
                 const partnerEstimation = kitFull + laborCost + getEucalyptusFoundation(numericArea);
                 const partnerEstimationDiscounted = partnerEstimation - (kitFull * discountRate);
 
                 // 3. Chave na Mão (Separado do Frete)
-                const freightTurnkey = getFreight(kitFull + (numericArea * 140));
+                const freightTurnkey = getFreight(kitFull + (numericArea * 140), modelKey, model.freight_value);
                 const paintCost = numericArea <= 25 ? 2000 : numericArea <= 55 ? 3000 : 4500;
                 const basePrice = numericArea * 150;
                 const turnkeyEstimation = kitFull + basePrice + laborCost + adminCost + getEucalyptusFoundation(numericArea) + modelTilesPrice + modelFixturesPrice + modelGlassPrice + paintCost + getElectricalKit(numericArea);

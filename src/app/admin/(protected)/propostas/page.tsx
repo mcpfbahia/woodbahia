@@ -20,7 +20,8 @@ const STATUS_CONFIG: Record<'rascunho' | 'enviada' | 'fechada' | 'perdida', { la
   fechada: { label: 'Ganha', bg: 'bg-green-50', text: 'text-green-700', border: 'border-green-200/60', emoji: '🤝' },
   perdida: { label: 'Perdida', bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-200/60', emoji: '❌' },
 };
-import { CABIN_MODELS, calculateProposalItems, calculateInstallmentValue, getTilesStainPrice, getFixturesPrice, getModelDiscountRate, getPaymentBases, type KitType, type ProposalData, type ExtraItem, type FoundationType, type PaintType, type CabinModel } from '~/lib/pricing';
+import { CABIN_MODELS, findCabinModel, calculateProposalItems, calculateInstallmentValue, getTilesStainPrice, getFixturesPrice, getModelDiscountRate, getPaymentBases, type KitType, type ProposalData, type ExtraItem, type FoundationType, type PaintType, type CabinModel } from '~/lib/pricing';
+import { applyModelOverrides } from '~/lib/data';
 import { generateProposalPDF, getIncludedItems, getNotIncludedItems } from '~/lib/proposal-pdf';
 import {
   Select,
@@ -237,13 +238,14 @@ export default function PropostasPage() {
       try {
         const querySnapshot = await getDocs(collection(db, "models"));
         const modelsData = querySnapshot.docs.map((doc) => {
-          const data = doc.data();
+          const data = applyModelOverrides({ id: doc.id, ...doc.data() });
           const areaNum = parseArea(data.area);
           return {
             id: doc.id,
             name: data.name || data.title || doc.id,
             area: areaNum,
             kitPrice: parsePriceToBRL(data.kitPrice || data.price),
+            freightPrice: parsePriceToBRL(data.freight_value),
             tilesStainPrice: parsePriceToBRL(data.tilesStainPrice || getTilesStainPrice(areaNum).total),
             fixturesPrice: parsePriceToBRL(data.fixturesPrice || getFixturesPrice(areaNum).base),
           } as CabinModel;
@@ -251,9 +253,15 @@ export default function PropostasPage() {
         if (modelsData.length > 0) {
           const merged = [...CABIN_MODELS];
           modelsData.forEach(firestoreModel => {
-            const index = merged.findIndex(m => m.id === firestoreModel.id || m.name.trim().toLowerCase() === firestoreModel.name.trim().toLowerCase());
-            if (index !== -1) {
-              merged[index] = firestoreModel;
+            const matched = findCabinModel(firestoreModel.id, merged) || findCabinModel(firestoreModel.name, merged);
+            if (matched) {
+              const index = merged.findIndex(m => m.id === matched.id);
+              if (index !== -1) {
+                merged[index] = {
+                  ...firestoreModel,
+                  ...matched,
+                };
+              }
             } else {
               merged.push(firestoreModel);
             }
@@ -487,7 +495,7 @@ export default function PropostasPage() {
     setSavingProposal(true);
     try {
       const currentData = getProposalData();
-      const selectedModel = cabinModels.find(m => m.id === modelId);
+      const selectedModel = findCabinModel(modelId, cabinModels);
       const proposalRef = currentProposalId
         ? doc(db, "proposals", currentProposalId)
         : doc(collection(db, "proposals"));
@@ -795,7 +803,7 @@ export default function PropostasPage() {
   const fmt = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   const proposalData = getProposalData();
   const summary = calculateProposalItems(proposalData, cabinModels);
-  const selectedModel = cabinModels.find(m => m.id === modelId);
+  const selectedModel = findCabinModel(modelId, cabinModels);
   const CASH_DISCOUNT = getModelDiscountRate(selectedModel?.id || selectedModel?.name, selectedModel?.discountRate);
   const { creditCardBase, pixBase } = getPaymentBases(summary.items, summary.total);
   const kitTotalAVista = creditCardBase * (1 - CASH_DISCOUNT);

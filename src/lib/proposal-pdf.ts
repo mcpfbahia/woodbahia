@@ -4,6 +4,7 @@ import cabecalhoNovoImg from '../../public/assets/cabecalho-novo.jpg';
 import {
   calculateProposalItems,
   CABIN_MODELS,
+  findCabinModel,
   CARD_RATES,
   calculateInstallmentValue,
   getModelDiscountRate,
@@ -240,7 +241,7 @@ export function generateProposalPDF(
   const today = new Date();
   const dateStr = today.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
 
-  const model = modelsList.find(m => m.id === data.modelId);
+  const model = findCabinModel(data.modelId, modelsList);
   const area = data.customArea || model?.area || 0;
   const kitName = KIT_NAMES[data.kitType] || data.kitType;
   const kitDesc = data.kitType === 'custom' && data.customModelDescription ? data.customModelDescription : (KIT_DESCRIPTIONS[data.kitType] || '');

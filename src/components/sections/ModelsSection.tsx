@@ -150,19 +150,20 @@ export const ModelsSection = ({ initialModelsData }: { initialModelsData?: any[]
 
               const discountRate = getModelDiscountRate(model.id || model.name, model.discountRate);
               const safeNum = (n: any) => isNaN(Number(n)) ? 0 : Number(n);
+              const modelKey = model.id || model.name;
 
               // 1. Kit Madeiramento (Separado do Frete)
-              const freightKit = safeNum(getFreight(safeNum(kitFull)));
+              const freightKit = safeNum(getFreight(safeNum(kitFull), modelKey, model.freight_value));
               const kitEstimation = safeNum(kitFull);
               const kitPriceDiscounted = kitEstimation - (safeNum(kitFull) * safeNum(discountRate));
 
               // 2. Montagem Parceira (Separado do Frete)
-              const freightPartner = safeNum(getFreight(safeNum(kitFull) + safeNum(numericArea * 140)));
+              const freightPartner = safeNum(getFreight(safeNum(kitFull) + safeNum(numericArea * 140), modelKey, model.freight_value));
               const partnerEstimation = safeNum(kitFull) + safeNum(laborCost) + safeNum(getEucalyptusFoundation(numericArea));
               const partnerEstimationDiscounted = partnerEstimation - (safeNum(kitFull) * safeNum(discountRate));
 
               // 3. Chave na Mão (Separado do Frete)
-              const freightTurnkey = safeNum(getFreight(safeNum(kitFull) + safeNum(numericArea * 140)));
+              const freightTurnkey = safeNum(getFreight(safeNum(kitFull) + safeNum(numericArea * 140), modelKey, model.freight_value));
               const paintCost = numericArea <= 25 ? 2000 : numericArea <= 55 ? 3000 : 4500;
               const basePrice = numericArea * 150;
               const turnkeyEstimation = safeNum(kitFull) + safeNum(basePrice) + safeNum(laborCost) + safeNum(adminCost) + safeNum(getEucalyptusFoundation(numericArea)) + safeNum(modelTilesPrice) + safeNum(modelFixturesPrice) + safeNum(modelGlassPrice) + safeNum(paintCost) + safeNum(getElectricalKit(numericArea));

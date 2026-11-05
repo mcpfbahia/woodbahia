@@ -99,7 +99,7 @@ export default function ModelDetailPage() {
       if (!db) {
         const staticModel = initialModels.find((m) => m.id === id);
         if (staticModel) {
-          setModel(staticModel);
+          setModel(applyModelOverrides(staticModel));
         }
         setLoading(false);
         return;
@@ -115,7 +115,7 @@ export default function ModelDetailPage() {
           // Tentar no initialModels antes de desistir
           const staticModel = initialModels.find((m) => m.id === id);
           if (staticModel) {
-            setModel(staticModel);
+            setModel(applyModelOverrides(staticModel));
           } else {
             // Fallback para IDs específicos baseados no projeto antigo
             const fallbackIds: Record<string, string> = {
@@ -132,7 +132,7 @@ export default function ModelDetailPage() {
                 setModel(applyModelOverrides({ id, ...fbSnap.data() }));
               } else {
                 const staticFallback = initialModels.find(m => m.id === mappedId);
-                if (staticFallback) setModel({ ...staticFallback, id });
+                if (staticFallback) setModel(applyModelOverrides({ ...staticFallback, id }));
               }
             }
           }
@@ -140,7 +140,7 @@ export default function ModelDetailPage() {
       } catch (error) {
         console.error("Erro ao buscar modelo:", error);
         const staticModel = initialModels.find((m) => m.id === id);
-        if (staticModel) setModel(staticModel);
+        if (staticModel) setModel(applyModelOverrides(staticModel));
       } finally {
         setLoading(false);
       }
@@ -462,25 +462,24 @@ export default function ModelDetailPage() {
   const adminCost = Math.round(laborCost * 0.25); // 25% de coordenação
 
   const discountRate = getModelDiscountRate(model.id || model.name, model.discountRate);
+  const modelKey = model.id || model.name;
 
   // Kit Madeiramento (Separado do Frete)
-  const freightKit = getFreight(kitBasePriceNum);
+  const freightKit = getFreight(kitBasePriceNum, modelKey, model.freight_value);
   const kitEstimation = kitBasePriceNum;
   const kitPriceDiscounted = kitEstimation - (kitBasePriceNum * discountRate);
 
   // Montagem Parceira (Separado do Frete)
-  const freightPartner = getFreight(kitBasePriceNum + (numericArea * 140));
-  const partnerEstimation = kitBasePriceNum + modelFixturesPrice + laborCost + getEucalyptusFoundation(numericArea);
+  const freightPartner = getFreight(kitBasePriceNum + (numericArea * 140), modelKey, model.freight_value);
+  const partnerEstimation = kitBasePriceNum + laborCost + getEucalyptusFoundation(numericArea);
   const partnerEstimationDiscounted = partnerEstimation - (kitBasePriceNum * discountRate);
 
   // Chave na Mão (Separado do Frete)
-  const freightTurnkey = getFreight(kitBasePriceNum + (numericArea * 140));
+  const freightTurnkey = getFreight(kitBasePriceNum + (numericArea * 140), modelKey, model.freight_value);
   const paintCost = numericArea <= 25 ? 2000 : numericArea <= 55 ? 3000 : 4500;
   const basePrice = numericArea * 150;
-  const isVilas = id.includes('vilas') || (model.name && (model.name.toLowerCase().includes('vilas') || model.name.toLowerCase().includes('villas')));
   const turnkeyEstimation = kitBasePriceNum + basePrice + laborCost + adminCost + getEucalyptusFoundation(numericArea) + modelTilesPrice + modelFixturesPrice + modelGlassPrice + paintCost + getElectricalKit(numericArea);
   const turnkeyEstimationDiscounted = turnkeyEstimation - ((kitBasePriceNum + basePrice) * discountRate);
-  const hasPromo = !!model.promoPrice && model.promoPrice.trim() !== "" && model.promoPrice !== "R$ 0,00" && model.promoPrice !== "0";
 
   return (
     <div className="min-h-screen bg-background">
@@ -660,17 +659,8 @@ export default function ModelDetailPage() {
                     <div className="mt-4 pt-3 border-t border-stone-50">
                       <span className="text-[9px] text-gray-400 block uppercase font-bold">Investimento Estimado</span>
                       <div className="flex flex-wrap items-baseline gap-1.5 mt-0.5">
-                        {hasPromo ? (
-                          <>
-                            <span className="text-[11px] text-muted-foreground line-through">{model.kitPrice || formatBRL(kitEstimation)}</span>
-                            <span className="font-serif text-xl font-bold text-primary">{model.promoPrice}</span>
-                          </>
-                        ) : (
-                          <>
-                            <span className="text-[11px] text-muted-foreground line-through">{formatBRL(kitEstimation)}</span>
-                            <span className="font-serif text-xl font-bold text-primary">{formatBRL(kitPriceDiscounted)}</span>
-                          </>
-                        )}
+                        <span className="text-[11px] text-muted-foreground line-through">{formatBRL(kitEstimation)}</span>
+                        <span className="font-serif text-xl font-bold text-primary">{formatBRL(kitPriceDiscounted)}</span>
                       </div>
                     <div className="flex flex-col mt-0.5">
                       <span className="text-[9px] text-emerald-600 font-bold block">{discountRate * 100}% de desc. à vista no madeiramento</span>
@@ -702,7 +692,7 @@ export default function ModelDetailPage() {
                       </div>
                     <div className="flex flex-col mt-0.5">
                       <span className="text-[9px] text-emerald-600 font-bold block">{discountRate * 100}% de desc. à vista no madeiramento</span>
-                      <span className="text-[9px] text-slate-500 font-medium block">ou 12x s/ juros de {formatBRL(partnerEstimation / 12)}</span>
+                      <span className="text-[9px] text-slate-500 font-medium block">ou Kit em 12x s/ juros de {formatBRL(kitEstimation / 12)}</span>
                     </div>
                       <span className="text-[9px] text-stone-555 block mt-2.5 font-medium italic">+ Frete Estimado: {formatBRL(freightPartner)}. Solicite proposta exata.</span>
                     </div>
@@ -725,21 +715,12 @@ export default function ModelDetailPage() {
                     <div className="mt-4 pt-3 border-t border-[#E8DCCF]/60">
                       <span className="text-[9px] text-[#8A3A1B] block uppercase font-black tracking-wider mb-1">Preço de Tabela (Montado)</span>
                       <div className="flex flex-wrap items-baseline gap-1.5 mt-0.5">
-                        {model.price && model.price.trim() !== "" && model.price !== "R$ 0,00" && !isVilas ? (
-                          <>
-                            <span className="text-[11px] text-muted-foreground line-through">{model.price}</span>
-                            <span className="font-serif text-xl font-bold text-[#8A3A1B]">{formatBRL(turnkeyEstimationDiscounted)}</span>
-                          </>
-                        ) : (
-                          <>
-                            <span className="text-[11px] text-muted-foreground line-through">{formatBRL(turnkeyEstimation)}</span>
-                            <span className="font-serif text-xl font-bold text-[#8A3A1B]">{formatBRL(turnkeyEstimationDiscounted)}</span>
-                          </>
-                        )}
+                        <span className="text-[11px] text-muted-foreground line-through">{formatBRL(turnkeyEstimation)}</span>
+                        <span className="font-serif text-xl font-bold text-[#8A3A1B]">{formatBRL(turnkeyEstimationDiscounted)}</span>
                       </div>
                     <div className="flex flex-col mt-0.5">
                       <span className="text-[9px] text-emerald-600 font-bold block">{discountRate * 100}% de desc. à vista aplicado</span>
-                      <span className="text-[9px] text-slate-500 font-medium block">ou 12x s/ juros de {formatBRL(turnkeyEstimation / 12)}</span>
+                      <span className="text-[9px] text-slate-500 font-medium block">ou Kit em 12x s/ juros de {formatBRL(kitEstimation / 12)}</span>
                     </div>
                       <span className="text-[9px] text-stone-555 block mt-2.5 font-medium italic">+ Frete Estimado: {formatBRL(freightTurnkey)}. Solicite proposta exata.</span>
                     </div>
@@ -1161,28 +1142,30 @@ export default function ModelDetailPage() {
                     {/* Item 11: Frete Estimado */}
                     <div className="flex justify-between pb-3 border-b border-stone-100">
                       <span className="text-stone-700 font-medium">Frete Estimado (Litoral/Região Metropolitana):</span>
-                      <span className="font-bold text-stone-850">{formatBRL(getFreight(kitBasePriceNum + (includeBaseInSim ? (numericArea * 140) : 0)))}</span>
+                      <span className="font-bold text-stone-850">{formatBRL(getFreight(kitBasePriceNum + (includeBaseInSim ? (numericArea * 140) : 0), modelKey, model.freight_value))}</span>
                     </div>
                   </div>
                     
                   {/* Totais de investimento com base de cálculo rigorosa */}
                     {(() => {
                       const basePrice = numericArea * 150;
+                      const simFreight = getFreight(kitBasePriceNum + (includeBaseInSim ? (numericArea * 140) : 0), modelKey, model.freight_value);
+                      const turnkeyFreight = getFreight(kitBasePriceNum + (numericArea * 140), modelKey, model.freight_value);
                       
                       // 1. Kit
-                      const kitAPrazo = kitBasePriceNum + getFreight(kitBasePriceNum + (includeBaseInSim ? (numericArea * 140) : 0)) + (includeBaseInSim ? basePrice : 0);
+                      const kitAPrazo = kitBasePriceNum + simFreight + (includeBaseInSim ? basePrice : 0);
                       const kitDiscountable = kitBasePriceNum + (includeBaseInSim ? basePrice : 0);
                       const kitDesconto = Math.round(kitDiscountable * discountRate);
                       const kitAVista = kitAPrazo - kitDesconto;
                       
                       // 2. Parceira (isolando mão de obra para pagamento direto ao carpinteiro)
-                      const partnerAPrazo = kitBasePriceNum + getFreight(kitBasePriceNum + (includeBaseInSim ? (numericArea * 140) : 0)) + (includeBaseInSim ? basePrice : 0);
+                      const partnerAPrazo = kitBasePriceNum + simFreight + (includeBaseInSim ? basePrice : 0);
                       const partnerDiscountable = kitBasePriceNum + (includeBaseInSim ? basePrice : 0);
                       const partnerDesconto = Math.round(partnerDiscountable * discountRate);
                       const partnerAVista = partnerAPrazo - partnerDesconto;
                       
                       // 3. Chave na mão (base está inclusa por padrão)
-                      const turnkeyAPrazo = kitBasePriceNum + basePrice + laborCost + adminCost + getEucalyptusFoundation(numericArea) + modelTilesPrice + modelFixturesPrice + modelGlassPrice + (numericArea <= 25 ? 2000 : numericArea <= 55 ? 3000 : 4500) + getElectricalKit(numericArea) + getFreight(kitBasePriceNum + (numericArea * 140));
+                      const turnkeyAPrazo = kitBasePriceNum + basePrice + laborCost + adminCost + getEucalyptusFoundation(numericArea) + modelTilesPrice + modelFixturesPrice + modelGlassPrice + (numericArea <= 25 ? 2000 : numericArea <= 55 ? 3000 : 4500) + getElectricalKit(numericArea) + turnkeyFreight;
                       const turnkeyDiscountable = kitBasePriceNum + basePrice;
                       const turnkeyDesconto = Math.round(turnkeyDiscountable * discountRate);
                       const turnkeyAVista = turnkeyAPrazo - turnkeyDesconto;
