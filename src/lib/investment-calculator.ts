@@ -404,7 +404,15 @@ export function calculateInvestmentSimulation(options: InvestmentSimulationOptio
   const montagemParedeDupla = (canHaveDoubleWall && hasDoubleWall) ? Math.round(area * 100) : 0;
 
   // Instalação Elétrica
-  const instalacaoEletrica = isCamping ? 600 : isGuarajuba ? 1200 : area <= 35 ? 1000 : area <= 60 ? 1200 : 1600;
+  // Todos os modelos de chalé até 80m²: R$ 1.200,00
+  let instalacaoEletrica = 1200;
+  if (isCamping) {
+    instalacaoEletrica = 600;
+  } else if (isAFrame) {
+    instalacaoEletrica = area <= 80 ? 1200 : 1600;
+  } else {
+    instalacaoEletrica = area <= 60 ? 1200 : 1600;
+  }
 
   // Serviço de Pintura: R$ 500 (camping), R$ 1.000 (médio), R$ 1.500 (grande > 55m²)
   const servicoPintura = isCamping ? 500 : area <= 55 ? 1000 : 1500;
