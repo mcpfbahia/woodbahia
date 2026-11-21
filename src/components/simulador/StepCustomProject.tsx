@@ -288,3 +288,4 @@ export function StepCustomProject({ config, onChange, onBack, onNext }: Props) {
     </motion.div>
   );
 }
+

@@ -110,3 +110,4 @@ export function StepCustomSummary({ clientData, config, onBack, onReset }: Props
     </motion.div>
   );
 }
+

@@ -102,9 +102,9 @@ export const ModelsSection = ({ initialModelsData }: { initialModelsData?: any[]
           <div className="mt-8 flex justify-center w-full">
             <div className="flex w-full overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:w-auto sm:overflow-visible sm:inline-flex rounded-2xl bg-muted/65 p-1.5 border border-border/50 gap-1.5 shadow-inner backdrop-blur-sm">
               {[
-                { id: 'kit', label: '1. Kit Madeiramento', emoji: '🪵', desc: 'Apenas a estrutura' },
-                { id: 'parceira', label: '2. Kit + Montagem Parceira', emoji: '🔨', desc: 'Indicação credenciada' },
-                { id: 'turnkey', label: '3. Wood Bahia Chave na Mão', emoji: '🔑', desc: 'Obra 100% coordenada' },
+                { id: 'kit', label: '1. Kit Madeiramento', emoji: '🪵', desc: 'Menor custo de entrada' },
+                { id: 'parceira', label: '2. Kit + Montagem Parceira', emoji: '⭐', desc: 'Mais Escolhido • Sem taxa de gestão', isBest: true },
+                { id: 'turnkey', label: '3. Wood Bahia Chave na Mão', emoji: '🔑', desc: 'Coordenação total (+15%)' },
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -127,6 +127,34 @@ export const ModelsSection = ({ initialModelsData }: { initialModelsData?: any[]
               ))}
             </div>
           </div>
+
+          {/* Banners Estratégicos Dinâmicos por Modalidade */}
+          {selectedModalidade === 'kit' && (
+            <div className="mt-6 flex items-center justify-center gap-2 rounded-2xl border border-amber-200 bg-amber-50 py-3 px-5 text-center sm:mx-auto sm:max-w-xl shadow-sm">
+              <span className="text-base shrink-0">🪵</span>
+              <p className="text-xs sm:text-sm font-semibold text-amber-800">
+                10% de desconto à vista no Kit Madeiramento em autoclave
+              </p>
+            </div>
+          )}
+
+          {selectedModalidade === 'parceira' && (
+            <div className="mt-6 flex items-center justify-center gap-2 rounded-2xl border border-emerald-300 bg-emerald-50 py-3 px-6 text-center sm:mx-auto sm:max-w-2xl shadow-sm">
+              <span className="text-base shrink-0">⭐</span>
+              <p className="text-xs sm:text-sm font-semibold text-emerald-900 leading-snug">
+                <strong>Opção Mais Vantajosa:</strong> Você compra o Kit direto da fábrica e contrata a equipe credenciada parceira, <strong>economizando até 15% em taxas de gestão de obra</strong>!
+              </p>
+            </div>
+          )}
+
+          {selectedModalidade === 'turnkey' && (
+            <div className="mt-6 flex items-center justify-center gap-2 rounded-2xl border border-stone-200 bg-stone-50 py-3 px-6 text-center sm:mx-auto sm:max-w-2xl shadow-sm">
+              <span className="text-base shrink-0">🔑</span>
+              <p className="text-xs sm:text-sm font-medium text-stone-700 leading-snug">
+                <strong>Chave na Mão Oficial:</strong> Estrutura completa, cobertura, vidros e pintura com <strong>15% de Coordenação Técnica da Wood Bahia</strong>. *(Louças, pia e piso cerâmico adquiridos à parte no comércio local)*.
+              </p>
+            </div>
+          )}
         </ScrollReveal>
 
         {isLoading ? (
@@ -146,7 +174,6 @@ export const ModelsSection = ({ initialModelsData }: { initialModelsData?: any[]
               const modelFixturesPrice = model.fixturesPrice ? parsePriceToBRL(model.fixturesPrice) : getFixturesPrice(numericArea).base;
               const modelTilesPrice = model.tilesStainPrice ? parsePriceToBRL(model.tilesStainPrice) : getTilesStainPrice(numericArea).total;
               const modelGlassPrice = getGlassPrice(numericArea);
-              const adminCost = Math.round(laborCost * 0.25); // 25% de coordenação
 
               const discountRate = getModelDiscountRate(model.id || model.name, model.discountRate);
               const safeNum = (n: any) => isNaN(Number(n)) ? 0 : Number(n);
@@ -162,12 +189,17 @@ export const ModelsSection = ({ initialModelsData }: { initialModelsData?: any[]
               const partnerEstimation = safeNum(kitFull) + safeNum(laborCost) + safeNum(getEucalyptusFoundation(numericArea));
               const partnerEstimationDiscounted = partnerEstimation - (safeNum(kitFull) * safeNum(discountRate));
 
-              // 3. Chave na Mão (Separado do Frete)
+              // 3. Chave na Mão (15% de Coordenação e Gestão Técnica de Obra)
               const freightTurnkey = safeNum(getFreight(safeNum(kitFull) + safeNum(numericArea * 140), modelKey, model.freight_value));
               const paintCost = numericArea <= 25 ? 2000 : numericArea <= 55 ? 3000 : 4500;
               const basePrice = numericArea * 150;
-              const turnkeyEstimation = safeNum(kitFull) + safeNum(basePrice) + safeNum(laborCost) + safeNum(adminCost) + safeNum(getEucalyptusFoundation(numericArea)) + safeNum(modelTilesPrice) + safeNum(modelFixturesPrice) + safeNum(modelGlassPrice) + safeNum(paintCost) + safeNum(getElectricalKit(numericArea));
+              const structuralPackage = safeNum(kitFull) + safeNum(basePrice) + safeNum(laborCost) + safeNum(getEucalyptusFoundation(numericArea)) + safeNum(modelTilesPrice) + safeNum(modelFixturesPrice) + safeNum(modelGlassPrice) + safeNum(paintCost) + safeNum(getElectricalKit(numericArea));
+              const adminCost = Math.round(structuralPackage * 0.15); // 15% de gestão técnica
+              const turnkeyEstimation = structuralPackage + adminCost;
               const turnkeyEstimationDiscounted = turnkeyEstimation - ((safeNum(kitFull) + safeNum(basePrice)) * safeNum(discountRate));
+
+              // Economia direta da Montagem Parceira
+              const economyVsTurnkey = turnkeyEstimationDiscounted - partnerEstimationDiscounted;
 
               return (
                 <StaggerItem key={model.id} index={idx}>
@@ -253,7 +285,7 @@ export const ModelsSection = ({ initialModelsData }: { initialModelsData?: any[]
                         <div className="flex flex-col">
                           <p className="text-[11px] font-black uppercase tracking-widest text-muted-foreground mb-1">
                             {selectedModalidade === 'kit' && "🪵 Kit Madeiramento"}
-                            {selectedModalidade === 'parceira' && "🔨 Montagem Parceira"}
+                            {selectedModalidade === 'parceira' && "⭐ Montagem Parceira (Mais Escolhido)"}
                             {selectedModalidade === 'turnkey' && "🔑 Chave na Mão"}
                           </p>
                           
@@ -277,8 +309,18 @@ export const ModelsSection = ({ initialModelsData }: { initialModelsData?: any[]
                                  </span>
                                </div>
                                <span className="text-xs font-bold text-emerald-700 mt-1">
-                                 {discountRate * 100}% desc. à vista ou parcelado em até 12x s/ juros
+                                 {discountRate * 100}% desc. à vista no kit ou até 12x s/ juros
                                </span>
+                               {selectedModalidade === 'parceira' && economyVsTurnkey > 0 && (
+                                 <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100/90 px-2 py-0.5 rounded mt-1.5 inline-block self-start leading-tight">
+                                   Economize ~{formatBRL(economyVsTurnkey)} sem taxas de gestão
+                                 </span>
+                               )}
+                               {selectedModalidade === 'turnkey' && (
+                                 <span className="text-[10px] font-semibold text-stone-600 bg-stone-100 px-2 py-0.5 rounded mt-1.5 inline-block self-start leading-tight">
+                                   Inclui 15% de gestão técnica • Louças, pia e piso à parte
+                                 </span>
+                               )}
                             </div>
                           ) : (
                             <p className="font-serif text-lg font-bold text-primary">Consulte</p>

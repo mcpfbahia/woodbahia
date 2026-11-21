@@ -105,15 +105,15 @@ export default function ModelsGalleryPage() {
             <div className="mt-8 flex justify-center">
               <div className="inline-flex flex-col sm:flex-row rounded-2xl bg-muted/65 p-1.5 border border-border/50 gap-1.5 shadow-inner backdrop-blur-sm">
                 {[
-                  { id: 'kit', label: '1. Kit Madeiramento', emoji: '🪵', desc: 'Apenas a estrutura' },
-                  { id: 'parceira', label: '2. Kit + Montagem Parceira', emoji: '🔨', desc: 'Indicação credenciada' },
-                  { id: 'turnkey', label: '3. Wood Bahia Chave na Mão', emoji: '🔑', desc: 'Obra 100% coordenada' },
+                  { id: 'kit', label: '1. Kit Madeiramento', emoji: '🪵', desc: 'Menor custo de entrada' },
+                  { id: 'parceira', label: '2. Kit + Montagem Parceira', emoji: '⭐', desc: 'Mais Escolhido • Sem taxa de gestão', isBest: true },
+                  { id: 'turnkey', label: '3. Wood Bahia Chave na Mão', emoji: '🔑', desc: 'Coordenação total (+15%)' },
                 ].map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setSelectedModalidade(tab.id as any)}
                     className={cn(
-                      "flex flex-col items-center sm:items-start rounded-xl px-4 py-2.5 text-center sm:text-left transition-all duration-300 min-w-[150px] md:min-w-[190px]",
+                      "flex flex-col items-center sm:items-start rounded-xl px-4 py-2.5 text-center sm:text-left transition-all duration-300 min-w-[150px] md:min-w-[200px] relative",
                       selectedModalidade === tab.id
                         ? "bg-white text-primary shadow-md scale-105 border border-primary/5 font-bold"
                         : "text-muted-foreground hover:text-foreground hover:bg-white/30 font-medium"
@@ -123,7 +123,7 @@ export default function ModelsGalleryPage() {
                       <span>{tab.emoji}</span>
                       <span>{tab.label}</span>
                     </div>
-                    <span className="hidden sm:inline text-[9px] opacity-70 mt-0.5 font-medium">
+                    <span className="hidden sm:inline text-[9px] opacity-80 mt-0.5 font-medium">
                       {tab.desc}
                     </span>
                   </button>
@@ -132,12 +132,30 @@ export default function ModelsGalleryPage() {
             </div>
           </div>
 
-          {/* Banner desconto */}
+          {/* Banners Estratégicos Dinâmicos por Modalidade */}
           {selectedModalidade === 'kit' && (
-            <div className="mb-8 flex items-center justify-center gap-2 rounded-2xl border border-amber-200 bg-amber-50 py-3 px-5 text-center sm:mx-auto sm:max-w-xl">
+            <div className="mb-8 flex items-center justify-center gap-2 rounded-2xl border border-amber-200 bg-amber-50 py-3 px-5 text-center sm:mx-auto sm:max-w-xl shadow-sm">
               <Tag className="h-4 w-4 shrink-0 text-amber-600" />
               <p className="text-sm font-semibold text-amber-800">
-                10% de desconto à vista em todos os modelos
+                10% de desconto à vista no Kit Madeiramento em autoclave
+              </p>
+            </div>
+          )}
+
+          {selectedModalidade === 'parceira' && (
+            <div className="mb-8 flex items-center justify-center gap-2 rounded-2xl border border-emerald-300 bg-emerald-50 py-3.5 px-6 text-center sm:mx-auto sm:max-w-2xl shadow-sm">
+              <span className="text-base shrink-0">⭐</span>
+              <p className="text-xs sm:text-sm font-semibold text-emerald-900 leading-snug">
+                <strong>Opção Mais Vantajosa:</strong> Você compra o Kit com desconto de fábrica e contrata os montadores credenciados indicados, <strong>economizando até 15% em taxas de gestão de obra</strong>!
+              </p>
+            </div>
+          )}
+
+          {selectedModalidade === 'turnkey' && (
+            <div className="mb-8 flex items-center justify-center gap-2 rounded-2xl border border-stone-200 bg-stone-50 py-3.5 px-6 text-center sm:mx-auto sm:max-w-2xl shadow-sm">
+              <span className="text-base shrink-0">🔑</span>
+              <p className="text-xs sm:text-sm font-medium text-stone-700 leading-snug">
+                <strong>Chave na Mão Oficial:</strong> Estrutura montada, cobertura, vidros e pintura com <strong>15% de Coordenação e Gestão Técnica da Wood Bahia</strong>. *(Louças, pia e pisos por conta do cliente no comércio local)*.
               </p>
             </div>
           )}
@@ -159,7 +177,6 @@ export default function ModelsGalleryPage() {
                 const modelFixturesPrice = model.fixturesPrice ? parsePriceToBRL(model.fixturesPrice) : getFixturesPrice(numericArea).base;
                 const modelTilesPrice = model.tilesStainPrice ? parsePriceToBRL(model.tilesStainPrice) : getTilesStainPrice(numericArea).total;
                 const modelGlassPrice = getGlassPrice(numericArea);
-                const adminCost = Math.round(laborCost * 0.25); // 25% de coordenação
                 
                 const discountRate = getModelDiscountRate(model.id || model.name, model.discountRate);
                 const modelKey = model.id || model.name;
@@ -174,12 +191,17 @@ export default function ModelsGalleryPage() {
                 const partnerEstimation = kitFull + laborCost + getEucalyptusFoundation(numericArea);
                 const partnerEstimationDiscounted = partnerEstimation - (kitFull * discountRate);
 
-                // 3. Chave na Mão (Separado do Frete)
+                // 3. Chave na Mão (15% de Coordenação e Gestão Técnica de Obra)
                 const freightTurnkey = getFreight(kitFull + (numericArea * 140), modelKey, model.freight_value);
                 const paintCost = numericArea <= 25 ? 2000 : numericArea <= 55 ? 3000 : 4500;
                 const basePrice = numericArea * 150;
-                const turnkeyEstimation = kitFull + basePrice + laborCost + adminCost + getEucalyptusFoundation(numericArea) + modelTilesPrice + modelFixturesPrice + modelGlassPrice + paintCost + getElectricalKit(numericArea);
+                const structuralPackage = kitFull + basePrice + laborCost + getEucalyptusFoundation(numericArea) + modelTilesPrice + modelFixturesPrice + modelGlassPrice + paintCost + getElectricalKit(numericArea);
+                const adminCost = Math.round(structuralPackage * 0.15); // 15% de gestão técnica
+                const turnkeyEstimation = structuralPackage + adminCost;
                 const turnkeyEstimationDiscounted = turnkeyEstimation - ((kitFull + basePrice) * discountRate);
+
+                // Economia direta da Montagem Parceira em relação ao Chave na Mão
+                const economyVsTurnkey = turnkeyEstimationDiscounted - partnerEstimationDiscounted;
 
                 return (
                   <StaggerItem key={model.id} index={idx}>
@@ -297,9 +319,11 @@ export default function ModelsGalleryPage() {
                               {selectedModalidade === 'parceira' ? (
                                 <>
                                   <div>
-                                    <p className="text-[9px] font-black uppercase tracking-widest text-[#8C6239] mb-0.5 leading-none">
-                                      🔨 Montagem Parceira
-                                    </p>
+                                    <div className="flex items-center justify-between mb-0.5">
+                                      <p className="text-[9px] font-black uppercase tracking-widest text-[#8C6239] leading-none">
+                                        ⭐ Montagem Parceira
+                                      </p>
+                                    </div>
                                     {kitFull > 0 ? (
                                       <div className="flex flex-col mt-1">
                                         <span className="text-[9px] text-muted-foreground line-through leading-none mb-0.5">
@@ -315,8 +339,13 @@ export default function ModelsGalleryPage() {
                                   </div>
                                   <div className="flex flex-col mt-1">
                                     <span className="text-[8px] sm:text-[9px] text-[#8C6239] font-bold block">
-                                      {discountRate * 100}% desc. à vista
+                                      {discountRate * 100}% desc. à vista no kit
                                     </span>
+                                    {economyVsTurnkey > 0 && (
+                                      <span className="text-[8px] font-bold text-emerald-700 bg-emerald-100/90 px-1.5 py-0.5 rounded mt-1 inline-block leading-tight">
+                                        Economize ~{formatBRL(economyVsTurnkey)} sem taxas de gestão
+                                      </span>
+                                    )}
                                     <span className="text-[8px] font-medium text-slate-500 mt-0.5 block leading-tight">
                                       ou Kit em 12x s/ juros de {formatBRL(kitEstimation / 12)}
                                     </span>
@@ -325,7 +354,7 @@ export default function ModelsGalleryPage() {
                               ) : (
                                 <>
                                   <div>
-                                    <p className="text-[9px] font-black uppercase tracking-widest text-emerald-700 mb-0.5 leading-none">
+                                    <p className="text-[9px] font-black uppercase tracking-widest text-emerald-800 mb-0.5 leading-none">
                                       🔑 Chave na Mão
                                     </p>
                                     {kitFull > 0 ? (
@@ -345,8 +374,11 @@ export default function ModelsGalleryPage() {
                                     <span className="text-[8px] sm:text-[9px] text-emerald-700 font-bold block">
                                       {discountRate * 100}% desc. à vista
                                     </span>
-                                    <span className="text-[8px] font-medium text-slate-500 mt-0.5 block leading-tight">
-                                      ou Kit em 12x s/ juros de {formatBRL(kitEstimation / 12)}
+                                    <span className="text-[8px] font-semibold text-stone-600 bg-stone-100 px-1.5 py-0.5 rounded mt-1 inline-block leading-tight">
+                                      Inclui 15% de gestão de obra
+                                    </span>
+                                    <span className="text-[8px] font-medium text-slate-400 mt-0.5 block leading-tight">
+                                      Louças, pia e pisos à parte
                                     </span>
                                   </div>
                                 </>

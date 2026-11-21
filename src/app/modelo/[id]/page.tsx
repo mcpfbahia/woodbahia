@@ -379,10 +379,12 @@ export default function ModelDetailPage() {
       };
     } else if (modalidade === 'parceira') {
       return {
-        title: "Análise da Montagem Parceira",
+        title: "Análise da Montagem Parceira (Opção Mais Escolhida)",
         inclusionsTitle: "O que está Incluso na Parceria:",
         exclusionsTitle: "O que NÃO está Incluso na Parceria:",
         inclusions: [
+          "Isenção total da taxa de gestão de 15% da fábrica (Maior Economia)",
+          "Indicação de carpinteiros credenciados e homologados",
           "Pilares de sustentação em autoclave",
           "Vigas de travamento",
           "Linhas e caibros de telhado",
@@ -406,7 +408,7 @@ export default function ModelDetailPage() {
           "Instalações de elétrica/hidro",
           "Base civil / Laje radier",
           "Frete de entrega na obra",
-          "Taxa de gestão/coordenação (Isento!)",
+          "Taxa de gestão/coordenação de obra (Totalmente Isento!)",
           ...(!hasBase ? [
             "Barrotes de sustentação de piso e assoalho"
           ] : [])
@@ -418,6 +420,7 @@ export default function ModelDetailPage() {
         inclusionsTitle: "O que está Incluso no Chave na Mão:",
         exclusionsTitle: "O que NÃO está Incluso no Chave na Mão:",
         inclusions: [
+          "Gestão e Coordenação Técnica de Obra Wood Bahia (15%)",
           "Pilares de sustentação em autoclave",
           "Vigas de travamento",
           "Linhas e caibros de telhado",
@@ -428,20 +431,23 @@ export default function ModelDetailPage() {
           "Portas e janelas (esquadrias)",
           "Ferragens, pregos e parafusos",
           "Barras roscadas e fixadores",
-          "Mão de obra própria e montagem",
+          "Mão de obra de montagem",
           "Fundação de sapatas eucalipto",
           "Telhas ecológicas e manta térmica",
           "Vidros fachada",
           "Pintura protetora em Stain (1 cor)",
           "Instalações de elétrica/hidráulica básica",
-          "Gestão, coordenação e garantia Wood Bahia",
           "Barrotes de sustentação de piso",
           "Assoalho de madeira (Base estrutural)"
         ],
         exclusions: [
-          "Base civil / Laje radier",
-          "Frete de entrega na obra",
-          "Louças, metais e pisos cerâmicos"
+          "Louças sanitárias e torneiras (compradas no comércio local)",
+          "Bancada com pia e cuba de cozinha",
+          "Piso cerâmico / porcelanato (assentado no local)",
+          "Calhas e rufos perimetrais",
+          "Mobiliário e itens decorativos",
+          "Base civil / Laje radier / terraplanagem",
+          "Frete de entrega na obra"
         ]
       };
     }
@@ -460,8 +466,7 @@ export default function ModelDetailPage() {
   const modelFixturesPrice = model.fixturesPrice ? parseCurrencyToNumber(model.fixturesPrice) : getFixturesPrice(numericArea).base;
   const modelTilesPrice = model.tilesStainPrice ? parseCurrencyToNumber(model.tilesStainPrice) : getTilesStainPrice(numericArea).total;
   const modelGlassPrice = getGlassPrice(numericArea);
-  const adminCost = Math.round(laborCost * 0.25); // 25% de coordenação
-
+  
   const discountRate = getModelDiscountRate(model.id || model.name, model.discountRate);
   const modelKey = model.id || model.name;
 
@@ -475,12 +480,17 @@ export default function ModelDetailPage() {
   const partnerEstimation = kitBasePriceNum + laborCost + getEucalyptusFoundation(numericArea);
   const partnerEstimationDiscounted = partnerEstimation - (kitBasePriceNum * discountRate);
 
-  // Chave na Mão (Separado do Frete)
+  // Chave na Mão (15% de Coordenação e Gestão Técnica de Obra)
   const freightTurnkey = getFreight(kitBasePriceNum + (numericArea * 140), modelKey, model.freight_value);
   const paintCost = numericArea <= 25 ? 2000 : numericArea <= 55 ? 3000 : 4500;
   const basePrice = numericArea * 150;
-  const turnkeyEstimation = kitBasePriceNum + basePrice + laborCost + adminCost + getEucalyptusFoundation(numericArea) + modelTilesPrice + modelFixturesPrice + modelGlassPrice + paintCost + getElectricalKit(numericArea);
+  const structuralPackage = kitBasePriceNum + basePrice + laborCost + getEucalyptusFoundation(numericArea) + modelTilesPrice + modelFixturesPrice + modelGlassPrice + paintCost + getElectricalKit(numericArea);
+  const adminCost = Math.round(structuralPackage * 0.15); // 15% de gestão técnica
+  const turnkeyEstimation = structuralPackage + adminCost;
   const turnkeyEstimationDiscounted = turnkeyEstimation - ((kitBasePriceNum + basePrice) * discountRate);
+
+  // Economia direta da Montagem Parceira
+  const economyVsTurnkey = turnkeyEstimationDiscounted - partnerEstimationDiscounted;
 
   return (
     <div className="min-h-screen bg-background">
@@ -675,14 +685,17 @@ export default function ModelDetailPage() {
                   </div>
 
                   {/* Card 2: Kit + Montagem Parceira */}
-                  <div className="bg-white p-5 rounded-3xl border border-stone-200 flex flex-col justify-between hover:border-[#B06D46] transition-colors">
+                  <div className="bg-white p-5 rounded-3xl border-2 border-amber-300/80 flex flex-col justify-between hover:border-[#B06D46] transition-all shadow-md relative">
+                    <div className="absolute -top-3 right-4 rounded-full bg-emerald-700 text-white text-[9px] font-bold tracking-wider uppercase px-3 py-0.5 shadow-sm">
+                      ⭐ Mais Escolhido
+                    </div>
                     <div>
                       <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-[9px] font-bold uppercase tracking-wider text-[#B06D46] mb-3">
                         <Hammer className="h-3.5 w-3.5" />
                         2. Montagem Parceira
                       </span>
-                      <p className="text-[11px] text-gray-400 leading-normal mb-3">
-                        Compra do kit estrutural montado por carpinteiros homologados indicados.
+                      <p className="text-[11px] text-gray-500 leading-normal mb-3">
+                        Kit estrutural montado por carpinteiros homologados indicados. <strong>Sem taxas de gestão de obra!</strong>
                       </p>
                     </div>
                     <div className="mt-4 pt-3 border-t border-stone-50">
@@ -691,26 +704,31 @@ export default function ModelDetailPage() {
                         <span className="text-[11px] text-muted-foreground line-through">{formatBRL(partnerEstimation)}</span>
                         <span className="font-serif text-xl font-bold text-[#B06D46]">{formatBRL(partnerEstimationDiscounted)}</span>
                       </div>
-                    <div className="flex flex-col mt-0.5">
-                      <span className="text-[9px] text-emerald-600 font-bold block">{discountRate * 100}% de desc. à vista no madeiramento</span>
-                      <span className="text-[9px] text-slate-500 font-medium block">ou Kit em 12x s/ juros de {formatBRL(kitEstimation / 12)}</span>
-                    </div>
-                      <span className="text-[9px] text-stone-555 block mt-2.5 font-medium italic">+ Frete Estimado: {formatBRL(freightPartner)}. Solicite proposta exata.</span>
+                      <div className="flex flex-col mt-0.5">
+                        <span className="text-[9px] text-emerald-600 font-bold block">{discountRate * 100}% de desc. à vista no madeiramento</span>
+                        {economyVsTurnkey > 0 && (
+                          <span className="text-[9px] font-bold text-emerald-800 bg-emerald-100/90 px-2 py-0.5 rounded mt-1 inline-block leading-tight self-start">
+                            Economize ~{formatBRL(economyVsTurnkey)} sem taxas de gestão
+                          </span>
+                        )}
+                        <span className="text-[9px] text-slate-500 font-medium block mt-0.5">ou Kit em 12x s/ juros de {formatBRL(kitEstimation / 12)}</span>
+                      </div>
+                      <span className="text-[9px] text-stone-500 block mt-2.5 font-medium italic">+ Frete Estimado: {formatBRL(freightPartner)}. Solicite proposta exata.</span>
                     </div>
                   </div>
 
                   {/* Card 3: Chave na Mão */}
                   <div className="bg-[#FAF8F5] p-5 rounded-3xl border border-[#E8DCCF] flex flex-col justify-between hover:border-[#8A3A1B] transition-colors shadow-[0_8px_30px_rgba(138,58,27,0.03)] relative">
-                    <div className="absolute -top-2.5 right-4 rounded-full bg-[#8A3A1B] text-white text-[8px] font-bold tracking-widest uppercase px-2.5 py-0.5">
-                      Pronto
+                    <div className="absolute -top-2.5 right-4 rounded-full bg-stone-700 text-white text-[8px] font-bold tracking-widest uppercase px-2.5 py-0.5">
+                      Coordenação Total
                     </div>
                     <div>
                       <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-[9px] font-bold uppercase tracking-wider text-[#8A3A1B] mb-3 shadow-sm">
                         <Home className="h-3.5 w-3.5" />
                         3. Chave na Mão
                       </span>
-                      <p className="text-[11px] text-gray-400 leading-normal mb-3">
-                        Estrutura pronta, coberta, pintada, com portas, janelas e vidros instalados.
+                      <p className="text-[11px] text-gray-500 leading-normal mb-3">
+                        Estrutura pronta, coberta, pintada e vidros instalados com 15% de gestão técnica Wood Bahia.
                       </p>
                     </div>
                     <div className="mt-4 pt-3 border-t border-[#E8DCCF]/60">
@@ -719,11 +737,14 @@ export default function ModelDetailPage() {
                         <span className="text-[11px] text-muted-foreground line-through">{formatBRL(turnkeyEstimation)}</span>
                         <span className="font-serif text-xl font-bold text-[#8A3A1B]">{formatBRL(turnkeyEstimationDiscounted)}</span>
                       </div>
-                    <div className="flex flex-col mt-0.5">
-                      <span className="text-[9px] text-emerald-600 font-bold block">{discountRate * 100}% de desc. à vista aplicado</span>
-                      <span className="text-[9px] text-slate-500 font-medium block">ou Kit em 12x s/ juros de {formatBRL(kitEstimation / 12)}</span>
-                    </div>
-                      <span className="text-[9px] text-stone-555 block mt-2.5 font-medium italic">+ Frete Estimado: {formatBRL(freightTurnkey)}. Solicite proposta exata.</span>
+                      <div className="flex flex-col mt-0.5">
+                        <span className="text-[9px] text-emerald-600 font-bold block">{discountRate * 100}% de desc. à vista aplicado</span>
+                        <span className="text-[9px] font-semibold text-stone-600 bg-stone-200/70 px-1.5 py-0.5 rounded mt-1 inline-block leading-tight self-start">
+                          Inclui 15% de gestão de obra • Louças, pia e pisos à parte
+                        </span>
+                        <span className="text-[9px] text-slate-500 font-medium block mt-0.5">ou Kit em 12x s/ juros de {formatBRL(kitEstimation / 12)}</span>
+                      </div>
+                      <span className="text-[9px] text-stone-500 block mt-2.5 font-medium italic">+ Frete Estimado: {formatBRL(freightTurnkey)}. Solicite proposta exata.</span>
                     </div>
                   </div>
                 </div>
