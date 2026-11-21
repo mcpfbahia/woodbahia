@@ -124,18 +124,26 @@ export function calculateInvestmentSimulation(options: InvestmentSimulationOptio
   const ferragensPrice = isGuarajuba ? 1800 : isCamping ? 800 : Math.round(Math.max(900, area * 35));
 
   // 6. Esquadrias, Vidros e Fachada
-  // Em chalés A-Frame, a fachada frontal é um frontão triangular inteiro em vidro temperado (corte em ângulo, pé-direito duplo e porta blindex), piso mínimo de R$ 7.500.
+  // Em chalés A-Frame, a fachada frontal é um frontão triangular inteiro em vidro temperado (corte em ângulo, pé-direito duplo e porta blindex).
+  // Chalés 32m²-35m² (Itacimirim/Baixios) = R$ 7.500. Guarajuba 52m² = R$ 8.500.
   // Em casas, as paredes são de madeira e os vidros são esquadrias retangulares convencionais (em torno de R$ 4.500 a R$ 5.200).
   let fachadaVidro = 0;
   let janelaBasculante = 0;
   if (isCamping) {
     fachadaVidro = 3500;
     janelaBasculante = 400;
+  } else if (isGuarajuba) {
+    fachadaVidro = 8500;
+    janelaBasculante = 1000;
   } else if (isAFrame) {
-    // Chalés A-Frame: piso de R$ 7.500 para frontão triangular completo, escalando se > 52m²
-    fachadaVidro = area <= 52 
-      ? 7500 
-      : Math.round(7500 + (area - 52) * 120);
+    // Chalés A-Frame: R$ 7.500 até 35m², R$ 8.500 em 52m², escalando acima de 52m²
+    if (area <= 35) {
+      fachadaVidro = 7500;
+    } else if (area <= 52) {
+      fachadaVidro = 8500;
+    } else {
+      fachadaVidro = Math.round(8500 + (area - 52) * 120);
+    }
     janelaBasculante = 1000;
   } else {
     // Casas com paredes verticais: portas de correr e janelas retangulares prontas
