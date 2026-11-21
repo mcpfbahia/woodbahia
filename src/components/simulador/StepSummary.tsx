@@ -4,7 +4,9 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, MessageCircle, RotateCcw, Info } from 'lucide-react';
+import { ArrowLeft, MessageCircle, RotateCcw, Info, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
+import { InvestmentSimulationTable } from './InvestmentSimulationTable';
+import { useState } from 'react';
 
 interface Props {
   state: SimulationState;
@@ -25,6 +27,7 @@ const KIT_NAMES: Record<string, string> = {
 };
 
 export function StepSummary({ state, onBack, onReset }: Props) {
+  const [show360Table, setShow360Table] = useState(false);
   const { items, freight, additionalFreight, total } = calculateSummary(state);
   const area = getEffectiveArea(state);
   const complementsTotal = items.filter(i => !i.deleted && i.isComplement).reduce((sum, i) => sum + i.value, 0);
@@ -395,6 +398,48 @@ export function StepSummary({ state, onBack, onReset }: Props) {
           </Button>
         </motion.div>
       </div>
+
+      {/* Botão Expansível: Planilha de Investimento Global 360° */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6 }}
+        className="max-w-4xl mx-auto mt-6 px-2 space-y-4"
+      >
+        <button
+          type="button"
+          onClick={() => setShow360Table(!show360Table)}
+          className="w-full flex items-center justify-between p-5 rounded-2xl border-2 border-amber-300/80 bg-amber-50/80 hover:bg-amber-100/80 transition-all text-left shadow-sm group"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#5C3317] text-white flex items-center justify-center shrink-0">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <div>
+              <span className="font-serif font-bold text-base text-[#4A2B1D] block">
+                {show360Table ? 'Ocultar Planilha 360°' : 'Ver Planilha de Custo Global de Obra (Simulação 360°)'}
+              </span>
+              <span className="text-xs text-stone-600 block">
+                Detalhamento completo de Produtos, Serviços, Elétrica, Hidráulica, Louças e Contingência (10%).
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center gap-1.5 text-xs font-bold text-[#5C3317]">
+            <span>{show360Table ? 'Recolher' : 'Abrir Planilha'}</span>
+            {show360Table ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+          </div>
+        </button>
+
+        {show360Table && (
+          <div className="pt-2">
+            <InvestmentSimulationTable
+              modelId={state.model?.id || 'guarajuba'}
+              modelName={state.model?.name || 'Modelo'}
+              area={area}
+            />
+          </div>
+        )}
+      </motion.div>
 
       {/* Alerta Kit Madeiramento */}
       {state.kitType === 'madeiramento' && (

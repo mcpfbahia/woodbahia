@@ -14,7 +14,9 @@ import {
   Info, 
   CheckCircle2, 
   Sparkles,
-  HelpCircle
+  Home,
+  Check,
+  Building
 } from "lucide-react";
 import { cn } from "~/lib/utils";
 
@@ -22,15 +24,31 @@ interface Props {
   modelId: string;
   modelName: string;
   area: number;
+  customType?: 'casa' | 'chale';
+  isDuplex?: boolean;
+  customBedrooms?: number;
+  customSuites?: number;
+  hasSocialBathroom?: boolean;
+  showCustomControls?: boolean;
 }
 
-export function InvestmentSimulationTable({ modelId, modelName, area }: Props) {
+export function InvestmentSimulationTable({ 
+  modelId, 
+  modelName, 
+  area,
+  customType = 'casa',
+  isDuplex = false,
+  customBedrooms = 2,
+  customSuites = 1,
+  hasSocialBathroom = true,
+}: Props) {
   const [foundationType, setFoundationType] = useState<'eucalyptus' | 'radier'>('eucalyptus');
   const [hasDoubleWall, setHasDoubleWall] = useState(false);
   const [includeBaseFloor, setIncludeBaseFloor] = useState(false);
 
+  const isCustom = modelId === 'custom' || modelId.startsWith('custom');
   const isGuarajuba = modelId === 'guarajuba';
-  const canHaveDoubleWall = isVerticalWallModel(modelId);
+  const canHaveDoubleWall = isCustom ? customType === 'casa' : isVerticalWallModel(modelId);
 
   const simulation = calculateInvestmentSimulation({
     modelId,
@@ -38,28 +56,52 @@ export function InvestmentSimulationTable({ modelId, modelName, area }: Props) {
     foundationType,
     hasDoubleWall: canHaveDoubleWall && hasDoubleWall,
     includeBaseFloor: !isGuarajuba && includeBaseFloor,
+    customType,
+    isDuplex,
+    customBedrooms,
+    customSuites,
+    hasSocialBathroom,
   });
 
   return (
     <div className="w-full bg-[#FCFBF9] border border-[#EBE6DF] rounded-3xl p-4 sm:p-6 md:p-8 shadow-sm">
       
+      {/* Aviso Orientativo de Escopo Comercial vs Simulação 360 */}
+      <div className="mb-6 p-4 rounded-2xl bg-[#F5EFE6] border border-[#E3D7C7] flex items-start gap-3">
+        <Info className="w-5 h-5 text-[#8C6239] shrink-0 mt-0.5" />
+        <div className="text-xs text-stone-700 leading-relaxed">
+          <strong className="text-[#5C3317] block font-bold mb-0.5">
+            Orientação Importante sobre a Simulação 360°:
+          </strong>
+          A contratação oficial <strong>Wood Bahia Chave na Mão</strong> possui contrato fechado e escopo estrutural exclusivo. Já esta <strong>Simulação Global de Investimento</strong> contempla todos os materiais e serviços de canteiro (louças, piso cerâmico, bancadas, pintura etc.), sendo o guia fundamental para quem contrata o <strong>Kit Madeiramento</strong> ou <strong>Montagem Parceira</strong> planejar o custo final da obra sem surpresas.
+        </div>
+      </div>
+
       {/* Cabeçalho */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-[#EBE6DF]">
         <div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F2ECE4] text-[#8C6239] text-xs font-bold uppercase tracking-wider mb-2">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Estimativa de Custo Real 360°</span>
+            <span>Planejamento de Custo Real da Obra</span>
           </div>
           <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#4A2B1D]">
             Simulação de Investimento Global
           </h3>
           <p className="text-sm text-stone-600 mt-1">
-            Planejamento completo com todos os materiais e serviços para entrega do seu <strong className="text-[#4A2B1D]">{modelName} ({area}m²)</strong>.
+            Estimativa de custos para entrega de: <strong className="text-[#4A2B1D]">{simulation.modelName}</strong>
           </p>
+          {isCustom && (
+            <div className="flex flex-wrap gap-2 mt-2 text-[11px] text-stone-600 font-medium">
+              <span className="bg-white px-2.5 py-1 rounded-md border border-stone-200">📐 {area} m²</span>
+              <span className="bg-white px-2.5 py-1 rounded-md border border-stone-200">🛏️ {simulation.bedroomsCount} Quartos</span>
+              <span className="bg-white px-2.5 py-1 rounded-md border border-stone-200">🚿 {simulation.bathroomsCount} Banheiros</span>
+              {isDuplex && <span className="bg-amber-100 text-amber-900 px-2.5 py-1 rounded-md font-bold">🪜 Duplex / Mezanino</span>}
+            </div>
+          )}
         </div>
 
         {/* Resumo do m² e Total Rápido */}
-        <div className="flex flex-col items-start md:items-end bg-white border border-[#E8DFC8] px-4 py-3 rounded-2xl shadow-sm">
+        <div className="flex flex-col items-start md:items-end bg-white border border-[#E8DFC8] px-4 py-3 rounded-2xl shadow-sm shrink-0">
           <span className="text-[11px] text-stone-500 font-bold uppercase tracking-wider">Investimento Total Estimado</span>
           <span className="font-serif text-2xl sm:text-3xl font-black text-[#5C3317]">
             {formatBRL(simulation.totalInvestimento)}
@@ -118,7 +160,7 @@ export function InvestmentSimulationTable({ modelId, modelName, area }: Props) {
             </div>
           </div>
 
-          {/* Seletor de Parede Dupla ou Base Estrutural */}
+          {/* Seletor de Parede Dupla */}
           <div className="space-y-2">
             <label className="text-xs font-bold text-stone-700 flex items-center gap-1.5">
               <span>Acabamento Estrutural das Paredes:</span>
@@ -155,14 +197,14 @@ export function InvestmentSimulationTable({ modelId, modelName, area }: Props) {
               <div className="p-2.5 rounded-xl bg-[#F5F2EC] border border-[#E8E2D8] flex items-start gap-2 text-stone-600">
                 <Info className="w-4 h-4 text-[#8C6239] shrink-0 mt-0.5" />
                 <span className="text-[11px] leading-tight">
-                  <strong>Chalé A-Frame:</strong> As laterais são telhado e o fundo já possui fechamento duplo de fábrica (não requer parede dupla).
+                  <strong>Chalé A-Frame:</strong> As laterais são telhado e o fundo já possui fechamento duplo nativo (não requer parede dupla).
                 </span>
               </div>
             )}
           </div>
         </div>
 
-        {/* Opcional de Estrutura da Base + Assoalho para outros modelos em eucalipto */}
+        {/* Opcional de Estrutura da Base + Assoalho para modelos em eucalipto */}
         {!isGuarajuba && foundationType === 'eucalyptus' && (
           <div className="pt-2 border-t border-[#EBE6DF]">
             <label className="flex items-center gap-2.5 cursor-pointer text-stone-700 select-none">

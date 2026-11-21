@@ -11,8 +11,11 @@ export interface InvestmentSimulationOptions {
   foundationType: 'eucalyptus' | 'radier';
   includeBaseFloor?: boolean; // Para modelos que não são Guarajuba na base de eucalipto
   hasDoubleWall?: boolean;    // Apenas casas / escandinavo
-  customBathrooms?: number;
+  customType?: 'casa' | 'chale';
+  isDuplex?: boolean;         // Adicional Duplex (+R$ 120/m²)
   customBedrooms?: number;
+  customSuites?: number;
+  hasSocialBathroom?: boolean;
 }
 
 export interface CostItem {
@@ -32,6 +35,9 @@ export interface InvestmentSimulationResult {
   foundationType: 'eucalyptus' | 'radier';
   hasDoubleWall: boolean;
   includeBaseFloor: boolean;
+  isDuplex?: boolean;
+  bedroomsCount?: number;
+  bathroomsCount?: number;
   
   produtos: CostItem[];
   subtotalProdutos: number;
@@ -65,26 +71,46 @@ export function calculateInvestmentSimulation(options: InvestmentSimulationOptio
     foundationType = 'eucalyptus',
     includeBaseFloor = false,
     hasDoubleWall = false,
+    customType = 'casa',
+    isDuplex = false,
+    customBedrooms = 2,
+    customSuites = 1,
+    hasSocialBathroom = true,
   } = options;
 
-  const staticModel = CABIN_MODELS.find((m) => m.id === modelId);
-  const area = customArea || (staticModel ? staticModel.area : 52);
-  const modelName = staticModel ? staticModel.name : `Projeto Sob Medida (${area}m²)`;
+  const isCustom = modelId === 'custom' || modelId.startsWith('custom');
+  const staticModel = !isCustom ? CABIN_MODELS.find((m) => m.id === modelId) : null;
+  const area = customArea || (staticModel ? staticModel.area : 65);
   
-  const isAFrame = !isVerticalWallModel(modelId);
-  const canHaveDoubleWall = !isAFrame;
-  const isCamping = isCampingModel(modelId, area);
+  // Tipologia construtiva
+  let isAFrame = false;
+  let canHaveDoubleWall = false;
+  let modelName = '';
+
+  if (isCustom) {
+    isAFrame = customType === 'chale';
+    canHaveDoubleWall = !isAFrame; // Se for Casa, pode ter parede dupla
+    const styleLabel = customType === 'casa' ? (isDuplex ? 'Casa Duplex' : 'Casa Térrea') : (isDuplex ? 'Chalé Duplex' : 'Chalé');
+    modelName = `Projeto Sob Medida: ${styleLabel} (${area}m²)`;
+  } else {
+    isAFrame = !isVerticalWallModel(modelId);
+    canHaveDoubleWall = !isAFrame;
+    modelName = staticModel ? staticModel.name : `Chalé (${area}m²)`;
+  }
+
+  const isCamping = !isCustom && isCampingModel(modelId, area);
   const isGuarajuba = modelId === 'guarajuba';
 
   // 1. Kit Madeiramento (à vista com 10% desc)
-  let kitPriceTabela = staticModel ? staticModel.kitPrice : (area <= 12 ? area * 906 : area <= 80 ? area * 748 : area * 690);
+  let kitPriceTabela = staticModel 
+    ? staticModel.kitPrice 
+    : (area <= 12 ? area * 906 : area <= 80 ? area * 748 : area * 690);
   const kitPriceAVista = Math.round(kitPriceTabela * 0.90);
 
   // 2. Frete Kit Madeiramento da Fábrica
   const kitFreight = staticModel?.freightPrice || (area < 15 ? 1100 : area <= 35 ? 3600 : area <= 55 ? 4500 : 5500);
 
   // 3. Telhas e Cobertura
-  // Guarajuba (52m²) = 5.500
   const telhasPrice = isGuarajuba 
     ? 5500 
     : isCamping 
@@ -92,15 +118,12 @@ export function calculateInvestmentSimulation(options: InvestmentSimulationOptio
       : Math.round(Math.max(2200, area * 105));
 
   // 4. Manta Térmica
-  // Guarajuba = 350
   const mantaPrice = isGuarajuba ? 350 : isCamping ? 180 : Math.round(Math.max(200, area * 7));
 
   // 5. Ferragens de montagem
-  // Guarajuba = 1.800
   const ferragensPrice = isGuarajuba ? 1800 : isCamping ? 800 : Math.round(Math.max(900, area * 35));
 
   // 6. Esquadrias, Vidros e Fachada
-  // Guarajuba: Fachada vidro 7.500 + janelas/basculantes 1.000
   let fachadaVidro = 0;
   let janelaBasculante = 0;
   if (isCamping) {
@@ -129,17 +152,18 @@ export function calculateInvestmentSimulation(options: InvestmentSimulationOptio
   } else {
     // Base Elevada de Eucalipto
     pilaresEucalipto = isGuarajuba ? 1000 : isCamping ? 500 : Math.round(Math.max(600, area * 20));
-    // Guarajuba já tem chassi/assoalho incluso no kit padrão de fábrica
     if (!isGuarajuba && includeBaseFloor) {
       baseBarroteAssoalho = Math.round(area * 150); // R$ 150/m² (barrotes + assoalho)
     }
   }
 
   // 8. Stain Protetor
-  // Guarajuba = 1.600
   const stainPrice = isGuarajuba ? 1600 : isCamping ? 600 : Math.round(Math.max(800, area * 30));
 
-  // 9. Parede Dupla (Madeiramento)
+  // 9. Adicional Duplex (+R$ 120/m²)
+  const adicionalDuplex = (isCustom && isDuplex) ? Math.round(area * 120) : 0;
+
+  // 10. Parede Dupla (Madeiramento)
   // R$ 192,00/m² (4 peças/m² * R$ 48)
   let paredeDuplaMaterial = 0;
   let paredeDuplaPecas = 0;
@@ -148,22 +172,36 @@ export function calculateInvestmentSimulation(options: InvestmentSimulationOptio
     paredeDuplaMaterial = paredeDuplaPecas * 48; // ex: Caymmi 60m² = 240 peças * 48 = 11.520
   }
 
-  // 10. Cozinha e Banheiro (Produtos)
-  const numBanheiros = isCamping ? 0 : 1;
+  // 11. Quantitativos de Cômodos (Banheiros e Quartos)
+  let numBanheiros = 1;
+  let numQuartos = 1;
+
+  if (isCamping) {
+    numBanheiros = 0;
+    numQuartos = 1;
+  } else if (isCustom) {
+    numBanheiros = Math.max(1, (customSuites || 0) + (hasSocialBathroom ? 1 : 0));
+    numQuartos = Math.max(1, customBedrooms || 2);
+  }
+
   const numCozinhas = isCamping ? 0 : 1;
 
-  const portasFechadura = isCamping ? 300 : (numBanheiros * 500) + (isAFrame ? 0 : 800);
+  // Portas internas e fechaduras: 1 por banheiro + 1 por quarto
+  const portasFechadura = isCamping 
+    ? 300 
+    : (numBanheiros * 500) + (isAFrame ? 0 : (numQuartos * 500));
+
   const matEletrico = isCamping ? 400 : isGuarajuba ? 1100 : Math.round(Math.max(600, area * 22));
-  const matHidraulico = isCamping ? 0 : isGuarajuba ? 500 : Math.round(Math.max(400, area * 10));
+  const matHidraulico = isCamping ? 0 : isGuarajuba ? 500 : Math.round(Math.max(400, (area * 8) + (numBanheiros * 200)));
   const cozinhaBancada = numCozinhas * 1300;
 
-  // Banheiro completo
+  // Itens do banheiro (multiplicados por cada banheiro real)
   const boxBlindex = numBanheiros * 2000;
   const loucasMetaisBanheiro = numBanheiros * 1100;
   const placaCimenticiaParedes = numBanheiros * 600;
   const placaCimenticiaPiso = numBanheiros * 200;
   const drywallBanheiro = numBanheiros * 300;
-  const pisoRevestimentoCeramico = numBanheiros * 1000; // Até 4m²
+  const pisoRevestimentoCeramico = numBanheiros * 1000; // Até 4m² por banheiro
 
   // Montar lista de PRODUTOS
   const produtos: CostItem[] = [
@@ -172,14 +210,14 @@ export function calculateInvestmentSimulation(options: InvestmentSimulationOptio
       name: `Kit Madeiramento Estrutural (${area}m²)`,
       category: 'produto',
       value: kitPriceAVista,
-      detail: `Madeira autoclave com 10% desc. à vista (Tabela: R$ ${kitPriceTabela.toLocaleString('pt-BR')})`,
+      detail: `Pinus tratado em autoclave com 10% desc. à vista (Tabela: R$ ${kitPriceTabela.toLocaleString('pt-BR')})`,
     },
     {
       id: 'frete-kit',
       name: 'Frete Kit Madeiramento (Fábrica até Lote)',
       category: 'produto',
       value: kitFreight,
-      detail: 'Caminhão exclusivo de fábrica',
+      detail: 'Transporte dedicado de fábrica',
     },
     {
       id: 'telhas',
@@ -224,10 +262,10 @@ export function calculateInvestmentSimulation(options: InvestmentSimulationOptio
     },
     {
       id: 'portas-fechaduras',
-      name: isCamping ? 'Porta e Fechadura' : 'Portas e Fechaduras',
+      name: isCamping ? 'Porta e Fechadura' : `Portas e Fechaduras (${numQuartos + numBanheiros} kits)`,
       category: 'produto',
       value: portasFechadura,
-      detail: isCamping ? 'Kit porta principal' : 'Kit portas e fechaduras completas',
+      detail: isCamping ? 'Kit porta principal' : 'Portas internas para quartos e banheiros com fechaduras',
     },
     {
       id: 'mat-eletrico',
@@ -236,6 +274,17 @@ export function calculateInvestmentSimulation(options: InvestmentSimulationOptio
       value: matEletrico,
     },
   ];
+
+  // Se for Duplex, adiciona kit estrutural do 2º pavimento
+  if (isCustom && isDuplex) {
+    produtos.push({
+      id: 'adicional-duplex',
+      name: `Estrutura Duplex / Mezanino (${area}m²)`,
+      category: 'produto',
+      value: adicionalDuplex,
+      detail: 'Escada em madeira maciça, barrotes reforçados, assoalho do pavimento superior e guarda-corpo (+R$ 120/m²)',
+    });
+  }
 
   // Fundação na lista de produtos
   if (foundationType === 'radier') {
@@ -277,7 +326,7 @@ export function calculateInvestmentSimulation(options: InvestmentSimulationOptio
   }
 
   // Itens de Cozinha e Banheiro se não for camping
-  if (!isCamping) {
+  if (!isCamping && numBanheiros > 0) {
     produtos.push(
       {
         id: 'mat-hidraulico',
@@ -293,39 +342,39 @@ export function calculateInvestmentSimulation(options: InvestmentSimulationOptio
       },
       {
         id: 'box-blindex',
-        name: 'Box Blindex Banheiro',
+        name: `Box Blindex Banheiro (${numBanheiros} ${numBanheiros > 1 ? 'unidades' : 'unidade'})`,
         category: 'produto',
         value: boxBlindex,
-        detail: 'Vidro temperado 8mm com kit perfis',
+        detail: 'Vidro temperado 8mm com kit perfis de alumínio',
       },
       {
         id: 'loucas-metais-banheiro',
-        name: 'Louças e Metais do Banheiro',
+        name: `Louças e Metais Banheiro (${numBanheiros} ${numBanheiros > 1 ? 'banheiros' : 'banheiro'})`,
         category: 'produto',
         value: loucasMetaisBanheiro,
-        detail: 'Vaso sanitário com caixa acoplada, cuba e torneira',
+        detail: 'Vaso com caixa acoplada, cuba e torneira de bancada',
       },
       {
         id: 'placa-cimenticia-parede',
-        name: 'Placa Cimentícia / Drywall Paredes Banheiro',
+        name: `Placa Cimentícia / Drywall Banheiro (${numBanheiros} ${numBanheiros > 1 ? 'banheiros' : 'banheiro'})`,
         category: 'produto',
         value: placaCimenticiaParedes,
       },
       {
         id: 'placa-cimenticia-piso',
-        name: 'Placa Cimentícia Base Piso Banheiro',
+        name: `Placa Cimentícia Base Piso (${numBanheiros} ${numBanheiros > 1 ? 'banheiros' : 'banheiro'})`,
         category: 'produto',
         value: placaCimenticiaPiso,
       },
       {
         id: 'drywall-banheiro',
-        name: 'Drywall Revestimento Áreas Úmidas',
+        name: `Drywall Áreas Úmidas (${numBanheiros} ${numBanheiros > 1 ? 'banheiros' : 'banheiro'})`,
         category: 'produto',
         value: drywallBanheiro,
       },
       {
         id: 'piso-revestimento-ceramico',
-        name: 'Piso e Revestimento Cerâmico Banheiro (até 4m²)',
+        name: `Piso e Revestimento Cerâmico (${numBanheiros} ${numBanheiros > 1 ? 'banheiros' : 'banheiro'} de até 4m²)`,
         category: 'produto',
         value: pisoRevestimentoCeramico,
         detail: 'Piso cerâmico e revestimento de paredes do box',
@@ -335,8 +384,8 @@ export function calculateInvestmentSimulation(options: InvestmentSimulationOptio
 
   const subtotalProdutos = produtos.reduce((acc, curr) => acc + curr.value, 0);
 
-  // 11. SERVIÇOS
-  // Mão de Obra de Montagem Completa: R$ 500/m² (mínimo de R$ 3.500 para camping pequeno)
+  // 12. SERVIÇOS
+  // Mão de Obra de Montagem Completa: R$ 500/m²
   const montagemBase = isGuarajuba 
     ? 26000 
     : Math.round(Math.max(3500, area * 500));
@@ -410,10 +459,10 @@ export function calculateInvestmentSimulation(options: InvestmentSimulationOptio
   const custoPorM2 = Math.round(totalInvestimento / area);
 
   const observations = [
+    'A opção comercial "Wood Bahia Chave na Mão" é um contrato específico com garantia técnica unificada.',
+    'Esta planilha contempla a simulação integral de canteiro, essencial para quem opta por Kit Madeiramento ou Montagem Parceira planejar os custos de acabamento sem surpresas.',
     'Calhas pluviais, paisagismo, móveis soltos e decoração de interiores NÃO compõem este custo.',
-    'Os valores de materiais complementares de acabamento referem-se a referências médias de mercado da Bahia.',
-    'A fundação em radier é uma estimativa para terreno nivelado; condições topográficas acentuadas podem requerer terraplanagem.',
-    'Esta simulação tem caráter orientativo para planejamento financeiro global do investidor.',
+    'A fundação em radier é uma estimativa para terreno nivelado; condições com desnível acentuado podem demandar terraplanagem prévia.',
   ];
 
   return {
@@ -424,6 +473,9 @@ export function calculateInvestmentSimulation(options: InvestmentSimulationOptio
     foundationType,
     hasDoubleWall: canHaveDoubleWall && hasDoubleWall,
     includeBaseFloor: !isGuarajuba && includeBaseFloor,
+    isDuplex,
+    bedroomsCount: numQuartos,
+    bathroomsCount: numBanheiros,
     produtos,
     subtotalProdutos,
     servicos,
