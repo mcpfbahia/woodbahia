@@ -124,21 +124,23 @@ export function calculateInvestmentSimulation(options: InvestmentSimulationOptio
   const ferragensPrice = isGuarajuba ? 1800 : isCamping ? 800 : Math.round(Math.max(900, area * 35));
 
   // 6. Esquadrias, Vidros e Fachada
+  // Em chalés A-Frame, a fachada frontal é um frontão triangular inteiro em vidro temperado (corte em ângulo, pé-direito duplo e porta blindex), piso mínimo de R$ 7.500.
+  // Em casas, as paredes são de madeira e os vidros são esquadrias retangulares convencionais (em torno de R$ 4.500 a R$ 5.200).
   let fachadaVidro = 0;
   let janelaBasculante = 0;
   if (isCamping) {
-    fachadaVidro = 1800;
+    fachadaVidro = 3500;
     janelaBasculante = 400;
-  } else if (isGuarajuba) {
-    fachadaVidro = 7500;
-    janelaBasculante = 1000;
   } else if (isAFrame) {
-    fachadaVidro = Math.round(Math.max(3500, area * 140));
+    // Chalés A-Frame: piso de R$ 7.500 para frontão triangular completo, escalando se > 52m²
+    fachadaVidro = area <= 52 
+      ? 7500 
+      : Math.round(7500 + (area - 52) * 120);
     janelaBasculante = 1000;
   } else {
-    // Casas com janelas e portas de vidro
-    fachadaVidro = Math.round(Math.max(4000, area * 110));
-    janelaBasculante = 1500;
+    // Casas com paredes verticais: portas de correr e janelas retangulares prontas
+    fachadaVidro = Math.round(Math.min(5500, Math.max(4200, 3800 + (area * 20))));
+    janelaBasculante = 1200;
   }
 
   // 7. Base e Fundação
